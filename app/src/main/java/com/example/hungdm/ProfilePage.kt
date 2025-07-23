@@ -3,6 +3,7 @@ package com.example.lession6
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -57,12 +60,19 @@ fun ProfilePage(modifier: Modifier = Modifier) {
     var input by remember { mutableStateOf(Input()) }
     var showPopup by rememberSaveable { mutableStateOf(false) }
     var isEdit by rememberSaveable { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(16.dp),
+            .padding(16.dp)
+            .pointerInput(Unit){
+                detectTapGestures {
+                    focusManager.clearFocus()
+                }
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if(showPopup){
@@ -273,16 +283,15 @@ fun Item(
     value: String="",
     hint: String ="",
     isValid: Boolean = true,
-    isEdit:Boolean = false,
+    isEdit: Boolean = false,
     onValueChange: (String) -> Unit = {},
     fontSize: TextUnit = 14.sp,
     fontWeight: FontWeight = FontWeight(500),
     color: Color = Color.Gray,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
 ) {
-    Column(
-        modifier = Modifier.background(Color.White)
-    ) {
+
+    Column() {
         Text(
             modifier = modifier,
             text=text,

@@ -68,6 +68,7 @@ fun ProfilePage(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(16.dp)
             .pointerInput(Unit){
                 detectTapGestures {
@@ -299,7 +300,7 @@ fun Item(
             color = color
         )
 
-        Spacer(Modifier.size(10.dp))
+        Spacer(Modifier.size(4.dp))
 
         OutlinedTextField(
             modifier = modifier,

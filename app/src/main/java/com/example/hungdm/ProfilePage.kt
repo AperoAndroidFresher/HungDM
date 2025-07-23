@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
@@ -66,7 +68,6 @@ fun ProfilePage(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
             .padding(16.dp)
             .pointerInput(Unit){
                 detectTapGestures {
@@ -114,7 +115,7 @@ fun ProfilePage(modifier: Modifier = Modifier) {
         ) {
             Row{
                 Item(
-                    modifier2 = Modifier.width(160.dp),
+                    modifier = Modifier.width(160.dp),
                     text = "Name".uppercase(),
                     hint = "Enter your name...",
                     value = input.name,
@@ -128,7 +129,7 @@ fun ProfilePage(modifier: Modifier = Modifier) {
                 Spacer(Modifier.weight(1f))
 
                 Item(
-                    modifier2 = Modifier.width(180.dp),
+                    modifier = Modifier.width(180.dp),
                     text = "Phone number".uppercase(),
                     hint = "Your phone number...",
                     value = input.phone,
@@ -144,7 +145,7 @@ fun ProfilePage(modifier: Modifier = Modifier) {
             Spacer(Modifier.size(20.dp))
 
             Item(
-                modifier2 = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 text = "University name".uppercase(),
                 hint = "Your university name...",
                 value = input.uni,
@@ -158,7 +159,7 @@ fun ProfilePage(modifier: Modifier = Modifier) {
             Spacer(Modifier.size(20.dp))
 
             Item(
-                modifier2 = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
                 text = "describe yourself".uppercase(),
@@ -278,7 +279,6 @@ fun PopUp(
 @Composable
 fun Item(
     modifier: Modifier = Modifier,
-    modifier2: Modifier = Modifier,
     text: String ="",
     value: String="",
     hint: String ="",
@@ -293,7 +293,6 @@ fun Item(
 
     Column() {
         Text(
-            modifier = modifier,
             text=text,
             fontSize = fontSize,
             fontWeight = fontWeight,
@@ -303,7 +302,7 @@ fun Item(
         Spacer(Modifier.size(10.dp))
 
         OutlinedTextField(
-            modifier = modifier2,
+            modifier = modifier,
             textStyle = TextStyle(
                 color= Color.Black,
                 fontSize = 14.sp

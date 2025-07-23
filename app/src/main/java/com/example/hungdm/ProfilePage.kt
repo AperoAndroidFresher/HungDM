@@ -2,6 +2,7 @@ package com.example.lession6
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
@@ -28,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,17 +40,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.hungdm.R
 import kotlinx.coroutines.delay
 
 @Preview
 @Composable
 fun ProfilePage(modifier: Modifier = Modifier) {
+
+    var input by remember { mutableStateOf(Input()) }
+    var showPopup by rememberSaveable { mutableStateOf(false) }
+    var isEdit by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -56,31 +65,39 @@ fun ProfilePage(modifier: Modifier = Modifier) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-
-            Text(
-                text = "My Information".uppercase(),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.align(Alignment.Center)
-            )
-
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = null,
+        if(showPopup){
+            PopUp(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(30.dp)
+                    .background(Color(0xFFFEFEFE), RoundedCornerShape(20.dp))
+                    .height(350.dp)
+                    .width(330.dp)
             )
+            LaunchedEffect(Unit) {
+                delay(2000)
+                showPopup = false
+            }
         }
+
+        Title(
+            isEdit = isEdit,
+            title = "My Information",
+            onClick = {
+                isEdit = true
+            }
+        )
 
         Spacer(Modifier.size(20.dp))
 
-        Avatar()
+        Image(
+            painter = painterResource(R.drawable.img),
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
+            modifier= Modifier
+                .clip(CircleShape)
+                .size(120.dp)
+        )
 
-        Spacer(Modifier.size(40.dp))
+        Spacer(Modifier.size(20.dp))
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -90,6 +107,12 @@ fun ProfilePage(modifier: Modifier = Modifier) {
                     modifier2 = Modifier.width(160.dp),
                     text = "Name".uppercase(),
                     hint = "Enter your name...",
+                    value = input.name,
+                    isValid = input.nameValid,
+                    isEdit = isEdit,
+                    onValueChange = {
+                        input=input.copy(name = it)
+                    }
                 )
 
                 Spacer(Modifier.weight(1f))
@@ -97,7 +120,14 @@ fun ProfilePage(modifier: Modifier = Modifier) {
                 Item(
                     modifier2 = Modifier.width(180.dp),
                     text = "Phone number".uppercase(),
-                    hint = "Your phone number..."
+                    hint = "Your phone number...",
+                    value = input.phone,
+                    isValid = input.phoneValid,
+                    isEdit = isEdit,
+                    onValueChange = {
+                        input=input.copy(phone = it)
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
 
@@ -107,6 +137,12 @@ fun ProfilePage(modifier: Modifier = Modifier) {
                 modifier2 = Modifier.fillMaxWidth(),
                 text = "University name".uppercase(),
                 hint = "Your university name...",
+                value = input.uni,
+                isValid = input.uniValid,
+                isEdit = isEdit,
+                onValueChange = {
+                    input=input.copy(uni = it)
+                }
             )
 
             Spacer(Modifier.size(20.dp))
@@ -117,14 +153,34 @@ fun ProfilePage(modifier: Modifier = Modifier) {
                     .height(200.dp),
                 text = "describe yourself".uppercase(),
                 hint = "Enter a description about yourself...",
-                maxLines = 5
+                value = input.desc,
+                isEdit = isEdit,
+                onValueChange = {
+                    input=input.copy(desc = it)
+                }
             )
+        }
 
+        Spacer(Modifier.size(20.dp))
 
-            Spacer(Modifier.size(30.dp))
-
+        if(isEdit){
             Button(
-                onClick = {},
+                onClick = {
+                    val nameValid = isValid(input.name)
+                    val phoneValid = isValidPhone(input.phone)
+                    val uniValid = isValid(input.uni)
+
+                    input = input.copy(
+                        nameValid = nameValid,
+                        phoneValid = phoneValid,
+                        uniValid = uniValid
+                    )
+
+                    if (nameValid && phoneValid && uniValid) {
+                        isEdit = false
+                        showPopup = true
+                    }
+                },
                 shape = RoundedCornerShape(5.dp),
                 colors = ButtonDefaults.buttonColors(Color.Black),
                 modifier = Modifier
@@ -133,68 +189,81 @@ fun ProfilePage(modifier: Modifier = Modifier) {
             ) {
                 Text(text="Submit", fontSize = 16.sp, color = Color.White)
             }
-
         }
 
-
-
     }
 }
 
 @Composable
-fun Avatar(modifier: Modifier = Modifier) {
-    Box {
-        Image(
-            painter = painterResource(R.drawable.img),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            modifier= Modifier
-                .clip(CircleShape)
-                .size(150.dp)
-        )
-        Icon(
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = null,
-            modifier = Modifier.align(Alignment.BottomEnd),
-            tint = Color(0xFF0866FF)
-        )
-    }
-}
-
-@Composable
-fun TestPopUp(modifier: Modifier = Modifier) {
-    var showPopUp by remember { mutableStateOf(true) }
-
-    LaunchedEffect(Unit) {
-        delay(2000)
-        showPopUp=false
-    }
-
-
+fun Title(
+    modifier: Modifier = Modifier,
+    isEdit: Boolean = false,
+    title: String ="",
+    onClick: ()->Unit = {}
+) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-    ){
-        ProfilePage()
+        modifier = modifier.fillMaxWidth(),
+    ) {
 
-        if (showPopUp) {
-            Box(
+        Text(
+            text = title.uppercase(),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.align(Alignment.Center)
+        )
+
+        if(!isEdit){
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = null,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0x800E0D0D))
+                    .clickable { onClick() }
+                    .align(Alignment.TopEnd)
+                    .size(30.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun PopUp(
+    modifier: Modifier = Modifier,
+) {
+    Dialog(onDismissRequest = {  }) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            Column (
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ){
-                PopUp(
-                    modifier = Modifier.align(Alignment.Center)
-                        .background(Color(0xFFFEFEFE), RoundedCornerShape(20.dp))
-                        .height(350.dp)
-                        .width(330.dp)
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = Color(0xFF25AE88),
+                    modifier = Modifier.size(97.dp)
                 )
+
+                Text(
+                    text = "Success!",
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF25AE88)
+                )
+                Spacer(Modifier.size(20.dp))
+
+                Text(
+                    text = "Your information has \nbeen updated!",
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight(400),
+                    fontSize = 20.sp
+                )
+
             }
         }
-
     }
 }
-
 
 @Composable
 fun Item(
@@ -203,12 +272,17 @@ fun Item(
     text: String ="",
     value: String="",
     hint: String ="",
+    isValid: Boolean = true,
+    isEdit:Boolean = false,
+    onValueChange: (String) -> Unit = {},
     fontSize: TextUnit = 14.sp,
     fontWeight: FontWeight = FontWeight(500),
     color: Color = Color.Gray,
-    maxLines: Int =1
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
 ) {
-    Column {
+    Column(
+        modifier = Modifier.background(Color.White)
+    ) {
         Text(
             modifier = modifier,
             text=text,
@@ -226,43 +300,40 @@ fun Item(
                 fontSize = 14.sp
             ),
             value = value,
-            onValueChange = {},
+            onValueChange = onValueChange,
             placeholder = {
                 Text(text = hint, fontSize = 14.sp, color = color)
             },
-            maxLines = maxLines
+            keyboardOptions = keyboardOptions,
+            enabled = isEdit,
         )
+        Spacer(Modifier.size(4.dp))
+
+        if(!isValid){
+            Text(
+                text = "Invalid format",
+                color = Color.Red
+            )
+        }
     }
 }
 
-@Composable
-fun PopUp(modifier: Modifier = Modifier) {
-    Column (
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        Icon(
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = null,
-            tint = Color(0xFF25AE88),
-            modifier = Modifier.size(97.dp)
-        )
+data class Input(
+    var name: String ="",
+    var phone: String ="",
+    var uni: String ="",
+    var desc: String ="",
+    var nameValid: Boolean = true,
+    var phoneValid: Boolean = true,
+    var uniValid: Boolean = true
+)
 
-        Text(
-            text = "Success!",
-            fontSize = 36.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF25AE88)
-        )
-        Spacer(Modifier.size(20.dp))
+fun isValid(str: String): Boolean {
+    val regex = Regex("^[a-zA-Z]+$")
+    return regex.matches(str) && str.isNotEmpty()
+}
 
-        Text(
-            text = "Your information has \nbeen updated!",
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight(400),
-            fontSize = 20.sp
-        )
-
-    }
+fun isValidPhone(str: String): Boolean {
+    val regex = Regex("^\\d+$")
+    return regex.matches(str) && str.isNotEmpty()
 }

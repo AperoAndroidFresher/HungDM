@@ -1,5 +1,11 @@
 package com.example.lession6
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,11 +21,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
@@ -68,9 +72,8 @@ fun ProfilePage(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
             .padding(16.dp)
-            .pointerInput(Unit){
+            .pointerInput(Unit) {
                 detectTapGestures {
                     focusManager.clearFocus()
                 }
@@ -241,37 +244,43 @@ fun Title(
 fun PopUp(
     modifier: Modifier = Modifier,
 ) {
-    Dialog(onDismissRequest = {  }) {
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            Column (
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    tint = Color(0xFF25AE88),
-                    modifier = Modifier.size(97.dp)
-                )
+    AnimatedVisibility(
+        visible = true,
+        enter = fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.9f),
+        exit = fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.9f)
+    ){
+        Dialog(onDismissRequest = { }) {
+            Box(
+                modifier = modifier,
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = Color(0xFF25AE88),
+                        modifier = Modifier.size(97.dp)
+                    )
 
-                Text(
-                    text = "Success!",
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF25AE88)
-                )
-                Spacer(Modifier.size(20.dp))
+                    Text(
+                        text = "Success!",
+                        fontSize = 36.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF25AE88)
+                    )
+                    Spacer(Modifier.size(20.dp))
 
-                Text(
-                    text = "Your information has \nbeen updated!",
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight(400),
-                    fontSize = 20.sp
-                )
+                    Text(
+                        text = "Your information has \nbeen updated!",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight(400),
+                        fontSize = 20.sp
+                    )
 
+                }
             }
         }
     }

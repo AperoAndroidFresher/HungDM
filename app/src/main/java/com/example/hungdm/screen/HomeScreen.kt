@@ -50,59 +50,59 @@ fun HomeScreen(
     onClickPlaylist:  () -> Unit = {}
 ) {
 
-    val bottomItem = listOf(
-        BottomItem("Home", Icons.Default.Home),
-        BottomItem("Library", Icons.Default.DateRange),
-        BottomItem("Playlist", Icons.Default.PlayArrow)
-    )
-    var selected by remember { mutableStateOf(0) }
+//    val bottomItem = listOf(
+//        BottomItem("Home", Icons.Default.Home),
+//        BottomItem("Library", Icons.Default.DateRange),
+//        BottomItem("Playlist", Icons.Default.PlayArrow)
+//    )
+//    var selected by remember { mutableStateOf(0) }
 
     BackHandler { onBack() }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Row(Modifier.fillMaxWidth()) {
-                        Spacer(Modifier.weight(1f))
-                        IconButton(onClickProfile) { Icon(Icons.Default.AccountCircle, null) }
-                    }
-                },
-
-            )
-        },
-        bottomBar = {
-            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-                bottomItem.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selected == index,
-                        onClick = {
-                            selected = index
-                            if(selected==2) onClickPlaylist()
-                        },
-                        icon = {
-                            Icon(
-                                item.icon,
-                                contentDescription = null
-                            )
-                        },
-                        label = { Text(item.label) }
-                    )
-                }
-            }
-        }
-    ) { padding ->
+//    Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                colors = TopAppBarDefaults.topAppBarColors(
+//                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+//                    titleContentColor = MaterialTheme.colorScheme.primary,
+//                ),
+//                title = {
+//                    Row(Modifier.fillMaxWidth()) {
+//                        Spacer(Modifier.weight(1f))
+//                        IconButton(onClickProfile) { Icon(Icons.Default.AccountCircle, null) }
+//                    }
+//                },
+//
+//            )
+//        },
+//        bottomBar = {
+//            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
+//                bottomItem.forEachIndexed { index, item ->
+//                    NavigationBarItem(
+//                        selected = selected == index,
+//                        onClick = {
+//                            selected = index
+//                            if(selected==2) onClickPlaylist()
+//                        },
+//                        icon = {
+//                            Icon(
+//                                item.icon,
+//                                contentDescription = null
+//                            )
+//                        },
+//                        label = { Text(item.label) }
+//                    )
+//                }
+//            }
+//        }
+//    ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
 
         }
-    }
+//    }
 }

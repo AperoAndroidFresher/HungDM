@@ -1,11 +1,5 @@
-package com.example.hungdm
+package com.example.hungdm.screen
 
-import android.app.ComponentCaller
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,14 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,56 +27,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.hungdm.ui.theme.*
-
-class LoginActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-
-            val user = intent.getStringExtra("user") ?: ""
-            val pass = intent.getStringExtra("pass") ?: ""
-            LoginScreen(
-                user=user,
-                pass=pass,
-                onClick = {
-                    val intent = Intent(this, SignupActivity::class.java)
-                    startActivity(intent)
-                }
-            )
-        }
-    }
-
-}
-
-
+import com.example.hungdm.InputText
+import com.example.hungdm.Logo
+import com.example.hungdm.UserInfo
 
 @Preview
 @Composable
 fun LoginScreen(
-    user: String = "",
-    pass: String = "",
     modifier: Modifier = Modifier,
-    onClick: ()->Unit = {}
+    userInfo: UserInfo=UserInfo(),
+    onClickSignup: ()->Unit = {},
+    onClickLogin: (UserInfo)->Unit={},
+    onValueChangeUsername: (String)->Unit={},
+    onValueChangePassword: (String)->Unit={},
 ) {
 
-    var user by remember { mutableStateOf(user) }
-    var pass by remember { mutableStateOf(pass) }
     var showPass by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -99,23 +64,19 @@ fun LoginScreen(
 
         InputText(
             title = "Username",
-            value = user,
-            onValueChange = {
-                user=it
-            }
+            value = userInfo.username,
+            onValueChange = onValueChangeUsername
         )
 
         Spacer(Modifier.size(10.dp))
 
         InputText(
             title = "Password",
-            value = pass,
+            value = userInfo.password,
             leadingIcon = Icons.Default.Lock,
             isPass = true,
             showPass = showPass,
-            onValueChange = {
-                pass=it
-            },
+            onValueChange = onValueChangePassword,
             onClickShowPass = {
                 showPass=!showPass
             }
@@ -148,7 +109,7 @@ fun LoginScreen(
             modifier = Modifier
                 .width(380.dp)
                 .height(60.dp),
-            onClick = {},
+            onClick = { onClickLogin(userInfo) },
             colors = ButtonDefaults.buttonColors(Color(0xFF76D7E6))
         ) {
             Text(
@@ -171,9 +132,11 @@ fun LoginScreen(
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = Color.White,
-            modifier = Modifier.padding(10.dp).padding(bottom = 20.dp)
+            modifier = Modifier
+                .padding(10.dp)
+                .padding(bottom = 20.dp)
                 .clickable {
-                    onClick()
+                    onClickSignup()
                 }
         )
     }

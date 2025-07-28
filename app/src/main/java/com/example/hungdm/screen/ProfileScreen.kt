@@ -1,5 +1,6 @@
-package com.example.lession6
+package com.example.hungdm.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -24,19 +25,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,16 +53,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hungdm.R
+import com.example.hungdm.UserInfo
 import com.example.hungdm.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
+@Preview
 @Composable
-fun ProfilePage(modifier: Modifier = Modifier) {
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    userInfo: UserInfo = UserInfo(),
+    isEditUser: Boolean = false,
+    onBack:()->Unit = {}
+) {
 
     var input by remember { mutableStateOf(Input()) }
     var showPopup by rememberSaveable { mutableStateOf(false) }
@@ -80,6 +82,8 @@ fun ProfilePage(modifier: Modifier = Modifier) {
             showPopup = false
         }
     }
+
+    BackHandler { onBack() }
 
     AppTheme (
         darkTheme = darkTheme,
@@ -140,13 +144,13 @@ fun ProfilePage(modifier: Modifier = Modifier) {
                         modifier = Modifier.width(160.dp),
                         text = "Name".uppercase(),
                         hint = "Enter your name...",
-                        value = input.name,
+                        value = input.name + userInfo.username,
                         isValid = input.nameValid,
                         isEdit = isEdit,
                         color = colorScheme.primary,
                         color1 = colorScheme.onSecondary,
                         onValueChange = {
-                            input = input.copy(name = it)
+                            input = input.copy(name = it, nameValid = true)
                         }
                     )
 
@@ -162,13 +166,13 @@ fun ProfilePage(modifier: Modifier = Modifier) {
                         color = colorScheme.primary,
                         color1 = colorScheme.onSecondary,
                         onValueChange = {
-                            input = input.copy(phone = it)
+                            input = input.copy(phone = it, phoneValid = true)
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
 
-                Spacer(Modifier.size(20.dp))
+                Spacer(Modifier.size(10.dp))
 
                 Item(
                     modifier = Modifier.fillMaxWidth(),
@@ -180,16 +184,31 @@ fun ProfilePage(modifier: Modifier = Modifier) {
                     color = colorScheme.primary,
                     color1 = colorScheme.onSecondary,
                     onValueChange = {
-                        input = input.copy(uni = it)
+                        input = input.copy(uni = it, uniValid = true)
                     }
                 )
 
-                Spacer(Modifier.size(20.dp))
+                Spacer(Modifier.size(10.dp))
+
+                Item(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "Email".uppercase(),
+                    hint = "Your email...",
+                    value = input.email,
+                    isEdit = isEdit,
+                    color = colorScheme.primary,
+                    color1 = colorScheme.onSecondary,
+                    onValueChange = {
+                        input = input.copy(email = it)
+                    }
+                )
+
+                Spacer(Modifier.size(10.dp))
 
                 Item(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp),
+                        .height(150.dp),
                     text = "describe yourself".uppercase(),
                     hint = "Enter a description about yourself...",
                     value = input.desc,
@@ -351,7 +370,6 @@ fun Item(
             color = color
         )
 
-        Spacer(Modifier.size(4.dp))
 
         OutlinedTextField(
             modifier = modifier.background(color1),
@@ -382,6 +400,7 @@ data class Input(
     var name: String ="",
     var phone: String ="",
     var uni: String ="",
+    var email:String ="",
     var desc: String ="",
     var nameValid: Boolean = true,
     var phoneValid: Boolean = true,

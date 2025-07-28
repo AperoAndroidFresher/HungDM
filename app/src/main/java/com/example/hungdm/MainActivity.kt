@@ -1,6 +1,5 @@
 package com.example.hungdm
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,8 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.hungdm.ui.theme.*
+import com.example.hungdm.navigation.AppNavigation
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -23,12 +21,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Splash(
-                run = {
-                    startActivity(Intent(Intent(this, LoginActivity::class.java)))
-                    finish()
-                }
-            )
+            AppNavigation()
         }
     }
 }

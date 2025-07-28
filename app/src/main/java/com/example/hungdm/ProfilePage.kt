@@ -24,14 +24,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,182 +62,219 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hungdm.R
+import com.example.hungdm.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
-@Preview
 @Composable
 fun ProfilePage(modifier: Modifier = Modifier) {
 
     var input by remember { mutableStateOf(Input()) }
     var showPopup by rememberSaveable { mutableStateOf(false) }
     var isEdit by rememberSaveable { mutableStateOf(false) }
+    var darkTheme by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    focusManager.clearFocus()
-                }
-            },
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    LaunchedEffect(showPopup) {
         if(showPopup){
+            delay(2000)
+            showPopup = false
+        }
+    }
+
+    AppTheme (
+        darkTheme = darkTheme,
+        dynamicColor = false
+    ) {
+        Column(
+            modifier = modifier
+                .background(colorScheme.background)
+                .fillMaxSize()
+                .padding(16.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures {
+                        focusManager.clearFocus()
+                    }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+
             PopUp(
                 modifier = Modifier
                     .background(Color(0xFFFEFEFE), RoundedCornerShape(20.dp))
                     .height(350.dp)
-                    .width(330.dp)
+                    .width(330.dp),
+                visible = showPopup
             )
-            LaunchedEffect(Unit) {
-                delay(2000)
-                showPopup = false
-            }
-        }
 
-        Title(
-            isEdit = isEdit,
-            title = "My Information",
-            onClick = {
-                isEdit = true
-            }
-        )
-
-        Spacer(Modifier.size(20.dp))
-
-        Image(
-            painter = painterResource(R.drawable.img),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            modifier= Modifier
-                .clip(CircleShape)
-                .size(120.dp)
-        )
-
-        Spacer(Modifier.size(20.dp))
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row{
-                Item(
-                    modifier = Modifier.width(160.dp),
-                    text = "Name".uppercase(),
-                    hint = "Enter your name...",
-                    value = input.name,
-                    isValid = input.nameValid,
-                    isEdit = isEdit,
-                    onValueChange = {
-                        input=input.copy(name = it)
-                    }
-                )
-
-                Spacer(Modifier.weight(1f))
-
-                Item(
-                    modifier = Modifier.width(180.dp),
-                    text = "Phone number".uppercase(),
-                    hint = "Your phone number...",
-                    value = input.phone,
-                    isValid = input.phoneValid,
-                    isEdit = isEdit,
-                    onValueChange = {
-                        input=input.copy(phone = it)
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
-
-            Spacer(Modifier.size(20.dp))
-
-            Item(
-                modifier = Modifier.fillMaxWidth(),
-                text = "University name".uppercase(),
-                hint = "Your university name...",
-                value = input.uni,
-                isValid = input.uniValid,
+            Title(
+                title = "My Information",
                 isEdit = isEdit,
-                onValueChange = {
-                    input=input.copy(uni = it)
+                darkTheme = darkTheme,
+                color = colorScheme.primary,
+                onEdit = {
+                    isEdit = true
+                },
+                onChangeTheme = {
+                    darkTheme = !darkTheme
                 }
             )
 
             Spacer(Modifier.size(20.dp))
 
-            Item(
+            Image(
+                painter = painterResource(R.drawable.img),
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                text = "describe yourself".uppercase(),
-                hint = "Enter a description about yourself...",
-                value = input.desc,
-                isEdit = isEdit,
-                onValueChange = {
-                    input=input.copy(desc = it)
-                }
+                    .clip(CircleShape)
+                    .size(120.dp)
             )
-        }
 
-        Spacer(Modifier.size(20.dp))
+            Spacer(Modifier.size(20.dp))
 
-        if(isEdit){
-            Button(
-                onClick = {
-                    val nameValid = isValid(input.name)
-                    val phoneValid = isValidPhone(input.phone)
-                    val uniValid = isValid(input.uni)
-
-                    input = input.copy(
-                        nameValid = nameValid,
-                        phoneValid = phoneValid,
-                        uniValid = uniValid
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row {
+                    Item(
+                        modifier = Modifier.width(160.dp),
+                        text = "Name".uppercase(),
+                        hint = "Enter your name...",
+                        value = input.name,
+                        isValid = input.nameValid,
+                        isEdit = isEdit,
+                        color = colorScheme.primary,
+                        color1 = colorScheme.onSecondary,
+                        onValueChange = {
+                            input = input.copy(name = it)
+                        }
                     )
 
-                    if (nameValid && phoneValid && uniValid) {
-                        isEdit = false
-                        showPopup = true
-                    }
-                },
-                shape = RoundedCornerShape(5.dp),
-                colors = ButtonDefaults.buttonColors(Color.Black),
-                modifier = Modifier
-                    .width(170.dp)
-                    .height(60.dp)
-            ) {
-                Text(text="Submit", fontSize = 16.sp, color = Color.White)
-            }
-        }
+                    Spacer(Modifier.weight(1f))
 
+                    Item(
+                        modifier = Modifier.width(180.dp),
+                        text = "Phone number".uppercase(),
+                        hint = "Your phone number...",
+                        value = input.phone,
+                        isValid = input.phoneValid,
+                        isEdit = isEdit,
+                        color = colorScheme.primary,
+                        color1 = colorScheme.onSecondary,
+                        onValueChange = {
+                            input = input.copy(phone = it)
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+
+                Spacer(Modifier.size(20.dp))
+
+                Item(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "University name".uppercase(),
+                    hint = "Your university name...",
+                    value = input.uni,
+                    isValid = input.uniValid,
+                    isEdit = isEdit,
+                    color = colorScheme.primary,
+                    color1 = colorScheme.onSecondary,
+                    onValueChange = {
+                        input = input.copy(uni = it)
+                    }
+                )
+
+                Spacer(Modifier.size(20.dp))
+
+                Item(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    text = "describe yourself".uppercase(),
+                    hint = "Enter a description about yourself...",
+                    value = input.desc,
+                    isEdit = isEdit,
+                    color = colorScheme.primary,
+                    color1 = colorScheme.onSecondary,
+                    onValueChange = {
+                        input = input.copy(desc = it)
+                    }
+                )
+            }
+
+            Spacer(Modifier.size(20.dp))
+
+            if (isEdit) {
+                Button(
+                    onClick = {
+                        val nameValid = isValid(input.name)
+                        val phoneValid = isValidPhone(input.phone)
+                        val uniValid = isValid(input.uni)
+
+                        input = input.copy(
+                            nameValid = nameValid,
+                            phoneValid = phoneValid,
+                            uniValid = uniValid
+                        )
+
+                        if (nameValid && phoneValid && uniValid) {
+                            isEdit = false
+                            showPopup = true
+                        }
+                    },
+                    shape = RoundedCornerShape(5.dp),
+                    modifier = Modifier
+                        .background(colorScheme.surfaceTint, RoundedCornerShape(10.dp))
+                        .width(170.dp)
+                        .height(60.dp),
+                ) {
+                    Text(text = "Submit", fontSize = 16.sp, color = Color.White)
+                }
+            }
+
+        }
     }
 }
 
 @Composable
 fun Title(
     modifier: Modifier = Modifier,
-    isEdit: Boolean = false,
     title: String ="",
-    onClick: ()->Unit = {}
+    isEdit: Boolean = false,
+    darkTheme: Boolean = false,
+    color: Color = Color.Black,
+    onEdit: ()->Unit = {},
+    onChangeTheme: ()->Unit = {}
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
     ) {
 
+        Icon(
+            painter = painterResource(if(darkTheme) R.drawable.light else R.drawable.dark),
+            contentDescription = null,
+            tint = if(darkTheme) Color.White else Color.Black,
+            modifier = Modifier
+                .clickable { onChangeTheme() }
+                .align(Alignment.TopStart)
+                .size(30.dp)
+        )
+
         Text(
             text = title.uppercase(),
             fontSize = 24.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center),
+            color=color
         )
 
         if(!isEdit){
             Icon(
                 imageVector = Icons.Default.Edit,
                 contentDescription = null,
+                tint = color,
                 modifier = Modifier
-                    .clickable { onClick() }
+                    .clickable { onEdit() }
                     .align(Alignment.TopEnd)
                     .size(30.dp)
             )
@@ -243,9 +285,10 @@ fun Title(
 @Composable
 fun PopUp(
     modifier: Modifier = Modifier,
+    visible: Boolean  = false
 ) {
     AnimatedVisibility(
-        visible = true,
+        visible = visible,
         enter = fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.9f),
         exit = fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.9f)
     ){
@@ -295,24 +338,23 @@ fun Item(
     isValid: Boolean = true,
     isEdit: Boolean = false,
     onValueChange: (String) -> Unit = {},
-    fontSize: TextUnit = 14.sp,
-    fontWeight: FontWeight = FontWeight(500),
     color: Color = Color.Gray,
+    color1: Color = Color.Gray,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
 ) {
 
-    Column() {
+    Column {
         Text(
             text=text,
-            fontSize = fontSize,
-            fontWeight = fontWeight,
+            fontSize = 14.sp,
+            fontWeight = FontWeight(500),
             color = color
         )
 
         Spacer(Modifier.size(4.dp))
 
         OutlinedTextField(
-            modifier = modifier,
+            modifier = modifier.background(color1),
             textStyle = TextStyle(
                 color= Color.Black,
                 fontSize = 14.sp

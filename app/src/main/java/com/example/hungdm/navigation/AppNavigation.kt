@@ -1,5 +1,7 @@
 package com.example.hungdm.navigation
 
+import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,18 +24,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.hungdm.UserInfo
-import com.example.hungdm.screen.BottomItem
 import com.example.hungdm.screen.HomeScreen
+import com.example.hungdm.screen.LibraryScreen
 import com.example.hungdm.screen.LoginScreen
 import com.example.hungdm.screen.PlaylistScreen
 import com.example.hungdm.screen.ProfileScreen
@@ -41,7 +44,8 @@ import com.example.hungdm.screen.SignupScreen
 
 data class BottomItem(
     var label: String,
-    var icon: ImageVector
+    var icon: ImageVector,
+    val destination: Destination
 )
 
 
@@ -49,22 +53,23 @@ data class BottomItem(
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
 
-    val backStack = rememberNavBackStack(Destination.Login(UserInfo()))
     var userInfoState by remember { mutableStateOf(UserInfo()) }
-    var isEditUser by remember { mutableStateOf(false) }
-    var darkTheme by remember { mutableStateOf(false) }
+    val backStack = remember { mutableStateListOf<Destination>(Destination.Login(userInfoState)) }
+
 
     val bottomItem = listOf(
-        BottomItem("Home", Icons.Default.Home),
-        BottomItem("Library", Icons.Default.DateRange),
-        BottomItem("Playlist", Icons.Default.PlayArrow)
+        BottomItem("Home", Icons.Default.Home, Destination.Home(userInfoState)),
+        BottomItem("Library", Icons.Default.DateRange, Destination.Library),
+        BottomItem("Playlist", Icons.Default.PlayArrow, Destination.Playlist)
     )
     var selected by remember { mutableStateOf(0) }
 
     Scaffold(
         topBar = {
+            val showTopNav = backStack.lastOrNull()?.let {
+                it !is Destination.Login && it !is Destination.Signup
+            } ?: false
 
-            val showTopNav = backStack.last() !is Destination.Login && backStack.last() !is Destination.Signup
             if(showTopNav){
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -86,7 +91,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
         },
         bottomBar = {
-            val showBottomNav = backStack.last() !is Destination.Login && backStack.last() !is Destination.Signup
+            val showBottomNav = backStack.lastOrNull()?.let {
+                it !is Destination.Login && it !is Destination.Signup
+            } ?: false
 
             if(showBottomNav) {
                 NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
@@ -95,7 +102,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             selected = selected == index,
                             onClick = {
                                 selected = index
-                                if(selected==2) backStack.add(Destination.Playlist)
+                                backStack.clear()
+                                backStack.add(item.destination)
+                                Log.d("TAG", "${backStack.size}")
                             },
                             icon = {
                                 Icon(
@@ -124,6 +133,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         onClickLogin = {
                             backStack.clear()
                             backStack.add(Destination.Home(userInfoState))
+                            Log.d("TAG", "${backStack.size}")
                         },
                         onValueChangeUsername = {
                             userInfoState = userInfoState.copy(username = it)
@@ -146,16 +156,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 }
 
                 entry<Destination.Home> { key ->
+                    val context = LocalContext.current
+                    val activity = context as? Activity
                     HomeScreen(
                         userInfo = key.user,
                         onBack = {
-                            backStack.clear()
-                        },
-                        onClickProfile = {
-                            backStack.add(Destination.Profile(key.user))
-                        },
-                        onClickPlaylist = {
-                            backStack.add(Destination.Playlist)
+                            activity?.finish()
                         }
                     )
                 }
@@ -163,7 +169,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 entry<Destination.Profile> { key ->
                     ProfileScreen(
                         userInfo = key.user,
-                        isEditUser = isEditUser,
                         onBack = {
                             backStack.removeLastOrNull()
                         }
@@ -171,9 +176,21 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 }
 
                 entry<Destination.Playlist> {
+                    val context = LocalContext.current
+                    val activity = context as? Activity
                     PlaylistScreen(
                         onBack = {
-                            backStack.clear()
+                            activity?.finish()
+                        }
+                    )
+                }
+
+                entry<Destination.Library> {
+                    val context = LocalContext.current
+                    val activity = context as? Activity
+                    LibraryScreen(
+                        onBack = {
+                            activity?.finish()
                         }
                     )
                 }

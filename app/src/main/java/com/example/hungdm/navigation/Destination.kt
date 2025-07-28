@@ -28,4 +28,8 @@ sealed interface Destination: NavKey {
     @Serializable
     @SerialName("Playlist")
     data object Playlist : Destination
+
+    @Serializable
+    @SerialName("Library")
+    data object Library : Destination
 }

@@ -11,12 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +54,7 @@ fun LoginScreen(
 
     Column(
         modifier = Modifier
-            .background(Color.Black)
+            .background(colorScheme.background)
             .fillMaxSize()
             .padding(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -92,7 +92,7 @@ fun LoginScreen(
                 Checkbox(
                     checked = checked,
                     onCheckedChange = { checked = !checked},
-                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF76D7E6))
+                    colors = CheckboxDefaults.colors(checkedColor = colorScheme.surfaceTint)
                 )
                 Text(
                     text = "Remember me",
@@ -107,10 +107,10 @@ fun LoginScreen(
 
         Button(
             modifier = Modifier
+                .background(colorScheme.surfaceTint, RoundedCornerShape(30.dp))
                 .width(380.dp)
                 .height(60.dp),
-            onClick = { onClickLogin(userInfo) },
-            colors = ButtonDefaults.buttonColors(Color(0xFF76D7E6))
+            onClick = { onClickLogin(userInfo) }
         ) {
             Text(
                 "Login",
@@ -125,7 +125,7 @@ fun LoginScreen(
         Text(
             text = buildAnnotatedString {
                 append("Don’t have an account? ")
-                withStyle(style = SpanStyle(color = Color(0xFF76D7E6), fontWeight = FontWeight.Bold)) {
+                withStyle(style = SpanStyle(color = colorScheme.surfaceTint, fontWeight = FontWeight.Bold)) {
                     append("Sign Up")
                 }
             },

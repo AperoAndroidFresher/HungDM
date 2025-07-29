@@ -25,6 +25,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,7 +46,12 @@ import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
 
 @Composable
-fun PlaylistScreen(modifier: Modifier = Modifier, onBack: () -> Unit = {}) {
+fun PlaylistScreen(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit = {},
+    linearListMusic: Boolean = true,
+    onChangeTypeListMusic: ()->Unit = {}
+) {
 
 
     val listSong = remember {
@@ -68,31 +74,29 @@ fun PlaylistScreen(modifier: Modifier = Modifier, onBack: () -> Unit = {}) {
     }
 
 
-    var linear by rememberSaveable { mutableStateOf(true) }
+//    var linear by rememberSaveable { mutableStateOf(true) }
 
     BackHandler { onBack() }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(colorScheme.background)
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Header(
-            linear = linear,
-            onClick = {
-                linear = !linear
-            }
-        )
+//        Header(
+//            linear = linearListMusic,
+//            onClick = onChangeTypeListMusic
+//        )
         LazyVerticalGrid(
-            columns = GridCells.Fixed(if (linear) 1 else 2),
+            columns = GridCells.Fixed(if (linearListMusic) 1 else 2),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(if (linear) 8.dp else 16.dp),
+            verticalArrangement = Arrangement.spacedBy(if (linearListMusic) 8.dp else 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(listSong.size) {
-                if (linear) {
+                if (linearListMusic) {
                     var showOption by remember { mutableStateOf(false) }
                     ItemLinear(
                         song = listSong[it],
@@ -208,14 +212,14 @@ fun ItemLinear(
                 text = song.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = colorScheme.primary,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = song.author,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Gray,
+                color = colorScheme.primary,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )
@@ -225,7 +229,7 @@ fun ItemLinear(
             text = song.time,
             fontSize = 16.sp,
             fontWeight = FontWeight(400),
-            color = Color.White,
+            color = colorScheme.primary,
             modifier = Modifier.padding(10.dp)
         )
 
@@ -234,14 +238,13 @@ fun ItemLinear(
                 onClick = onClickShowOption,
                 modifier = Modifier
                     .padding(8.dp)
-                    .background(Color(0xB2000000), CircleShape)
                     .size(30.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.about),
                     contentDescription = null,
                     modifier = Modifier.size(20.dp),
-                    tint = Color.White
+                    tint = colorScheme.primary
                 )
             }
             Option(
@@ -310,7 +313,7 @@ fun ItemGrid(
             text = song.name,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = colorScheme.primary,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             textAlign = TextAlign.Center
@@ -319,7 +322,7 @@ fun ItemGrid(
             text = song.author,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Gray,
+            color = colorScheme.primary,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
         )
@@ -327,7 +330,7 @@ fun ItemGrid(
             text = song.time,
             fontSize = 16.sp,
             fontWeight = FontWeight(400),
-            color = Color.White,
+            color = colorScheme.primary,
             modifier = Modifier.padding(8.dp)
         )
 

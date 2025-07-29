@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.hungdm.navigation.AppNavigation
+import com.example.hungdm.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -39,7 +40,9 @@ fun Splash(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.Black),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

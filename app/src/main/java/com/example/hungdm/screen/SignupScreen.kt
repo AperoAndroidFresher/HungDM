@@ -5,14 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,7 +49,7 @@ fun SignupScreen(
 
     Column(
         modifier = Modifier
-            .background(Color.Black)
+            .background(colorScheme.background)
             .fillMaxSize()
             .padding(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -117,8 +120,9 @@ fun SignupScreen(
         Spacer(Modifier.weight(1f))
         Button(
             modifier = Modifier
+                .background(colorScheme.surfaceTint, RoundedCornerShape(30.dp))
                 .width(380.dp)
-                .padding(bottom = 30.dp),
+                .height(60.dp),
             onClick = {
                 val userValid = isValidUser(inputInfo.user)
                 val passValid = isValidPass(inputInfo.pass)
@@ -146,8 +150,7 @@ fun SignupScreen(
                     if (!pass2valid) inputInfo = inputInfo.copy(pass2 = "")
                     if (!emailValid) inputInfo = inputInfo.copy(email = "")
                 }
-            },
-            colors = ButtonDefaults.buttonColors(Color(0xFF76D7E6))
+            }
         ) {
             Text(
                 "Sign up",

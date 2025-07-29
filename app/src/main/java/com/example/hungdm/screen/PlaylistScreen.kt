@@ -1,10 +1,8 @@
-package com.example.hungdm
+package com.example.hungdm.screen
 
-import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +25,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,56 +41,62 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.R
 
-@Preview
 @Composable
-fun PlayListPage(modifier: Modifier = Modifier) {
+fun PlaylistScreen(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit = {},
+    linearListMusic: Boolean = true,
+    onChangeTypeListMusic: ()->Unit = {}
+) {
 
 
-    val listSong = remember { mutableStateListOf(
-        Song("grainy days","moody","04:30",R.drawable.img1),
-        Song("coffee","kainbeats","04:30",R.drawable.img2),
-        Song("raindrops","rainyxx","00:30",R.drawable.img3),
-        Song("Em cua ngay hom qua","Son Tung - MTP","04:30",R.drawable.img2),
-        Song("tokyo","SmYang","02:30",R.drawable.img4),
-        Song("lullaby","iamfinenow","02:30",R.drawable.img5),
-        Song("Song gio","Jack - J97","04:30",R.drawable.img1),
-        Song("grainy days","moody","04:30",R.drawable.img1),
-        Song("coffee","kainbeats","04:30",R.drawable.img2),
-        Song("raindrops","rainyxx","00:30",R.drawable.img3),
-        Song("tokyo","SmYang","02:30",R.drawable.img4),
-        Song("lullaby","iamfinenow","02:30",R.drawable.img5),
-        Song("Song gio","Jack - J97","04:30",R.drawable.img1),
-        Song("Em cua ngay hom qua","Son Tung - MTP","04:30",R.drawable.img2)
-    ) }
+    val listSong = remember {
+        mutableStateListOf(
+            Song("grainy days", "moody", "04:30", R.drawable.img1),
+            Song("coffee", "kainbeats", "04:30", R.drawable.img2),
+            Song("raindrops", "rainyxx", "00:30", R.drawable.img3),
+            Song("Em cua ngay hom qua", "Son Tung - MTP", "04:30", R.drawable.img2),
+            Song("tokyo", "SmYang", "02:30", R.drawable.img4),
+            Song("lullaby", "iamfinenow", "02:30", R.drawable.img5),
+            Song("Song gio", "Jack - J97", "04:30", R.drawable.img1),
+            Song("grainy days", "moody", "04:30", R.drawable.img1),
+            Song("coffee", "kainbeats", "04:30", R.drawable.img2),
+            Song("raindrops", "rainyxx", "00:30", R.drawable.img3),
+            Song("tokyo", "SmYang", "02:30", R.drawable.img4),
+            Song("lullaby", "iamfinenow", "02:30", R.drawable.img5),
+            Song("Song gio", "Jack - J97", "04:30", R.drawable.img1),
+            Song("Em cua ngay hom qua", "Son Tung - MTP", "04:30", R.drawable.img2)
+        )
+    }
 
 
-    var linear by rememberSaveable { mutableStateOf(true) }
+//    var linear by rememberSaveable { mutableStateOf(true) }
+
+    BackHandler { onBack() }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(colorScheme.background)
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Header(
-            linear = linear,
-            onClick = {
-                linear = !linear
-            }
-        )
+//        Header(
+//            linear = linearListMusic,
+//            onClick = onChangeTypeListMusic
+//        )
         LazyVerticalGrid(
-            columns = GridCells.Fixed(if(linear) 1 else 2),
+            columns = GridCells.Fixed(if (linearListMusic) 1 else 2),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(if(linear) 8.dp else 16.dp),
+            verticalArrangement = Arrangement.spacedBy(if (linearListMusic) 8.dp else 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(listSong.size){
-                if(linear){
+            items(listSong.size) {
+                if (linearListMusic) {
                     var showOption by remember { mutableStateOf(false) }
                     ItemLinear(
                         song = listSong[it],
@@ -133,8 +138,8 @@ fun PlayListPage(modifier: Modifier = Modifier) {
 fun Header(
     modifier: Modifier = Modifier,
     linear: Boolean = true,
-    title: String ="My Playlist",
-    onClick: ()->Unit = {}
+    title: String = "My Playlist",
+    onClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
@@ -157,7 +162,7 @@ fun Header(
                 onClick = onClick
             ) {
                 Icon(
-                    painter = if(linear) painterResource(R.drawable.type) else painterResource(R.drawable.type1),
+                    painter = if (linear) painterResource(R.drawable.type) else painterResource(R.drawable.type1),
                     contentDescription = null,
                     modifier = Modifier.size(20.dp),
                     tint = Color.White
@@ -178,15 +183,14 @@ fun Header(
 }
 
 
-
 @Composable
 fun ItemLinear(
     modifier: Modifier = Modifier,
-    song:Song = Song("","","",R.drawable.img1),
+    song: Song = Song("", "", "", R.drawable.img1),
     showOption: Boolean = false,
-    onClickShowOption: () -> Unit={},
-    onClickRemove: () -> Unit={},
-    onDismissRequest: () -> Unit={}
+    onClickShowOption: () -> Unit = {},
+    onClickRemove: () -> Unit = {},
+    onDismissRequest: () -> Unit = {}
 ) {
 
     Row(
@@ -208,14 +212,14 @@ fun ItemLinear(
                 text = song.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = colorScheme.primary,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = song.author,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Gray,
+                color = colorScheme.primary,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )
@@ -225,23 +229,22 @@ fun ItemLinear(
             text = song.time,
             fontSize = 16.sp,
             fontWeight = FontWeight(400),
-            color = Color.White,
+            color = colorScheme.primary,
             modifier = Modifier.padding(10.dp)
         )
 
-        Box(){
+        Box() {
             IconButton(
                 onClick = onClickShowOption,
                 modifier = Modifier
                     .padding(8.dp)
-                    .background(Color(0xB2000000), CircleShape)
                     .size(30.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.about),
                     contentDescription = null,
                     modifier = Modifier.size(20.dp),
-                    tint = Color.White
+                    tint = colorScheme.primary
                 )
             }
             Option(
@@ -259,11 +262,11 @@ fun ItemLinear(
 @Composable
 fun ItemGrid(
     modifier: Modifier = Modifier,
-    song:Song = Song("Song gio","J97","04:30",R.drawable.img1),
+    song: Song = Song("Song gio", "J97", "04:30", R.drawable.img1),
     showOption: Boolean = false,
-    onClickShowOption: () -> Unit={},
-    onClickRemove: () -> Unit={},
-    onDismissRequest: () -> Unit={}
+    onClickShowOption: () -> Unit = {},
+    onClickRemove: () -> Unit = {},
+    onDismissRequest: () -> Unit = {}
 ) {
 
     Column(
@@ -281,7 +284,7 @@ fun ItemGrid(
 
             Box(
                 modifier = Modifier.align(Alignment.TopEnd)
-            ){
+            ) {
                 IconButton(
                     onClick = onClickShowOption,
                     modifier = Modifier
@@ -310,7 +313,7 @@ fun ItemGrid(
             text = song.name,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = colorScheme.primary,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             textAlign = TextAlign.Center
@@ -319,7 +322,7 @@ fun ItemGrid(
             text = song.author,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Gray,
+            color = colorScheme.primary,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
         )
@@ -327,7 +330,7 @@ fun ItemGrid(
             text = song.time,
             fontSize = 16.sp,
             fontWeight = FontWeight(400),
-            color = Color.White,
+            color = colorScheme.primary,
             modifier = Modifier.padding(8.dp)
         )
 
@@ -340,26 +343,26 @@ fun ItemGrid(
 fun Option(
     modifier: Modifier = Modifier,
     expanded: Boolean = false,
-    onClickRemove: ()->Unit = {},
-    onDismissRequest: ()->Unit = {}
+    onClickRemove: () -> Unit = {},
+    onDismissRequest: () -> Unit = {}
 ) {
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest =onDismissRequest,
+        onDismissRequest = onDismissRequest,
         modifier = modifier.background(Color.DarkGray),
     ) {
         DropdownMenuItem(
             text = { Text("Remove from playlist", color = Color.White) },
             onClick = onClickRemove,
             leadingIcon = {
-                Icon(Icons.Default.Delete,null, tint = Color.White)
+                Icon(Icons.Default.Delete, null, tint = Color.White)
             }
         )
         DropdownMenuItem(
             text = { Text("Share (coming soon)", color = Color(0x60FFFFFF)) },
             onClick = onDismissRequest,
             leadingIcon = {
-                Icon(Icons.Default.Share,null, tint = Color.White)
+                Icon(Icons.Default.Share, null, tint = Color.White)
             }
         )
     }
@@ -367,8 +370,8 @@ fun Option(
 
 
 data class Song(
-    var name: String="",
-    var author: String="",
-    var time: String="",
+    var name: String = "",
+    var author: String = "",
+    var time: String = "",
     var img: Int = 0,
 )

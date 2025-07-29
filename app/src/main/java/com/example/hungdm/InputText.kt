@@ -1,16 +1,19 @@
 package com.example.hungdm
 
 import android.graphics.drawable.Icon
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +42,7 @@ fun InputText(
     Column {
         OutlinedTextField(
             modifier = modifier
+                .background(colorScheme.onSecondary)
                 .width(380.dp)
                 .height(60.dp),
             value = value,
@@ -62,12 +66,12 @@ fun InputText(
             label = {
                 Text(
                     title,
-                    color = Color.White,
+                    color = colorScheme.primary,
                     fontSize = 12.sp
                 )
             },
             textStyle = TextStyle(
-                color = Color.White,
+                color = colorScheme.primary,
                 fontSize = 16.sp
             ),
             singleLine = true

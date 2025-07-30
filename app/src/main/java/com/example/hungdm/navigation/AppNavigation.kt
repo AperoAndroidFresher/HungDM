@@ -1,7 +1,10 @@
 package com.example.hungdm.navigation
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -68,6 +71,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     var selected by remember { mutableStateOf(0) }
     var darkTheme by remember { mutableStateOf(true) }
     var linearListMusic by remember { mutableStateOf(true) }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            uri?.let { imageUri = it }
+        }
+    )
 
 
     val bottomItem = listOf(
@@ -94,15 +104,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         title = {
                             when (selected) {
                                 0 -> {
-                                    Text("Home")
+                                    Text("Home", color = colorScheme.primary)
                                 }
 
                                 1 -> {
-                                    Text("Library")
+                                    Text("Library", color = colorScheme.primary)
                                 }
 
                                 2 -> {
-                                    Text("Playlist")
+                                    Text("Playlist", color = colorScheme.primary)
                                 }
                             }
                         },
@@ -164,11 +174,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 selected = selected == index,
                                 onClick = {
                                     selected = index
-//                                    backStack.clear()
+                                    backStack.clear()
                                     backStack.add(item.destination)
                                 },
                                 icon = { Icon(item.icon,null) },
-                                label = { Text(item.label) }
+                                label = { Text(item.label, color = colorScheme.primary) }
                             )
                         }
 
@@ -227,6 +237,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             userInfo = key.user,
                             onBack = {
                                 backStack.removeLastOrNull()
+                            },
+                            onChangeAvatar = {
+                                launcher.launch("image/*")
                             }
                         )
                     }

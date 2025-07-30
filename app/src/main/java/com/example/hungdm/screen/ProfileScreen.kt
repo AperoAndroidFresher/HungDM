@@ -1,13 +1,15 @@
 package com.example.hungdm.screen
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -30,6 +32,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -46,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -56,9 +60,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.hungdm.R
 import com.example.hungdm.UserInfo
-import com.example.hungdm.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
 @Preview
@@ -66,13 +71,20 @@ import kotlinx.coroutines.delay
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     userInfo: UserInfo = UserInfo(),
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    onChangeAvatar: () -> Unit={},
 ) {
-
-    var input by remember { mutableStateOf(Input()) }
+    var input by remember { mutableStateOf(Input(name = userInfo.username)) }
     var showPopup by rememberSaveable { mutableStateOf(false) }
     var isEdit by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            uri?.let { imageUri = it }
+        }
+    )
 
     LaunchedEffect(showPopup) {
         if (showPopup) {
@@ -114,13 +126,10 @@ fun ProfileScreen(
 
         Spacer(Modifier.size(20.dp))
 
-        Image(
-            painter = painterResource(R.drawable.img),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            modifier = Modifier
-                .clip(CircleShape)
-                .size(120.dp)
+        Avatar(
+            isEdit = isEdit,
+            onChangeAvatar = { launcher.launch("image/*") },
+            imageUri = imageUri?:R.drawable.img
         )
 
         Spacer(Modifier.size(20.dp))
@@ -133,7 +142,7 @@ fun ProfileScreen(
                     modifier = Modifier.width(160.dp),
                     text = "Name".uppercase(),
                     hint = "Enter your name...",
-                    value = input.name + userInfo.username,
+                    value = input.name,
                     isValid = input.nameValid,
                     isEdit = isEdit,
                     onValueChange = {
@@ -234,6 +243,49 @@ fun ProfileScreen(
 }
 
 @Composable
+fun Avatar(
+    modifier: Modifier = Modifier,
+    isEdit: Boolean = false,
+    onChangeAvatar: () -> Unit = {},
+    imageUri: Any = R.drawable.img
+) {
+
+    Box(
+        modifier = modifier.clickable {
+            if (isEdit) {
+                onChangeAvatar()
+            }
+        }
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUri)
+                .crossfade(true)
+                .placeholder(R.drawable.outline_photo_camera_24)
+                .error(R.drawable.outline_photo_camera_24)
+                .size(300, 300)
+                .build(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(120.dp)
+        )
+        if (isEdit) {
+            IconButton(
+                onClick = {},
+                modifier = Modifier
+                    .background(Color(0xB2000000), CircleShape)
+                    .size(30.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+                Icon(painterResource(R.drawable.outline_photo_camera_24), null, tint = Color.White)
+            }
+        }
+    }
+}
+
+@Composable
 fun Title(
     modifier: Modifier = Modifier,
     title: String = "",
@@ -323,7 +375,6 @@ fun InfoText(
     onValueChange: (String) -> Unit = {},
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
 ) {
-
     Column {
         Text(
             text = text,

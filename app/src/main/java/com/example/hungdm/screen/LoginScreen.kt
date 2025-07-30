@@ -96,7 +96,7 @@ fun LoginScreen(
                 )
                 Text(
                     text = "Remember me",
-                    color = Color.White,
+                    color = colorScheme.primary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -124,7 +124,9 @@ fun LoginScreen(
 
         Text(
             text = buildAnnotatedString {
-                append("Don’t have an account? ")
+                withStyle(style = SpanStyle(color = colorScheme.inversePrimary)){
+                    append("Don’t have an account? ")
+                }
                 withStyle(style = SpanStyle(color = colorScheme.surfaceTint, fontWeight = FontWeight.Bold)) {
                     append("Sign Up")
                 }

@@ -46,14 +46,14 @@ fun InputText(
                 .width(380.dp)
                 .height(60.dp),
             value = value,
-            leadingIcon = { Icon(leadingIcon, null, tint = Color.White) },
+            leadingIcon = { Icon(leadingIcon, null, tint = colorScheme.primary) },
             onValueChange = onValueChange,
             trailingIcon = {
                 if (isPass) {
                     Icon(
                         painter = painterResource(if (showPass) R.drawable.outline_password_24 else R.drawable.outline_password_2_off_24),
                         null,
-                        tint = Color.White,
+                        tint = colorScheme.primary,
                         modifier = Modifier.clickable {
                             onClickShowPass()
                         }

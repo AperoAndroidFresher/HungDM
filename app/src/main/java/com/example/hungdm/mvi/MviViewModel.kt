@@ -90,7 +90,7 @@ class MviViewModel : ViewModel(){
 
                 is MviIntent.CheckSignup -> {
                     val valid = intent.userInfo.inputValid.let {
-                        it.userValid && it.passValid && it.emailValid
+                        it.userValid && it.passValid && it.emailValid && it.pass2valid
                     }
                     if (valid) {
                         _state.value = _state.value.copy(userInfo = intent.userInfo)

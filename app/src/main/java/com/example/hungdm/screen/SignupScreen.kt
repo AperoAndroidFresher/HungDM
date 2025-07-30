@@ -120,13 +120,7 @@ fun SignupScreen(
                 .background(colorScheme.surfaceTint, RoundedCornerShape(30.dp))
                 .width(380.dp)
                 .height(60.dp),
-            onClick = {
-                val inputValid = state.userInfo.inputValid
-                if(inputValid.passValid && inputValid.pass2valid && inputValid.userValid && inputValid.emailValid){
-                    onSigupClick(state.userInfo)
-                }
-                Log.d("TAG", inputValid.toString())
-            }
+            onClick = { onSigupClick(state.userInfo) }
         ) {
             Text(
                 "Sign up",
@@ -139,20 +133,3 @@ fun SignupScreen(
 
     }
 }
-
-//fun noSpace(input: String): Boolean {
-//    return !input.contains("\\s".toRegex())
-//}
-//
-//fun isValidUser(username: String): Boolean {
-//    return username.matches("^[a-zA-Z0-9]+$".toRegex()) && noSpace(username)
-//}
-//
-//fun isValidPass(password: String): Boolean {
-//    return password.matches("^[a-zA-Z0-9]+$".toRegex()) && noSpace(password)
-//}
-//
-//fun isValidEmail(email: String): Boolean {
-//    val regex = "^[a-zA-Z0-9._-]+@apero\\.vn$".toRegex()
-//    return email.matches(regex) && noSpace(email)
-//}

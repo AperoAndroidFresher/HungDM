@@ -231,8 +231,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         SignupScreen(
                             state = state,
                             onBack = { viewModel.removeLast() },
-                            onSigupClick = { key ->
-                                viewModel.processIntent(MviIntent.CheckSignup(key))
+                            onSigupClick = { user ->
+                                viewModel.processIntent(MviIntent.CheckSignup(user))
                             },
                             onValueChangeUsername = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.USERNAME))

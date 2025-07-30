@@ -10,7 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.hungdm.UserInfo
+import com.example.hungdm.model.UserInfo
+import com.example.hungdm.mvi.MviState
 
 data class BottomItem(
     var label: String,
@@ -21,7 +22,7 @@ data class BottomItem(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    userInfo: UserInfo = UserInfo(),
+    state: MviState = MviState(),
     onBack: () -> Unit = {},
 ) {
 
@@ -33,7 +34,7 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Home")
-        Text(text = userInfo.username)
+        Text(text = state.userInfo.username+"---"+state.userInfo.name)
     }
 
 }

@@ -5,9 +5,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -18,35 +15,35 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.hungdm.R
-import com.example.hungdm.UserInfo
+import com.example.hungdm.model.InfoName
+import com.example.hungdm.mvi.MviEvent
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.HomeScreen
 import com.example.hungdm.screen.LibraryScreen
 import com.example.hungdm.screen.LoginScreen
@@ -66,10 +63,30 @@ data class BottomItem(
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
 
-    var userInfoState by remember { mutableStateOf(UserInfo()) }
-    val backStack = remember { mutableStateListOf<Destination>(Destination.Login(userInfoState)) }
+    val viewModel: MviViewModel = viewModel()
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collect{e->
+            when(e){
+                is MviEvent.GotoLogin ->{
+                    viewModel.add(Destination.Login)
+                }
+                is MviEvent.GotoSignup ->{
+                    viewModel.add(Destination.Signup)
+                }
+                is MviEvent.GotoHome->{
+                    viewModel.add(Destination.Home)
+                }
+                is MviEvent.GotoProfile ->{
+                    viewModel.add(Destination.Profile)
+                }
+            }
+        }
+    }
+
+
     var selected by remember { mutableStateOf(0) }
-    var darkTheme by remember { mutableStateOf(true) }
     var linearListMusic by remember { mutableStateOf(true) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(
@@ -81,18 +98,18 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
 
     val bottomItem = listOf(
-        BottomItem("Home", Icons.Default.Home, Destination.Home(userInfoState)),
+        BottomItem("Home", Icons.Default.Home, Destination.Home),
         BottomItem("Library", Icons.Default.DateRange, Destination.Library),
         BottomItem("Playlist", Icons.Default.PlayArrow, Destination.Playlist)
     )
 
     AppTheme (
-        darkTheme = darkTheme,
+        darkTheme = state.darkTheme,
         dynamicColor = false
     ){
         Scaffold(
             topBar = {
-                val showTopNav = backStack.lastOrNull()?.let {
+                val showTopNav = state.backStack.lastOrNull()?.let {
                     it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile
                 } ?: false
 
@@ -138,16 +155,16 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 }
                             }
                             IconButton(
-                                onClick = { darkTheme = !darkTheme }
+                                onClick = { viewModel.processIntent(MviIntent.ChangeTheme) }
                             ) {
                                 Icon(
-                                    painter = painterResource(if(darkTheme) R.drawable.light else R.drawable.dark),
+                                    painter = painterResource(if(state.darkTheme) R.drawable.light else R.drawable.dark),
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp),
                                 )
                             }
                             IconButton(
-                                onClick = { backStack.add(Destination.Profile(userInfoState)) }
+                                onClick = { viewModel.processIntent(MviIntent.OnClickProfile(state.userInfo)) }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
@@ -160,7 +177,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 }
             },
             bottomBar = {
-                val showBottomNav = backStack.lastOrNull()?.let {
+                val showBottomNav = state.backStack.lastOrNull()?.let {
                     it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile
                 } ?: false
 
@@ -174,8 +191,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 selected = selected == index,
                                 onClick = {
                                     selected = index
-                                    backStack.clear()
-                                    backStack.add(item.destination)
+//                                    backStack.clear()
+//                                    backStack.add(item.destination)
+                                    viewModel.replace(item.destination)
                                 },
                                 icon = { Icon(item.icon,null) },
                                 label = { Text(item.label, color = colorScheme.primary) }
@@ -188,44 +206,54 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         ) { p ->
             NavDisplay(
                 modifier = Modifier.padding(p),
-                backStack = backStack,
-                onBack = { backStack.removeLastOrNull() },
+                backStack = state.backStack,
+                onBack = { viewModel.removeLast() },
                 entryProvider = entryProvider {
                     entry<Destination.Login> {
                         LoginScreen(
-                            userInfo = userInfoState,
+                            state = state,
                             onClickSignup = {
-                                backStack.add(Destination.Signup)
+                                viewModel.processIntent(MviIntent.OnSignupClicked)
                             },
                             onClickLogin = {
-                                backStack.clear()
-                                backStack.add(Destination.Home(userInfoState))
+                                viewModel.processIntent(MviIntent.CheckLogin(state.userInfo))
                             },
                             onValueChangeUsername = {
-                                userInfoState = userInfoState.copy(username = it)
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.USERNAME))
                             },
                             onValueChangePassword = {
-                                userInfoState = userInfoState.copy(password = it)
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.PASSWORD))
                             }
                         )
                     }
 
                     entry<Destination.Signup> {
                         SignupScreen(
-                            onBack = { backStack.removeLastOrNull() },
+                            state = state,
+                            onBack = { viewModel.removeLast() },
                             onSigupClick = { key ->
-                                userInfoState = key
-                                backStack.removeLastOrNull()
-                                backStack.add(Destination.Login(userInfoState))
+                                viewModel.processIntent(MviIntent.CheckSignup(key))
+                            },
+                            onValueChangeUsername = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.USERNAME))
+                            },
+                            onValueChangePass = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.PASSWORD))
+                            },
+                            onValueChangePass2 = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.PASS2))
+                            },
+                            onValueChangeEmail = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.EMAIL))
                             }
                         )
                     }
 
-                    entry<Destination.Home> { key ->
+                    entry<Destination.Home> {
                         val context = LocalContext.current
                         val activity = context as? Activity
                         HomeScreen(
-                            userInfo = key.user,
+                            state = state,
                             onBack = {
                                 activity?.finish()
                             }
@@ -234,12 +262,31 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
                     entry<Destination.Profile> { key ->
                         ProfileScreen(
-                            userInfo = key.user,
+                            state = state,
+                            imageUri = imageUri,
                             onBack = {
-                                backStack.removeLastOrNull()
+                                viewModel.removeLast()
                             },
                             onChangeAvatar = {
                                 launcher.launch("image/*")
+                            },
+                            onValueChangeName = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.NAME))
+                            },
+                            onValueChangePhone = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.PHONE))
+                            },
+                            onValueChangeUni = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.UNI))
+                            },
+                            onValueChangeEmail = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.EMAIL))
+                            },
+                            onValueChangeDesc = {
+                                viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.DESC))
+                            },
+                            onClick = {
+                                viewModel.processIntent(MviIntent.EditProfile(state.userInfo))
                             }
                         )
                     }

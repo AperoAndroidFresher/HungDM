@@ -1,5 +1,6 @@
 package com.example.hungdm.screen
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -14,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,23 +29,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.hungdm.InputLoginSignup
-import com.example.hungdm.InputText
-import com.example.hungdm.Logo
-import com.example.hungdm.UserInfo
+import com.example.hungdm.component.InputText
+import com.example.hungdm.component.Logo
+import com.example.hungdm.model.UserInfo
+import com.example.hungdm.mvi.MviState
 
 
 @Preview
 @Composable
 fun SignupScreen(
     modifier: Modifier = Modifier,
+    state: MviState = MviState(),
     onBack: () -> Unit = {},
-    onSigupClick: (UserInfo) -> Unit = { _ -> }
+    onSigupClick: (UserInfo) -> Unit = { },
+    onValueChangeUsername: (String)->Unit={},
+    onValueChangePass: (String)->Unit={},
+    onValueChangePass2: (String)->Unit={},
+    onValueChangeEmail: (String)->Unit={},
+    checkSignup: ()->Unit = {}
 ) {
-    var inputInfo by remember { mutableStateOf(InputLoginSignup()) }
     var showPass by remember { mutableStateOf(false) }
     var showPass2 by remember { mutableStateOf(false) }
 
+    BackHandler {
+        onBack()
+        Log.d("TAG","Back"+ state.backStack.size)
+    }
 
     Column(
         modifier = Modifier
@@ -63,26 +72,20 @@ fun SignupScreen(
         Spacer(Modifier.size(40.dp))
         InputText(
             title = "Username",
-            value = inputInfo.user,
-            isValid = inputInfo.userValid,
-            onValueChange = {
-                inputInfo = inputInfo.copy(user = it)
-                inputInfo = inputInfo.copy(userValid = true)
-            }
+            value = state.userInfo.username,
+            isValid = state.userInfo.inputValid.userValid,
+            onValueChange = onValueChangeUsername
         )
 
         Spacer(Modifier.size(10.dp))
         InputText(
             title = "Password",
-            value = inputInfo.pass,
-            leadingIcon = Icons.Default.Lock,
-            isValid = inputInfo.passValid,
+            value = state.userInfo.password,
+            isValid = state.userInfo.inputValid.passValid,
             isPass = true,
+            leadingIcon = Icons.Default.Lock,
             showPass = showPass,
-            onValueChange = {
-                inputInfo = inputInfo.copy(pass = it)
-                inputInfo = inputInfo.copy(passValid = true)
-            },
+            onValueChange = onValueChangePass,
             onClickShowPass = {
                 showPass = !showPass
             }
@@ -91,15 +94,12 @@ fun SignupScreen(
         Spacer(Modifier.size(10.dp))
         InputText(
             title = "Confirm password",
-            value = inputInfo.pass2,
-            leadingIcon = Icons.Default.Lock,
-            isValid = inputInfo.pass2valid,
+            value = state.userInfo.pass2,
+            isValid = state.userInfo.inputValid.pass2valid,
             isPass = true,
+            leadingIcon = Icons.Default.Lock,
             showPass = showPass2,
-            onValueChange = {
-                inputInfo = inputInfo.copy(pass2 = it)
-                inputInfo = inputInfo.copy(pass2valid = true)
-            },
+            onValueChange = onValueChangePass2,
             onClickShowPass = {
                 showPass2 = !showPass2
             }
@@ -108,13 +108,10 @@ fun SignupScreen(
         Spacer(Modifier.size(10.dp))
         InputText(
             title = "Email",
-            value = inputInfo.email,
-            isValid = inputInfo.emailValid,
+            value = state.userInfo.email,
+            isValid = state.userInfo.inputValid.emailValid,
             leadingIcon = Icons.Default.Email,
-            onValueChange = {
-                inputInfo = inputInfo.copy(email = it)
-                inputInfo = inputInfo.copy(emailValid = true)
-            }
+            onValueChange = onValueChangeEmail
         )
 
         Spacer(Modifier.weight(1f))
@@ -124,32 +121,11 @@ fun SignupScreen(
                 .width(380.dp)
                 .height(60.dp),
             onClick = {
-                val userValid = isValidUser(inputInfo.user)
-                val passValid = isValidPass(inputInfo.pass)
-                val pass2valid = passValid && inputInfo.pass == inputInfo.pass2
-                val emailValid = isValidEmail(inputInfo.email)
-
-                inputInfo = inputInfo.copy(
-                    userValid = userValid,
-                    passValid = passValid,
-                    pass2valid = pass2valid,
-                    emailValid = emailValid
-                )
-
-                if (userValid && passValid && pass2valid && emailValid) {
-                    onSigupClick(
-                        UserInfo(
-                            username = inputInfo.user,
-                            password = inputInfo.pass,
-                            email = inputInfo.email
-                        )
-                    )
-                } else {
-                    if (!userValid) inputInfo = inputInfo.copy(user = "")
-                    if (!passValid) inputInfo = inputInfo.copy(pass = "")
-                    if (!pass2valid) inputInfo = inputInfo.copy(pass2 = "")
-                    if (!emailValid) inputInfo = inputInfo.copy(email = "")
+                val inputValid = state.userInfo.inputValid
+                if(inputValid.passValid && inputValid.pass2valid && inputValid.userValid && inputValid.emailValid){
+                    onSigupClick(state.userInfo)
                 }
+                Log.d("TAG", inputValid.toString())
             }
         ) {
             Text(
@@ -164,19 +140,19 @@ fun SignupScreen(
     }
 }
 
-fun noSpace(input: String): Boolean {
-    return !input.contains("\\s".toRegex())
-}
-
-fun isValidUser(username: String): Boolean {
-    return username.matches("^[a-zA-Z0-9]+$".toRegex()) && noSpace(username)
-}
-
-fun isValidPass(password: String): Boolean {
-    return password.matches("^[a-zA-Z0-9]+$".toRegex()) && noSpace(password)
-}
-
-fun isValidEmail(email: String): Boolean {
-    val regex = "^[a-zA-Z0-9._-]+@apero\\.vn$".toRegex()
-    return email.matches(regex) && noSpace(email)
-}
+//fun noSpace(input: String): Boolean {
+//    return !input.contains("\\s".toRegex())
+//}
+//
+//fun isValidUser(username: String): Boolean {
+//    return username.matches("^[a-zA-Z0-9]+$".toRegex()) && noSpace(username)
+//}
+//
+//fun isValidPass(password: String): Boolean {
+//    return password.matches("^[a-zA-Z0-9]+$".toRegex()) && noSpace(password)
+//}
+//
+//fun isValidEmail(email: String): Boolean {
+//    val regex = "^[a-zA-Z0-9._-]+@apero\\.vn$".toRegex()
+//    return email.matches(regex) && noSpace(email)
+//}

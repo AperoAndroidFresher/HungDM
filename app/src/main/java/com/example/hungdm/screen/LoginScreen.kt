@@ -34,19 +34,20 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.hungdm.InputText
-import com.example.hungdm.Logo
-import com.example.hungdm.UserInfo
+import com.example.hungdm.component.InputText
+import com.example.hungdm.component.Logo
+import com.example.hungdm.model.UserInfo
+import com.example.hungdm.mvi.MviState
 
 @Preview
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    userInfo: UserInfo=UserInfo(),
+    state: MviState = MviState(),
     onClickSignup: ()->Unit = {},
     onClickLogin: (UserInfo)->Unit={},
     onValueChangeUsername: (String)->Unit={},
-    onValueChangePassword: (String)->Unit={},
+    onValueChangePassword: (String)->Unit={}
 ) {
 
     var showPass by remember { mutableStateOf(false) }
@@ -64,7 +65,7 @@ fun LoginScreen(
 
         InputText(
             title = "Username",
-            value = userInfo.username,
+            value = state.userInfo.username,
             onValueChange = onValueChangeUsername
         )
 
@@ -72,7 +73,7 @@ fun LoginScreen(
 
         InputText(
             title = "Password",
-            value = userInfo.password,
+            value = state.userInfo.password,
             leadingIcon = Icons.Default.Lock,
             isPass = true,
             showPass = showPass,
@@ -110,7 +111,7 @@ fun LoginScreen(
                 .background(colorScheme.surfaceTint, RoundedCornerShape(30.dp))
                 .width(380.dp)
                 .height(60.dp),
-            onClick = { onClickLogin(userInfo) }
+            onClick = { onClickLogin(state.userInfo) }
         ) {
             Text(
                 "Login",

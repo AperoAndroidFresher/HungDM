@@ -13,8 +13,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.example.hungdm.component.Logo
 import com.example.hungdm.navigation.AppNavigation
-import com.example.hungdm.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {

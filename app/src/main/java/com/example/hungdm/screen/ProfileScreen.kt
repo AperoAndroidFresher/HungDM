@@ -60,31 +60,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
-import com.example.hungdm.UserInfo
+import com.example.hungdm.model.UserInfo
+import com.example.hungdm.mvi.MviState
 import kotlinx.coroutines.delay
 
 @Preview
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    userInfo: UserInfo = UserInfo(),
+    state: MviState = MviState(),
+    imageUri: Uri? = "".toUri(),
     onBack: () -> Unit = {},
     onChangeAvatar: () -> Unit={},
+    onValueChangeName: (String)->Unit={},
+    onValueChangePhone: (String)->Unit={},
+    onValueChangeUni: (String)->Unit={},
+    onValueChangeEmail: (String)->Unit={},
+    onValueChangeDesc: (String)->Unit={},
+    onClick: ()->Unit = {}
 ) {
-    var input by remember { mutableStateOf(Input(name = userInfo.username)) }
     var showPopup by rememberSaveable { mutableStateOf(false) }
     var isEdit by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            uri?.let { imageUri = it }
-        }
-    )
 
     LaunchedEffect(showPopup) {
         if (showPopup) {
@@ -128,7 +129,7 @@ fun ProfileScreen(
 
         Avatar(
             isEdit = isEdit,
-            onChangeAvatar = { launcher.launch("image/*") },
+            onChangeAvatar = onChangeAvatar,
             imageUri = imageUri?:R.drawable.img
         )
 
@@ -142,12 +143,10 @@ fun ProfileScreen(
                     modifier = Modifier.width(160.dp),
                     text = "Name".uppercase(),
                     hint = "Enter your name...",
-                    value = input.name,
-                    isValid = input.nameValid,
+                    value = state.userInfo.name,
+                    isValid = state.userInfo.inputValid.nameValid,
                     isEdit = isEdit,
-                    onValueChange = {
-                        input = input.copy(name = it, nameValid = true)
-                    }
+                    onValueChange = onValueChangeName
                 )
 
                 Spacer(Modifier.weight(1f))
@@ -156,12 +155,10 @@ fun ProfileScreen(
                     modifier = Modifier.width(180.dp),
                     text = "Phone number".uppercase(),
                     hint = "Your phone number...",
-                    value = input.phone,
-                    isValid = input.phoneValid,
+                    value = state.userInfo.phone,
+                    isValid = state.userInfo.inputValid.phoneValid,
                     isEdit = isEdit,
-                    onValueChange = {
-                        input = input.copy(phone = it, phoneValid = true)
-                    },
+                    onValueChange = onValueChangePhone,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
@@ -172,12 +169,10 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 text = "University name".uppercase(),
                 hint = "Your university name...",
-                value = input.uni,
-                isValid = input.uniValid,
+                value = state.userInfo.uni,
+                isValid = state.userInfo.inputValid.uniValid,
                 isEdit = isEdit,
-                onValueChange = {
-                    input = input.copy(uni = it, uniValid = true)
-                }
+                onValueChange = onValueChangeUni
             )
 
             Spacer(Modifier.size(10.dp))
@@ -186,11 +181,10 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Email".uppercase(),
                 hint = "Your email...",
-                value = input.email,
+                value = state.userInfo.email,
+                isValid = state.userInfo.inputValid.emailValid,
                 isEdit = isEdit,
-                onValueChange = {
-                    input = input.copy(email = it)
-                }
+                onValueChange = onValueChangeEmail
             )
 
             Spacer(Modifier.size(10.dp))
@@ -201,11 +195,9 @@ fun ProfileScreen(
                     .height(150.dp),
                 text = "describe yourself".uppercase(),
                 hint = "Enter a description about yourself...",
-                value = input.desc,
+                value = state.userInfo.desc,
                 isEdit = isEdit,
-                onValueChange = {
-                    input = input.copy(desc = it)
-                }
+                onValueChange = onValueChangeDesc
             )
         }
 
@@ -214,20 +206,9 @@ fun ProfileScreen(
         if (isEdit) {
             Button(
                 onClick = {
-                    val nameValid = isValid(input.name)
-                    val phoneValid = isValidPhone(input.phone)
-                    val uniValid = isValid(input.uni)
-
-                    input = input.copy(
-                        nameValid = nameValid,
-                        phoneValid = phoneValid,
-                        uniValid = uniValid
-                    )
-
-                    if (nameValid && phoneValid && uniValid) {
-                        isEdit = false
-                        showPopup = true
-                    }
+                    onClick()
+                    isEdit = false
+                    showPopup = true
                 },
                 shape = RoundedCornerShape(5.dp),
                 modifier = Modifier
@@ -409,23 +390,23 @@ fun InfoText(
     }
 }
 
-data class Input(
-    var name: String = "",
-    var phone: String = "",
-    var uni: String = "",
-    var email: String = "",
-    var desc: String = "",
-    var nameValid: Boolean = true,
-    var phoneValid: Boolean = true,
-    var uniValid: Boolean = true
-)
-
-fun isValid(str: String): Boolean {
-    val regex = Regex("^[a-zA-Z]+$")
-    return regex.matches(str) && str.isNotEmpty()
-}
-
-fun isValidPhone(str: String): Boolean {
-    val regex = Regex("^\\d+$")
-    return regex.matches(str) && str.isNotEmpty()
-}
+//data class Input(
+//    var name: String = "",
+//    var phone: String = "",
+//    var uni: String = "",
+//    var email: String = "",
+//    var desc: String = "",
+//    var nameValid: Boolean = true,
+//    var phoneValid: Boolean = true,
+//    var uniValid: Boolean = true
+//)
+//
+//fun isValid(str: String): Boolean {
+//    val regex = Regex("^[a-zA-Z]+$")
+//    return regex.matches(str) && str.isNotEmpty()
+//}
+//
+//fun isValidPhone(str: String): Boolean {
+//    val regex = Regex("^\\d+$")
+//    return regex.matches(str) && str.isNotEmpty()
+//}

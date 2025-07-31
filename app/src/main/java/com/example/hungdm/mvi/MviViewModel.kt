@@ -131,11 +131,14 @@ class MviViewModel : ViewModel(){
                 }
 
                 is MviIntent.LoadSong ->{
-                    _state.value = _state.value.copy(
-                        listSong = getAllSong(intent.context)
-                    )
+                    if(!_state.value.isLoadSong) {
+                        delay(2000)
+                        _state.value = _state.value.copy(
+                            listSong = getAllSong(intent.context),
+                            isLoadSong = true
+                        )
+                    }
 
-                    Log.d("tag","load"+_state.value.listSong.size.toString())
                 }
 
                 is MviIntent.RemoveSong->{
@@ -145,8 +148,6 @@ class MviViewModel : ViewModel(){
                     _state.value = _state.value.copy(
                         listSong = songs
                     )
-//                    val song = _state.value.listSong[intent.index]
-//                    deleteSongFile(intent.context,song)
                 }
 
                 is MviIntent.OnChangeTypeListMusic->{
@@ -277,7 +278,6 @@ class MviViewModel : ViewModel(){
 
                 val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
-                // URI ảnh bìa của album
                 val albumArtUri = ContentUris.withAppendedId(
                     Uri.parse("content://media/external/audio/albumart"),
                     albumId
@@ -289,14 +289,5 @@ class MviViewModel : ViewModel(){
 
         return songs
     }
-
-
-//    private fun deleteSongFile(context: Context, song: Song): Boolean {
-//        val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, song.id)
-//
-//        val rowsDeleted = context.contentResolver.delete(uri, null, null)
-//
-//        return rowsDeleted > 0
-//    }
 
 }

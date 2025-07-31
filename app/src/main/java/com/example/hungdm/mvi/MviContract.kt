@@ -30,7 +30,7 @@ sealed interface MviIntent{
     data object CheckEditProfile : MviIntent
     data object OnChangeTypeListMusic: MviIntent
     data class LoadSong(val context: Context) : MviIntent
-    data class RemoveSong(val index: Int, val context: Context): MviIntent
+    data class RemoveSong(val index: Int): MviIntent
     data class OnChangedInput(val s: String, val infoName: InfoName) : MviIntent
 }
 

@@ -391,24 +391,3 @@ fun InfoText(
         }
     }
 }
-
-//data class Input(
-//    var name: String = "",
-//    var phone: String = "",
-//    var uni: String = "",
-//    var email: String = "",
-//    var desc: String = "",
-//    var nameValid: Boolean = true,
-//    var phoneValid: Boolean = true,
-//    var uniValid: Boolean = true
-//)
-//
-//fun isValid(str: String): Boolean {
-//    val regex = Regex("^[a-zA-Z]+$")
-//    return regex.matches(str) && str.isNotEmpty()
-//}
-//
-//fun isValidPhone(str: String): Boolean {
-//    val regex = Regex("^\\d+$")
-//    return regex.matches(str) && str.isNotEmpty()
-//}

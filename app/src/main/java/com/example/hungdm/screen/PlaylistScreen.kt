@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -63,65 +64,75 @@ fun PlaylistScreen(
     state: MviState= MviState(),
     viewModel: MviViewModel = MviViewModel(),
     onBack: () -> Unit = {},
-    onClickRemove: (Int) -> Unit = {}
+    onClickRemove: () -> Unit = {}
 ) {
 
     val listSong = state.listSong
-    val context = LocalContext.current
+//    val context = LocalContext.current
 
 
     BackHandler { onBack() }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(colorScheme.background)
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(if (state.linearListMusic) 1 else 2),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(if (state.linearListMusic) 8.dp else 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+    if(!state.isLoadSong){
+        Box(modifier = Modifier.fillMaxSize()){
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+    }
+    else {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(colorScheme.background)
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(listSong.size) {
-                if (state.linearListMusic) {
-                    var showOption by remember { mutableStateOf(false) }
-                    ItemLinear(
-                        song = listSong[it],
-                        showOption = showOption,
-                        onClickShowOption = {
-                            showOption = true
-                            Log.d("tag", "showOption "+ state.listSong.size.toString())
-                            Log.d("tag", "showOption2 "+ viewModel.state.value.listSong.size.toString())
-                        },
-                        onClickRemove = {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(if (state.linearListMusic) 1 else 2),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(if (state.linearListMusic) 8.dp else 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(listSong.size) {
+                    if (state.linearListMusic) {
+                        var showOption by remember { mutableStateOf(false) }
+                        ItemLinear(
+                            song = listSong[it],
+                            showOption = showOption,
+                            onClickShowOption = {
+                                showOption = true
+                                Log.d("tag", "showOption " + state.listSong.size.toString())
+                                Log.d(
+                                    "tag",
+                                    "showOption2 " + viewModel.state.value.listSong.size.toString()
+                                )
+                            },
+                            onClickRemove = {
 //                            listSong.removeAt(it)
 //                            showOption = false
-                            viewModel.processIntent(MviIntent.RemoveSong(it,context))
-                        },
-                        onDismissRequest = {
-                            showOption = false
-                        }
-                    )
-                } else {
-                    var showOption by remember { mutableStateOf(false) }
-                    ItemGrid(
-                        song = listSong[it],
-                        showOption = showOption,
-                        onClickShowOption = {
-                            showOption = true
-                        },
-                        onClickRemove = {
+                                viewModel.processIntent(MviIntent.RemoveSong(it))
+                            },
+                            onDismissRequest = {
+                                showOption = false
+                            }
+                        )
+                    } else {
+                        var showOption by remember { mutableStateOf(false) }
+                        ItemGrid(
+                            song = listSong[it],
+                            showOption = showOption,
+                            onClickShowOption = {
+                                showOption = true
+                            },
+                            onClickRemove = {
 //                            listSong.removeAt(it)
 //                            showOption = false
-                            viewModel.processIntent(MviIntent.RemoveSong(it,context))
-                        },
-                        onDismissRequest = {
-                            showOption = false
-                        }
-                    )
+                                viewModel.processIntent(MviIntent.RemoveSong(it))
+                            },
+                            onDismissRequest = {
+                                showOption = false
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -283,7 +294,8 @@ fun ItemGrid(
                     .size(300, 300)
                     .build(),
                 contentDescription = null,
-                modifier = Modifier.size(135.dp)
+                modifier = Modifier
+                    .size(135.dp)
                     .align(Alignment.Center)
             )
 

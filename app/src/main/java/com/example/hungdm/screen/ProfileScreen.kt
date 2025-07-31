@@ -134,7 +134,7 @@ fun ProfileScreen(
             onChangeAvatar = {
                 launcher.launch("image/*")
             },
-            imageUri = state.imgUri?:R.drawable.img
+            imageUri = state.userInfo.imgUri?:R.drawable.img
         )
 
         Spacer(Modifier.size(20.dp))

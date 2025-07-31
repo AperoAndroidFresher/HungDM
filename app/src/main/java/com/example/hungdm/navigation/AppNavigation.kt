@@ -2,6 +2,7 @@ package com.example.hungdm.navigation
 
 import android.app.Activity
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
@@ -65,6 +66,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     val viewModel: MviViewModel = viewModel()
     val state by viewModel.state.collectAsState()
+    var selected by remember { mutableStateOf(0) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.event.collect{e->
@@ -80,14 +83,16 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 }
                 is MviEvent.GotoProfile ->{
                     viewModel.add(Destination.Profile)
+                    Log.d("tag","gotoprofile")
+                }
+                is MviEvent.GotoPlaylist ->{
+                    viewModel.replace(Destination.Playlist)
+                    Log.d("tag", state.listSong.size.toString())
                 }
             }
         }
     }
 
-
-    var selected by remember { mutableStateOf(0) }
-    var linearListMusic by remember { mutableStateOf(true) }
 
 
 
@@ -130,10 +135,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         actions = {
                             if (selected == 2) {
                                 IconButton(
-                                    onClick = { linearListMusic = !linearListMusic }
+                                    onClick = { viewModel.processIntent(MviIntent.OnChangeTypeListMusic) }
                                 ) {
                                     Icon(
-                                        painter = if (linearListMusic) painterResource(R.drawable.type) else painterResource(R.drawable.type1),
+                                        painter = if (state.linearListMusic) painterResource(R.drawable.type) else painterResource(R.drawable.type1),
                                         contentDescription = null,
                                         modifier = Modifier.size(20.dp),
                                     )
@@ -188,6 +193,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 //                                    backStack.clear()
 //                                    backStack.add(item.destination)
                                     viewModel.replace(item.destination)
+                                    if(selected==2) {
+                                        viewModel.processIntent(MviIntent.LoadSong(context))
+                                    }
                                 },
                                 icon = { Icon(item.icon,null) },
                                 label = { Text(item.label, color = colorScheme.primary) }
@@ -299,10 +307,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         val context = LocalContext.current
                         val activity = context as? Activity
                         PlaylistScreen(
+                            state=state,
+                            viewModel = viewModel,
                             onBack = {
                                 activity?.finish()
-                            },
-                            linearListMusic = linearListMusic
+                            }
                         )
                     }
 

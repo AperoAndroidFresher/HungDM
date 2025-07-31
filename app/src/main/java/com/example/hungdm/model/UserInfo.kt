@@ -1,8 +1,9 @@
 package com.example.hungdm.model
 
+import android.net.Uri
 import kotlinx.serialization.Serializable
 
-@Serializable
+//@Serializable
 data class UserInfo(
     var username: String="",
     var password: String="",
@@ -12,7 +13,8 @@ data class UserInfo(
     var email: String = "",
     var uni: String ="",
     var desc: String ="",
-    var inputValid: InputValid = InputValid()
+    var inputValid: InputValid = InputValid(),
+    var imgUri: Uri? = null
 )
 
 fun noSpace(input: String): Boolean {

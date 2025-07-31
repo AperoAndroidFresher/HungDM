@@ -1,11 +1,19 @@
 package com.example.hungdm.mvi
 
+import android.content.ContentResolver
+import android.content.ContentUris
+import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hungdm.model.InfoName
+import com.example.hungdm.model.Song
 import com.example.hungdm.model.UserInfo
+import com.example.hungdm.model.getAlbumArt
 import com.example.hungdm.model.isValid
 import com.example.hungdm.model.isValidEmail
 import com.example.hungdm.model.isValidPass
@@ -95,68 +103,15 @@ class MviViewModel : ViewModel(){
                 }
 
                 is MviIntent.CheckSignup -> {
-                    val usernameValid = isValid(_state.value.userInfo.username)
-                    val passValid = isValidPass(_state.value.userInfo.password)
-                    val pass2Valid = passValid && _state.value.userInfo.pass2==_state.value.userInfo.password
-                    val emailValid = isValidEmail(_state.value.userInfo.email)
-                    if (usernameValid && passValid && pass2Valid && emailValid) {
-                        _state.value = _state.value.copy(
-                            userInfo = _state.value.userInfo
-                        )
-                        removeLast()
-                        sendEvent(MviEvent.GotoLogin)
-                        removeLast()
-                    } else {
-                        val inputValid = _state.value.userInfo.inputValid.copy(
-                            userValid = usernameValid,
-                            passValid = passValid,
-                            pass2valid = pass2Valid,
-                            emailValid = emailValid
-                        )
-                        _state.value = _state.value.copy(
-                            userInfo = _state.value.userInfo.copy(
-                                inputValid = inputValid
-                            )
-                        )
-                    }
-                    Log.d("tag", _state.value.userInfo.toString())
+                    checkSignup()
                 }
 
                 is MviIntent.OnClickProfile ->{
                     sendEvent(MviEvent.GotoProfile)
-                    Log.d("tag state",_state.value.userInfo.toString())
                 }
 
                 is MviIntent.CheckEditProfile -> {
-                    val nameValid = isValid(_state.value.userInfo.name)
-                    val phoneValid = isValidPhone(_state.value.userInfo.phone)
-                    val uniValid = isValid(_state.value.userInfo.uni)
-                    val emailValid = isValidEmail(_state.value.userInfo.email)
-                    if (nameValid && phoneValid && uniValid && emailValid) {
-                        _state.value = _state.value.copy(
-                            userInfo = _state.value.userInfo,
-                            isEdit = !_state.value.isEdit,
-                            showPopup = !_state.value.showPopup
-                        )
-                        delay(2000)
-                        _state.value = _state.value.copy(
-                            showPopup = false
-                        )
-
-                    } else {
-                        val inputValid = _state.value.userInfo.inputValid.copy(
-                            nameValid = nameValid,
-                            phoneValid = phoneValid,
-                            uniValid = uniValid,
-                            emailValid = emailValid
-                        )
-                        _state.value = _state.value.copy(
-                            userInfo = _state.value.userInfo.copy(
-                                inputValid = inputValid
-                            )
-                        )
-                    }
-                    Log.d("tag", _state.value.userInfo.toString())
+                    checkEditProfile()
                 }
 
                 is MviIntent.ChangeTheme -> {
@@ -169,9 +124,37 @@ class MviViewModel : ViewModel(){
 
                 is MviIntent.OnChangeAvatar ->{
                     _state.value = _state.value.copy(
-                        imgUri = intent.uri
+                        userInfo = _state.value.userInfo.copy(
+                            imgUri = intent.uri
+                        )
                     )
                 }
+
+                is MviIntent.LoadSong ->{
+                    _state.value = _state.value.copy(
+                        listSong = getAllSong(intent.context)
+                    )
+
+                    Log.d("tag","load"+_state.value.listSong.size.toString())
+                }
+
+                is MviIntent.RemoveSong->{
+                    val songs = _state.value.listSong.toMutableList().apply {
+                        removeAt(intent.index)
+                    }
+                    _state.value = _state.value.copy(
+                        listSong = songs
+                    )
+//                    val song = _state.value.listSong[intent.index]
+//                    deleteSongFile(intent.context,song)
+                }
+
+                is MviIntent.OnChangeTypeListMusic->{
+                    _state.value = _state.value.copy(
+                        linearListMusic = !_state.value.linearListMusic
+                    )
+                }
+
             }
         }
     }
@@ -200,4 +183,120 @@ class MviViewModel : ViewModel(){
             _event.emit(event)
         }
     }
+
+    private fun checkSignup(){
+        val usernameValid = isValid(_state.value.userInfo.username)
+        val passValid = isValidPass(_state.value.userInfo.password)
+        val pass2Valid = passValid && _state.value.userInfo.pass2==_state.value.userInfo.password
+        val emailValid = isValidEmail(_state.value.userInfo.email)
+        if (usernameValid && passValid && pass2Valid && emailValid) {
+            _state.value = _state.value.copy(
+                userInfo = _state.value.userInfo
+            )
+            removeLast()
+            sendEvent(MviEvent.GotoLogin)
+            removeLast()
+        } else {
+            val inputValid = _state.value.userInfo.inputValid.copy(
+                userValid = usernameValid,
+                passValid = passValid,
+                pass2valid = pass2Valid,
+                emailValid = emailValid
+            )
+            _state.value = _state.value.copy(
+                userInfo = _state.value.userInfo.copy(
+                    inputValid = inputValid
+                )
+            )
+        }
+    }
+
+    private suspend fun checkEditProfile(){
+        val nameValid = isValid(_state.value.userInfo.name)
+        val phoneValid = isValidPhone(_state.value.userInfo.phone)
+        val uniValid = isValid(_state.value.userInfo.uni)
+        val emailValid = isValidEmail(_state.value.userInfo.email)
+        if (nameValid && phoneValid && uniValid && emailValid) {
+            _state.value = _state.value.copy(
+                userInfo = _state.value.userInfo,
+                isEdit = !_state.value.isEdit,
+                showPopup = !_state.value.showPopup
+            )
+            delay(2000)
+            _state.value = _state.value.copy(
+                showPopup = false
+            )
+
+        } else {
+            val inputValid = _state.value.userInfo.inputValid.copy(
+                nameValid = nameValid,
+                phoneValid = phoneValid,
+                uniValid = uniValid,
+                emailValid = emailValid
+            )
+            _state.value = _state.value.copy(
+                userInfo = _state.value.userInfo.copy(
+                    inputValid = inputValid
+                )
+            )
+        }
+    }
+
+    private fun getAllSong(context: Context): MutableList<Song>{
+        val songs = mutableListOf<Song>()
+        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+        val projection = arrayOf(
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Albums.ALBUM_ID
+        )
+
+        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
+
+        val cursor = context.contentResolver.query(
+            uri, projection, selection, null, null
+        )
+
+        cursor?.use {
+            val idColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+            val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+            val artistColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+            val durationColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+
+            while (it.moveToNext()) {
+                val id = it.getLong(idColumn)
+                val title = it.getString(titleColumn)
+                val artist = it.getString(artistColumn)
+                val duration  = it.getLong(durationColumn)
+                val albumId = it.getLong(albumIdColumn)
+                val albumArt = getAlbumArt(context, albumId)
+
+                val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+
+                // URI ảnh bìa của album
+                val albumArtUri = ContentUris.withAppendedId(
+                    Uri.parse("content://media/external/audio/albumart"),
+                    albumId
+                )
+
+                songs.add(Song(id, title, artist, duration, albumArt, uri, albumArtUri))
+            }
+        }
+
+        return songs
+    }
+
+
+//    private fun deleteSongFile(context: Context, song: Song): Boolean {
+//        val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, song.id)
+//
+//        val rowsDeleted = context.contentResolver.delete(uri, null, null)
+//
+//        return rowsDeleted > 0
+//    }
+
 }

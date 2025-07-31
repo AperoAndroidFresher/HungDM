@@ -1,14 +1,17 @@
 package com.example.hungdm.mvi
 
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hungdm.model.InfoName
+import com.example.hungdm.model.UserInfo
 import com.example.hungdm.model.isValid
 import com.example.hungdm.model.isValidEmail
 import com.example.hungdm.model.isValidPass
 import com.example.hungdm.model.isValidPhone
 import com.example.hungdm.navigation.Destination
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -81,38 +84,93 @@ class MviViewModel : ViewModel(){
                 }
 
                 is MviIntent.OnSignupClicked -> {
-                    _event.emit(MviEvent.GotoSignup)
+                    _state.value = _state.value.copy(
+                        userInfo = UserInfo()
+                    )
+                    sendEvent(MviEvent.GotoSignup)
                 }
 
                 is MviIntent.CheckLogin -> {
-                    _event.emit(MviEvent.GotoHome(intent.userInfo))
+                    sendEvent(MviEvent.GotoHome)
                 }
 
                 is MviIntent.CheckSignup -> {
-                    val valid = intent.userInfo.inputValid.let {
-                        it.userValid && it.passValid && it.emailValid && it.pass2valid
+                    val usernameValid = isValid(_state.value.userInfo.username)
+                    val passValid = isValidPass(_state.value.userInfo.password)
+                    val pass2Valid = passValid && _state.value.userInfo.pass2==_state.value.userInfo.password
+                    val emailValid = isValidEmail(_state.value.userInfo.email)
+                    if (usernameValid && passValid && pass2Valid && emailValid) {
+                        _state.value = _state.value.copy(
+                            userInfo = _state.value.userInfo
+                        )
+                        removeLast()
+                        sendEvent(MviEvent.GotoLogin)
+                        removeLast()
+                    } else {
+                        val inputValid = _state.value.userInfo.inputValid.copy(
+                            userValid = usernameValid,
+                            passValid = passValid,
+                            pass2valid = pass2Valid,
+                            emailValid = emailValid
+                        )
+                        _state.value = _state.value.copy(
+                            userInfo = _state.value.userInfo.copy(
+                                inputValid = inputValid
+                            )
+                        )
                     }
-                    if (valid) {
-                        _state.value = _state.value.copy(userInfo = intent.userInfo)
-                        _event.emit(MviEvent.GotoLogin(intent.userInfo))
-                    }
-                }
-                is MviIntent.OnClickProfile ->{
-                    _event.emit(MviEvent.GotoProfile(intent.userInfo))
+                    Log.d("tag", _state.value.userInfo.toString())
                 }
 
-                is MviIntent.EditProfile -> {
-                    val valid = intent.userInfo.inputValid.let {
-                        it.nameValid && it.phoneValid && it.emailValid && it.uniValid
+                is MviIntent.OnClickProfile ->{
+                    sendEvent(MviEvent.GotoProfile)
+                    Log.d("tag state",_state.value.userInfo.toString())
+                }
+
+                is MviIntent.CheckEditProfile -> {
+                    val nameValid = isValid(_state.value.userInfo.name)
+                    val phoneValid = isValidPhone(_state.value.userInfo.phone)
+                    val uniValid = isValid(_state.value.userInfo.uni)
+                    val emailValid = isValidEmail(_state.value.userInfo.email)
+                    if (nameValid && phoneValid && uniValid && emailValid) {
+                        _state.value = _state.value.copy(
+                            userInfo = _state.value.userInfo,
+                            isEdit = !_state.value.isEdit,
+                            showPopup = !_state.value.showPopup
+                        )
+                        delay(2000)
+                        _state.value = _state.value.copy(
+                            showPopup = false
+                        )
+
+                    } else {
+                        val inputValid = _state.value.userInfo.inputValid.copy(
+                            nameValid = nameValid,
+                            phoneValid = phoneValid,
+                            uniValid = uniValid,
+                            emailValid = emailValid
+                        )
+                        _state.value = _state.value.copy(
+                            userInfo = _state.value.userInfo.copy(
+                                inputValid = inputValid
+                            )
+                        )
                     }
-                    if (valid) {
-                        _state.value = _state.value.copy(userInfo = intent.userInfo)
-                        Log.d("tag","submit ok")
-                    }
+                    Log.d("tag", _state.value.userInfo.toString())
                 }
 
                 is MviIntent.ChangeTheme -> {
                     _state.value = _state.value.copy( darkTheme = !_state.value.darkTheme)
+                }
+
+                is MviIntent.OnClickEditProfile ->{
+                    _state.value = _state.value.copy( isEdit = !_state.value.isEdit)
+                }
+
+                is MviIntent.OnChangeAvatar ->{
+                    _state.value = _state.value.copy(
+                        imgUri = intent.uri
+                    )
                 }
             }
         }
@@ -135,5 +193,11 @@ class MviViewModel : ViewModel(){
     fun replace(destination: Destination){
         val newBackStack = mutableListOf<Destination>(destination)
         _state.value = _state.value.copy(backStack = newBackStack)
+    }
+
+    private fun sendEvent(event: MviEvent){
+        viewModelScope.launch {
+            _event.emit(event)
+        }
     }
 }

@@ -12,17 +12,8 @@ data class UserInfo(
     var email: String = "",
     var uni: String ="",
     var desc: String ="",
-    var inputValid: InputValid = InputValid(
-        userValid = isValid(username),
-        passValid = isValidPass(password),
-        pass2valid = isValidPass(password) && password == pass2,
-        emailValid = isValidEmail(email),
-        nameValid = isValid(name),
-        phoneValid = isValidPhone(phone),
-        uniValid = isValid(uni)
-    )
-){
-}
+    var inputValid: InputValid = InputValid()
+)
 
 fun noSpace(input: String): Boolean {
     return !input.contains("\\s".toRegex())

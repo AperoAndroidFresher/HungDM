@@ -65,34 +65,38 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
 import com.example.hungdm.model.UserInfo
+import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviState
+import com.example.hungdm.mvi.MviViewModel
 import kotlinx.coroutines.delay
 
 @Preview
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
+    viewModel: MviViewModel = MviViewModel(),
     state: MviState = MviState(),
     imageUri: Uri? = "".toUri(),
     onBack: () -> Unit = {},
-    onChangeAvatar: () -> Unit={},
     onValueChangeName: (String)->Unit={},
     onValueChangePhone: (String)->Unit={},
     onValueChangeUni: (String)->Unit={},
     onValueChangeEmail: (String)->Unit={},
     onValueChangeDesc: (String)->Unit={},
-    onClick: ()->Unit = {}
+    onClickEdit: ()->Unit = {},
+    onClickSubmit: ()->Unit = {}
 ) {
-    var showPopup by rememberSaveable { mutableStateOf(false) }
-    var isEdit by rememberSaveable { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            uri?.let {
+                viewModel.processIntent(MviIntent.OnChangeAvatar(it))
+            }
+        }
+    )
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(showPopup) {
-        if (showPopup) {
-            delay(2000)
-            showPopup = false
-        }
-    }
 
     BackHandler { onBack() }
 
@@ -114,23 +118,23 @@ fun ProfileScreen(
                 .background(Color(0xFFFEFEFE), RoundedCornerShape(20.dp))
                 .height(350.dp)
                 .width(330.dp),
-            visible = showPopup
+            visible = state.showPopup
         )
 
         Title(
             title = "My Information",
-            isEdit = isEdit,
-            onEdit = {
-                isEdit = true
-            }
+            isEdit = state.isEdit,
+            onEdit = onClickEdit
         )
 
         Spacer(Modifier.size(20.dp))
 
         Avatar(
-            isEdit = isEdit,
-            onChangeAvatar = onChangeAvatar,
-            imageUri = imageUri?:R.drawable.img
+            isEdit = state.isEdit,
+            onChangeAvatar = {
+                launcher.launch("image/*")
+            },
+            imageUri = state.imgUri?:R.drawable.img
         )
 
         Spacer(Modifier.size(20.dp))
@@ -145,7 +149,7 @@ fun ProfileScreen(
                     hint = "Enter your name...",
                     value = state.userInfo.name,
                     isValid = state.userInfo.inputValid.nameValid,
-                    isEdit = isEdit,
+                    isEdit = state.isEdit,
                     onValueChange = onValueChangeName
                 )
 
@@ -157,7 +161,7 @@ fun ProfileScreen(
                     hint = "Your phone number...",
                     value = state.userInfo.phone,
                     isValid = state.userInfo.inputValid.phoneValid,
-                    isEdit = isEdit,
+                    isEdit = state.isEdit,
                     onValueChange = onValueChangePhone,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -171,7 +175,7 @@ fun ProfileScreen(
                 hint = "Your university name...",
                 value = state.userInfo.uni,
                 isValid = state.userInfo.inputValid.uniValid,
-                isEdit = isEdit,
+                isEdit = state.isEdit,
                 onValueChange = onValueChangeUni
             )
 
@@ -183,7 +187,7 @@ fun ProfileScreen(
                 hint = "Your email...",
                 value = state.userInfo.email,
                 isValid = state.userInfo.inputValid.emailValid,
-                isEdit = isEdit,
+                isEdit = state.isEdit,
                 onValueChange = onValueChangeEmail
             )
 
@@ -196,19 +200,17 @@ fun ProfileScreen(
                 text = "describe yourself".uppercase(),
                 hint = "Enter a description about yourself...",
                 value = state.userInfo.desc,
-                isEdit = isEdit,
+                isEdit = state.isEdit,
                 onValueChange = onValueChangeDesc
             )
         }
 
         Spacer(Modifier.size(20.dp))
 
-        if (isEdit) {
+        if (state.isEdit) {
             Button(
                 onClick = {
-                    onClick()
-                    isEdit = false
-                    showPopup = true
+                    onClickSubmit()
                 },
                 shape = RoundedCornerShape(5.dp),
                 modifier = Modifier

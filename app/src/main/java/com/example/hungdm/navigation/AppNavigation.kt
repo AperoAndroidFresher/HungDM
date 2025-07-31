@@ -2,7 +2,6 @@ package com.example.hungdm.navigation
 
 import android.app.Activity
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
@@ -35,6 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
@@ -88,13 +88,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     var selected by remember { mutableStateOf(0) }
     var linearListMusic by remember { mutableStateOf(true) }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            uri?.let { imageUri = it }
-        }
-    )
+
 
 
     val bottomItem = listOf(
@@ -164,7 +158,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 )
                             }
                             IconButton(
-                                onClick = { viewModel.processIntent(MviIntent.OnClickProfile(state.userInfo)) }
+                                onClick = { viewModel.processIntent(MviIntent.OnClickProfile) }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
@@ -216,7 +210,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 viewModel.processIntent(MviIntent.OnSignupClicked)
                             },
                             onClickLogin = {
-                                viewModel.processIntent(MviIntent.CheckLogin(state.userInfo))
+                                viewModel.processIntent(MviIntent.CheckLogin)
                             },
                             onValueChangeUsername = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.USERNAME))
@@ -231,8 +225,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         SignupScreen(
                             state = state,
                             onBack = { viewModel.removeLast() },
-                            onSigupClick = { user ->
-                                viewModel.processIntent(MviIntent.CheckSignup(user))
+                            onSigupClick = {
+                                viewModel.processIntent(MviIntent.CheckSignup)
                             },
                             onValueChangeUsername = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.USERNAME))
@@ -260,15 +254,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         )
                     }
 
-                    entry<Destination.Profile> { key ->
+                    entry<Destination.Profile> {
                         ProfileScreen(
                             state = state,
-                            imageUri = imageUri,
+                            viewModel = viewModel,
                             onBack = {
                                 viewModel.removeLast()
-                            },
-                            onChangeAvatar = {
-                                launcher.launch("image/*")
                             },
                             onValueChangeName = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.NAME))
@@ -285,8 +276,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             onValueChangeDesc = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.DESC))
                             },
-                            onClick = {
-                                viewModel.processIntent(MviIntent.EditProfile(state.userInfo))
+                            onClickEdit = {
+                                viewModel.processIntent(MviIntent.OnClickEditProfile)
+                            },
+                            onClickSubmit = {
+                                viewModel.processIntent(MviIntent.CheckEditProfile)
                             }
                         )
                     }

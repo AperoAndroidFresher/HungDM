@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
@@ -48,6 +49,7 @@ import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.HomeScreen
 import com.example.hungdm.screen.LibraryScreen
 import com.example.hungdm.screen.LoginScreen
+import com.example.hungdm.screen.PlaylistDetailScreen
 import com.example.hungdm.screen.PlaylistScreen
 import com.example.hungdm.screen.ProfileScreen
 import com.example.hungdm.screen.SignupScreen
@@ -66,8 +68,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     val viewModel: MviViewModel = viewModel()
     val state by viewModel.state.collectAsState()
-    var selected by remember { mutableStateOf(0) }
+//    var selected by remember { mutableStateOf(0) }
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        if(!state.isLoadSong){
+            viewModel.processIntent(MviIntent.LoadSong(context))
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.event.collect{e->
@@ -87,7 +95,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 }
                 is MviEvent.GotoPlaylist ->{
                     viewModel.replace(Destination.Playlist)
-                    Log.d("tag", state.listSong.size.toString())
+                }
+                is MviEvent.GotoPlaylistDetail->{
+                    viewModel.add(Destination.PlaylistDetail)
                 }
             }
         }
@@ -109,7 +119,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         Scaffold(
             topBar = {
                 val showTopNav = state.backStack.lastOrNull()?.let {
-                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile
+                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile && it !is Destination.PlaylistDetail
                 } ?: false
 
                 if (showTopNav) {
@@ -118,7 +128,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             containerColor = colorScheme.background
                         ),
                         title = {
-                            when (selected) {
+                            when (state.selectedBottomBar) {
                                 0 -> {
                                     Text("Home", color = colorScheme.primary)
                                 }
@@ -133,7 +143,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             }
                         },
                         actions = {
-                            if (selected == 2) {
+                            if (state.selectedBottomBar == 1) {
                                 IconButton(
                                     onClick = { viewModel.processIntent(MviIntent.OnChangeTypeListMusic) }
                                 ) {
@@ -143,16 +153,29 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                         modifier = Modifier.size(20.dp),
                                     )
                                 }
+//                                IconButton(
+//                                    onClick = {}
+//                                ) {
+//                                    Icon(
+//                                        painter = painterResource(R.drawable.sort),
+//                                        contentDescription = null,
+//                                        modifier = Modifier.size(20.dp),
+//                                    )
+//                                }
+                            }
+
+                            if(state.selectedBottomBar ==2){
                                 IconButton(
-                                    onClick = {}
+                                    onClick = { viewModel.processIntent(MviIntent.ShowCreatePlaylistDialod) }
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.sort),
+                                        imageVector = Icons.Default.Add,
                                         contentDescription = null,
                                         modifier = Modifier.size(20.dp),
                                     )
                                 }
                             }
+
                             IconButton(
                                 onClick = { viewModel.processIntent(MviIntent.ChangeTheme) }
                             ) {
@@ -177,7 +200,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             },
             bottomBar = {
                 val showBottomNav = state.backStack.lastOrNull()?.let {
-                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile
+                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile && it !is Destination.PlaylistDetail
                 } ?: false
 
                 if (showBottomNav) {
@@ -187,15 +210,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     ) {
                         bottomItem.forEachIndexed { index, item ->
                             NavigationBarItem(
-                                selected = selected == index,
+                                selected = state.selectedBottomBar==index,
                                 onClick = {
-                                    selected = index
-//                                    backStack.clear()
-//                                    backStack.add(item.destination)
+                                    viewModel.processIntent(MviIntent.ClickItemBottomBar(index))
                                     viewModel.replace(item.destination)
-                                    if(selected==2) {
-                                        viewModel.processIntent(MviIntent.LoadSong(context))
-                                    }
                                 },
                                 icon = { Icon(item.icon,null) },
                                 label = { Text(item.label, color = colorScheme.primary) }
@@ -297,6 +315,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         val context = LocalContext.current
                         val activity = context as? Activity
                         LibraryScreen(
+                            state = state,
+                            viewModel = viewModel,
                             onBack = {
                                 activity?.finish()
                             }
@@ -315,6 +335,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         )
                     }
 
+                    entry<Destination.PlaylistDetail>{
+                        PlaylistDetailScreen(
+                            state = state,
+                            viewModel = viewModel,
+                            onBack = {
+                                viewModel.removeLast()
+                            }
+                        )
+                    }
                 }
             )
         }

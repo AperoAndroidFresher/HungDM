@@ -41,7 +41,7 @@ fun SignupScreen(
     modifier: Modifier = Modifier,
     state: MviState = MviState(),
     onBack: () -> Unit = {},
-    onSigupClick: (UserInfo) -> Unit = { },
+    onSigupClick: () -> Unit = { },
     onValueChangeUsername: (String)->Unit={},
     onValueChangePass: (String)->Unit={},
     onValueChangePass2: (String)->Unit={},
@@ -120,7 +120,7 @@ fun SignupScreen(
                 .background(colorScheme.surfaceTint, RoundedCornerShape(30.dp))
                 .width(380.dp)
                 .height(60.dp),
-            onClick = { onSigupClick(state.userInfo) }
+            onClick = onSigupClick
         ) {
             Text(
                 "Sign up",

@@ -1,5 +1,6 @@
 package com.example.hungdm.screen
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -21,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -37,97 +40,99 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.hungdm.R
+import com.example.hungdm.model.Song
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviState
+import com.example.hungdm.mvi.MviViewModel
+import java.io.File
 
 @Composable
 fun PlaylistScreen(
     modifier: Modifier = Modifier,
+    state: MviState= MviState(),
+    viewModel: MviViewModel = MviViewModel(),
     onBack: () -> Unit = {},
-    linearListMusic: Boolean = true,
-    onChangeTypeListMusic: ()->Unit = {}
+    onClickRemove: () -> Unit = {}
 ) {
 
+    val listSong = state.listSong
+//    val context = LocalContext.current
 
-    val listSong = remember {
-        mutableStateListOf(
-            Song("grainy days", "moody", "04:30", R.drawable.img1),
-            Song("coffee", "kainbeats", "04:30", R.drawable.img2),
-            Song("raindrops", "rainyxx", "00:30", R.drawable.img3),
-            Song("Em cua ngay hom qua", "Son Tung - MTP", "04:30", R.drawable.img2),
-            Song("tokyo", "SmYang", "02:30", R.drawable.img4),
-            Song("lullaby", "iamfinenow", "02:30", R.drawable.img5),
-            Song("Song gio", "Jack - J97", "04:30", R.drawable.img1),
-            Song("grainy days", "moody", "04:30", R.drawable.img1),
-            Song("coffee", "kainbeats", "04:30", R.drawable.img2),
-            Song("raindrops", "rainyxx", "00:30", R.drawable.img3),
-            Song("tokyo", "SmYang", "02:30", R.drawable.img4),
-            Song("lullaby", "iamfinenow", "02:30", R.drawable.img5),
-            Song("Song gio", "Jack - J97", "04:30", R.drawable.img1),
-            Song("Em cua ngay hom qua", "Son Tung - MTP", "04:30", R.drawable.img2)
-        )
-    }
-
-
-//    var linear by rememberSaveable { mutableStateOf(true) }
 
     BackHandler { onBack() }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(colorScheme.background)
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-//        Header(
-//            linear = linearListMusic,
-//            onClick = onChangeTypeListMusic
-//        )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(if (linearListMusic) 1 else 2),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(if (linearListMusic) 8.dp else 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+    if(!state.isLoadSong){
+        Box(modifier = Modifier.fillMaxSize()){
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+    }
+    else {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(colorScheme.background)
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(listSong.size) {
-                if (linearListMusic) {
-                    var showOption by remember { mutableStateOf(false) }
-                    ItemLinear(
-                        song = listSong[it],
-                        showOption = showOption,
-                        onClickShowOption = {
-                            showOption = true
-                        },
-                        onClickRemove = {
-                            listSong.removeAt(it)
-                            showOption = false
-                        },
-                        onDismissRequest = {
-                            showOption = false
-                        }
-                    )
-                } else {
-                    var showOption by remember { mutableStateOf(false) }
-                    ItemGrid(
-                        song = listSong[it],
-                        showOption = showOption,
-                        onClickShowOption = {
-                            showOption = true
-                        },
-                        onClickRemove = {
-                            listSong.removeAt(it)
-                            showOption = false
-                        },
-                        onDismissRequest = {
-                            showOption = false
-                        }
-                    )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(if (state.linearListMusic) 1 else 2),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(if (state.linearListMusic) 8.dp else 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(listSong.size) {
+                    if (state.linearListMusic) {
+                        var showOption by remember { mutableStateOf(false) }
+                        ItemLinear(
+                            song = listSong[it],
+                            showOption = showOption,
+                            onClickShowOption = {
+                                showOption = true
+                                Log.d("tag", "showOption " + state.listSong.size.toString())
+                                Log.d(
+                                    "tag",
+                                    "showOption2 " + viewModel.state.value.listSong.size.toString()
+                                )
+                            },
+                            onClickRemove = {
+//                            listSong.removeAt(it)
+//                            showOption = false
+                                viewModel.processIntent(MviIntent.RemoveSong(it))
+                            },
+                            onDismissRequest = {
+                                showOption = false
+                            }
+                        )
+                    } else {
+                        var showOption by remember { mutableStateOf(false) }
+                        ItemGrid(
+                            song = listSong[it],
+                            showOption = showOption,
+                            onClickShowOption = {
+                                showOption = true
+                            },
+                            onClickRemove = {
+//                            listSong.removeAt(it)
+//                            showOption = false
+                                viewModel.processIntent(MviIntent.RemoveSong(it))
+                            },
+                            onDismissRequest = {
+                                showOption = false
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -182,11 +187,11 @@ fun Header(
     }
 }
 
-
+@Preview
 @Composable
 fun ItemLinear(
     modifier: Modifier = Modifier,
-    song: Song = Song("", "", "", R.drawable.img1),
+    song: Song = Song(100,"Noi nay co anh - Son Tung MTP","MTP", duration = 100000L,null),
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
     onClickRemove: () -> Unit = {},
@@ -198,25 +203,33 @@ fun ItemLinear(
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        Image(
-            painter = painterResource(song.img),
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(song.albumArtUri)
+                .crossfade(true)
+                .error(R.drawable.img1)
+                .size(300, 300)
+                .build(),
             contentDescription = null,
             modifier = Modifier.size(54.dp)
         )
         Spacer(Modifier.size(8.dp))
 
         Column(
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier
+                .padding(4.dp)
+                .width(210.dp)
         ) {
             Text(
-                text = song.name,
+                text = song.title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.primary,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = song.author,
+                text = song.artist,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.primary,
@@ -258,11 +271,10 @@ fun ItemLinear(
 }
 
 
-//@Preview
 @Composable
 fun ItemGrid(
     modifier: Modifier = Modifier,
-    song: Song = Song("Song gio", "J97", "04:30", R.drawable.img1),
+    song: Song = Song(100,"Noi nay co anh - Son Tung MTP","MTP", duration = 100000L ,null),
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
     onClickRemove: () -> Unit = {},
@@ -274,8 +286,13 @@ fun ItemGrid(
         modifier = modifier.wrapContentSize()
     ) {
         Box() {
-            Image(
-                painter = painterResource(song.img),
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(song.albumArtUri)
+                    .crossfade(true)
+                    .error(R.drawable.img1)
+                    .size(300, 300)
+                    .build(),
                 contentDescription = null,
                 modifier = Modifier
                     .size(135.dp)
@@ -310,7 +327,7 @@ fun ItemGrid(
             modifier = Modifier
                 .padding(4.dp)
                 .fillMaxWidth(),
-            text = song.name,
+            text = song.title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
@@ -319,7 +336,7 @@ fun ItemGrid(
             textAlign = TextAlign.Center
         )
         Text(
-            text = song.author,
+            text = song.artist,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
@@ -353,7 +370,10 @@ fun Option(
     ) {
         DropdownMenuItem(
             text = { Text("Remove from playlist", color = Color.White) },
-            onClick = onClickRemove,
+            onClick = {
+                onClickRemove()
+                onDismissRequest()
+            },
             leadingIcon = {
                 Icon(Icons.Default.Delete, null, tint = Color.White)
             }
@@ -367,11 +387,3 @@ fun Option(
         )
     }
 }
-
-
-data class Song(
-    var name: String = "",
-    var author: String = "",
-    var time: String = "",
-    var img: Int = 0,
-)

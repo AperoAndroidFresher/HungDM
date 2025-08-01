@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
@@ -65,6 +66,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     val viewModel: MviViewModel = viewModel()
     val state by viewModel.state.collectAsState()
+    var selected by remember { mutableStateOf(0) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.event.collect{e->
@@ -80,21 +83,17 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 }
                 is MviEvent.GotoProfile ->{
                     viewModel.add(Destination.Profile)
+                    Log.d("tag","gotoprofile")
+                }
+                is MviEvent.GotoPlaylist ->{
+                    viewModel.replace(Destination.Playlist)
+                    Log.d("tag", state.listSong.size.toString())
                 }
             }
         }
     }
 
 
-    var selected by remember { mutableStateOf(0) }
-    var linearListMusic by remember { mutableStateOf(true) }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            uri?.let { imageUri = it }
-        }
-    )
 
 
     val bottomItem = listOf(
@@ -136,10 +135,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         actions = {
                             if (selected == 2) {
                                 IconButton(
-                                    onClick = { linearListMusic = !linearListMusic }
+                                    onClick = { viewModel.processIntent(MviIntent.OnChangeTypeListMusic) }
                                 ) {
                                     Icon(
-                                        painter = if (linearListMusic) painterResource(R.drawable.type) else painterResource(R.drawable.type1),
+                                        painter = if (state.linearListMusic) painterResource(R.drawable.type) else painterResource(R.drawable.type1),
                                         contentDescription = null,
                                         modifier = Modifier.size(20.dp),
                                     )
@@ -164,7 +163,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 )
                             }
                             IconButton(
-                                onClick = { viewModel.processIntent(MviIntent.OnClickProfile(state.userInfo)) }
+                                onClick = { viewModel.processIntent(MviIntent.OnClickProfile) }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
@@ -194,6 +193,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 //                                    backStack.clear()
 //                                    backStack.add(item.destination)
                                     viewModel.replace(item.destination)
+                                    if(selected==2) {
+                                        viewModel.processIntent(MviIntent.LoadSong(context))
+                                    }
                                 },
                                 icon = { Icon(item.icon,null) },
                                 label = { Text(item.label, color = colorScheme.primary) }
@@ -216,7 +218,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 viewModel.processIntent(MviIntent.OnSignupClicked)
                             },
                             onClickLogin = {
-                                viewModel.processIntent(MviIntent.CheckLogin(state.userInfo))
+                                viewModel.processIntent(MviIntent.CheckLogin)
                             },
                             onValueChangeUsername = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.USERNAME))
@@ -231,8 +233,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         SignupScreen(
                             state = state,
                             onBack = { viewModel.removeLast() },
-                            onSigupClick = { user ->
-                                viewModel.processIntent(MviIntent.CheckSignup(user))
+                            onSigupClick = {
+                                viewModel.processIntent(MviIntent.CheckSignup)
                             },
                             onValueChangeUsername = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.USERNAME))
@@ -260,15 +262,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         )
                     }
 
-                    entry<Destination.Profile> { key ->
+                    entry<Destination.Profile> {
                         ProfileScreen(
                             state = state,
-                            imageUri = imageUri,
+                            viewModel = viewModel,
                             onBack = {
                                 viewModel.removeLast()
-                            },
-                            onChangeAvatar = {
-                                launcher.launch("image/*")
                             },
                             onValueChangeName = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.NAME))
@@ -285,8 +284,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             onValueChangeDesc = {
                                 viewModel.processIntent(MviIntent.OnChangedInput(it, InfoName.DESC))
                             },
-                            onClick = {
-                                viewModel.processIntent(MviIntent.EditProfile(state.userInfo))
+                            onClickEdit = {
+                                viewModel.processIntent(MviIntent.OnClickEditProfile)
+                            },
+                            onClickSubmit = {
+                                viewModel.processIntent(MviIntent.CheckEditProfile)
                             }
                         )
                     }
@@ -305,10 +307,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         val context = LocalContext.current
                         val activity = context as? Activity
                         PlaylistScreen(
+                            state=state,
+                            viewModel = viewModel,
                             onBack = {
                                 activity?.finish()
-                            },
-                            linearListMusic = linearListMusic
+                            }
                         )
                     }
 

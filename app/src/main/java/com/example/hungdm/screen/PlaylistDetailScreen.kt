@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,12 +31,14 @@ import com.example.hungdm.mvi.MviViewModel
 @Composable
 fun PlaylistDetailScreen(
     modifier: Modifier = Modifier,
-    state: MviState = MviState(),
     viewModel: MviViewModel = MviViewModel(),
     onBack: () -> Unit = {},
 ) {
 
-    val listSong = state.selectedPlaylist!!.listSong
+    val state = viewModel.state.collectAsState()
+    val listSong = state.value.selectedPlaylist!!.listSong
+
+
     BackHandler {
         onBack()
     }
@@ -68,7 +71,7 @@ fun PlaylistDetailScreen(
                         showOption = true
                     },
                     onClickOption1 = {
-                        viewModel.processIntent(MviIntent.RemoveSong(it))
+
                     },
                     onClickOption2 = {
 

@@ -37,19 +37,17 @@ import androidx.compose.ui.unit.sp
 import com.example.hungdm.component.InputText
 import com.example.hungdm.component.Logo
 import com.example.hungdm.model.UserInfo
-import com.example.hungdm.mvi.MviState
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviViewModel
 
 @Preview
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    state: MviState = MviState(),
-    onClickSignup: ()->Unit = {},
-    onClickLogin: (UserInfo)->Unit={},
-    onValueChangeUsername: (String)->Unit={},
-    onValueChangePassword: (String)->Unit={}
+    viewModel: MviViewModel =MviViewModel()
 ) {
 
+    var userInfo by remember { mutableStateOf(UserInfo()) }
     var showPass by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(false) }
 
@@ -65,19 +63,23 @@ fun LoginScreen(
 
         InputText(
             title = "Username",
-            value = state.userInfo.username,
-            onValueChange = onValueChangeUsername
+            value = userInfo.username,
+            onValueChange = {
+                userInfo = userInfo.copy(username = it)
+            }
         )
 
         Spacer(Modifier.size(10.dp))
 
         InputText(
             title = "Password",
-            value = state.userInfo.password,
+            value = userInfo.password,
             leadingIcon = Icons.Default.Lock,
             isPass = true,
             showPass = showPass,
-            onValueChange = onValueChangePassword,
+            onValueChange = {
+                userInfo = userInfo.copy(password = it)
+            },
             onClickShowPass = {
                 showPass=!showPass
             }
@@ -111,7 +113,9 @@ fun LoginScreen(
                 .background(colorScheme.surfaceTint, RoundedCornerShape(30.dp))
                 .width(380.dp)
                 .height(60.dp),
-            onClick = { onClickLogin(state.userInfo) }
+            onClick = {
+                viewModel.processIntent(MviIntent.CheckLogin(userInfo))
+            }
         ) {
             Text(
                 "Login",
@@ -139,7 +143,7 @@ fun LoginScreen(
                 .padding(10.dp)
                 .padding(bottom = 20.dp)
                 .clickable {
-                    onClickSignup()
+                    viewModel.processIntent(MviIntent.OnClickSignup)
                 }
         )
     }

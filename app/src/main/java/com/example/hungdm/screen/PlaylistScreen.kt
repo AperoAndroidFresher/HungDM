@@ -1,9 +1,6 @@
 package com.example.hungdm.screen
 
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -19,80 +16,64 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.example.hungdm.R
-import com.example.hungdm.component.ItemGrid
 import com.example.hungdm.component.ItemLinear
-import com.example.hungdm.model.Song
+import com.example.hungdm.model.Playlist
 import com.example.hungdm.mvi.MviIntent
-import com.example.hungdm.mvi.MviState
 import com.example.hungdm.mvi.MviViewModel
-import com.example.hungdm.navigation.Destination
-import java.io.File
 
 @Composable
 fun PlaylistScreen(
     modifier: Modifier = Modifier,
-    state: MviState = MviState(),
     viewModel: MviViewModel = MviViewModel(),
     onBack: () -> Unit = {},
 ) {
 
-    val playlists = state.playlists
+    val state = viewModel.state.collectAsState()
+    val playlists = state.value.playlists
+    var selectedPlaylist by remember { mutableStateOf<Playlist?>(null) }
+    var showCreatePlaylistDialod by remember { mutableStateOf(false) }
 
     BackHandler { onBack() }
 
-    if (state.playlists.size > 0) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(colorScheme.background)
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(colorScheme.background)
+            .padding(start = 8.dp, end = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        PlaylistHeader(
+            onClickNewPlaylist = {
+                showCreatePlaylistDialod = true
+            }
+        )
+
+        if (playlists.size > 0) {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -100,15 +81,17 @@ fun PlaylistScreen(
                 items(playlists.size) {
                     var showOption by remember { mutableStateOf(false) }
                     ItemLinear(
+                        modifier = Modifier.fillMaxWidth(),
                         playlist = playlists[it],
                         showOption = showOption,
                         option1 = "Remove playlist",
                         option2 = "Rename",
                         onClickShowOption = {
                             showOption = true
+                            selectedPlaylist = playlists[it]
                         },
                         onClickOption1 = {
-                            viewModel.processIntent(MviIntent.RemoveSong(it))
+                            viewModel.processIntent(MviIntent.RemovePlaylist(selectedPlaylist!!))
                         },
                         onClickOption2 = {
 
@@ -117,46 +100,42 @@ fun PlaylistScreen(
                             showOption = false
                         },
                         onCLickShowPlaylistDetail = {
-                            viewModel.processIntent(MviIntent.ShowPlaylistDetail(playlists[it]))
+                            viewModel.processIntent(MviIntent.OnClickPlaylistDetail(playlists[it]))
                         }
                     )
                 }
             }
-        }
-    } else {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(colorScheme.background)
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-
-            Text(
-                "You don’t have any playlists.\n Click the '+' button to add",
-                color = colorScheme.primary
-            )
-
-            IconButton(
-                onClick = { viewModel.processIntent(MviIntent.ShowCreatePlaylistDialod) },
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .size(48.dp)
-                    .border(1.dp, colorScheme.primary, shape = CircleShape)
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add", tint = colorScheme.primary)
+                Text(
+                    "You don’t have any playlists.\n Click the '+' button to add",
+                    color = colorScheme.primary
+                )
+                IconButton(
+                    onClick = { showCreatePlaylistDialod = true },
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .size(48.dp)
+                        .border(1.dp, colorScheme.primary, shape = CircleShape)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add", tint = colorScheme.primary)
+                }
             }
         }
     }
 
-    if (state.showCreatePlaylistDialod) {
+
+    if (showCreatePlaylistDialod) {
         AddNewPlaylistDialog(
             onCreatePlaylist = {
                 viewModel.processIntent(MviIntent.CreatePlaylist(it))
             },
             onDismissRequest = {
-                viewModel.processIntent(MviIntent.ShowCreatePlaylistDialod)
+                showCreatePlaylistDialod = false
             }
         )
     }
@@ -176,7 +155,7 @@ fun AddNewPlaylistDialog(
             modifier = Modifier
                 .background(Color.DarkGray, RoundedCornerShape(20.dp))
                 .width(350.dp)
-                .height(220.dp)
+                .wrapContentHeight()
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -228,5 +207,34 @@ fun AddNewPlaylistDialog(
     }
 }
 
+@Composable
+fun PlaylistHeader(
+    modifier: Modifier = Modifier,
+    onClickNewPlaylist: ()->Unit = {},
+) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+    ) {
 
+        Text(
+            text = "Playlist",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.primary,
+            modifier = Modifier.align(Alignment.Center)
+        )
+
+        IconButton(
+            modifier = Modifier.align(Alignment.TopEnd),
+            onClick = onClickNewPlaylist
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = colorScheme.primary
+            )
+        }
+    }
+}
 

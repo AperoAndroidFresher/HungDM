@@ -1,6 +1,5 @@
 package com.example.hungdm.screen
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,9 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,7 +25,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -45,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,28 +48,26 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
-import com.example.hungdm.component.ItemGrid
 import com.example.hungdm.component.ItemLinear
-import com.example.hungdm.component.Option
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
 import com.example.hungdm.mvi.MviIntent
-import com.example.hungdm.mvi.MviState
 import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.navigation.Destination
+import androidx.compose.runtime.collectAsState
+import com.example.hungdm.UtilsFunction
 
 @Composable
 fun LibraryScreen(
     modifier: Modifier = Modifier,
-    state: MviState = MviState(),
     viewModel: MviViewModel = MviViewModel(),
     onBack: () -> Unit = {},
 ) {
-
-    val listSong = state.listSong
-//    var selectedData by remember { mutableStateOf(1) }
+    val state = viewModel.state.collectAsState()
+    val listSong = state.value.listSong
     var selectedSong by remember { mutableStateOf<Song?>(null) }
     var showAddSongToPlaylistDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
 
     BackHandler { onBack() }
@@ -84,9 +76,18 @@ fun LibraryScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colorScheme.background)
-            .padding(8.dp),
+            .padding(start = 8.dp, end = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            text = "Library",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.primary
+        )
+
+        Spacer(Modifier.size(20.dp))
+
         Row {
             Button(
                 onClick = {
@@ -96,7 +97,7 @@ fun LibraryScreen(
                     .width(140.dp)
                     .height(50.dp),
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors( colorScheme.surfaceTint )
+                colors = ButtonDefaults.buttonColors(colorScheme.surfaceTint)
             ) {
                 Text(text = "Local", fontSize = 16.sp, color = Color.White)
             }
@@ -111,72 +112,46 @@ fun LibraryScreen(
                     .width(140.dp)
                     .height(50.dp),
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors( Color.DarkGray)
+                colors = ButtonDefaults.buttonColors(Color.DarkGray)
             ) {
                 Text(text = "Remote", fontSize = 16.sp, color = Color.White)
             }
         }
+
         Spacer(Modifier.size(10.dp))
 
-        if (!state.isLoadSong) {
+        if (!state.value.isLoadSong) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(if (state.linearListMusic) 1 else 2),
+            LazyColumn(
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(if (state.linearListMusic) 8.dp else 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(listSong.size) {
-                    if (state.linearListMusic) {
-                        var showOption by remember { mutableStateOf(false) }
-                        ItemLinear(
-                            song = listSong[it],
-                            showOption = showOption,
-                            icon1 = Icons.Default.AddCircle,
-                            icon2 = Icons.Default.Share,
-                            option1 = "Add to playlist",
-                            option2 = "Share",
-                            onClickShowOption = {
-                                showOption = true
-                            },
-                            onClickOption1 = {
-                                selectedSong = listSong[it]
-                                showAddSongToPlaylistDialog = true
-                            },
-                            onClickOption2 = {
-
-                            },
-                            onDismissRequest = {
-                                showOption = false
-                            }
-                        )
-                    } else {
-                        var showOption by remember { mutableStateOf(false) }
-                        ItemGrid(
-                            song = listSong[it],
-                            showOption = showOption,
-                            icon1 = Icons.Default.AddCircle,
-                            icon2 = Icons.Default.Share,
-                            option1 = "Add to playlist",
-                            option2 = "Share",
-                            onClickShowOption = {
-                                showOption = true
-                            },
-                            onClickOption1 = {
-                                selectedSong = listSong[it]
-                                showAddSongToPlaylistDialog = true
-                            },
-                            onClickOption2 = {
-
-                            },
-                            onDismissRequest = {
-                                showOption = false
-                            }
-                        )
-                    }
+                    var showOption by remember { mutableStateOf(false) }
+                    ItemLinear(
+                        song = listSong[it],
+                        showOption = showOption,
+                        icon1 = Icons.Default.AddCircle,
+                        icon2 = Icons.Default.Share,
+                        option1 = "Add to playlist",
+                        option2 = "Share",
+                        onClickShowOption = {
+                            showOption = true
+                            selectedSong = listSong[it]
+                        },
+                        onClickOption1 = {
+                            showAddSongToPlaylistDialog = true
+                        },
+                        onClickOption2 = {
+                            UtilsFunction.shareSong(context, selectedSong!!)
+                        },
+                        onDismissRequest = {
+                            showOption = false
+                        }
+                    )
                 }
             }
 
@@ -185,15 +160,15 @@ fun LibraryScreen(
 
     if (showAddSongToPlaylistDialog) {
         AddSongDialog(
-            playlists = state.playlists,
+            playlists = state.value.playlists,
             onClickNewPlaylist = {
-                viewModel.processIntent(MviIntent.ClickItemBottomBar(2))
-                viewModel.replace(Destination.Playlist)
                 showAddSongToPlaylistDialog = false
+                viewModel.processIntent(MviIntent.OnClickItemBottomBar(2))
+                viewModel.replace(Destination.Playlist)
             },
             onAddSongToPlaylist = {
-                selectedSong?.let { song ->
-                    viewModel.processIntent(MviIntent.AddSongToPlaylist(song, it))
+                selectedSong?.let { selectedSong ->
+                    viewModel.processIntent(MviIntent.AddSongToPlaylist(selectedSong, it))
                 }
                 showAddSongToPlaylistDialog = false
                 selectedSong = null
@@ -245,7 +220,7 @@ fun AddSongDialog(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(playlists.size){
+                    items(playlists.size) {
                         ItemPlaylist(
                             playlist = playlists[it],
                             onAddSongToPlaylist = {
@@ -263,7 +238,7 @@ fun AddSongDialog(
 fun ItemPlaylist(
     modifier: Modifier = Modifier,
     playlist: Playlist = Playlist(),
-    onAddSongToPlaylist: ()->Unit = {}
+    onAddSongToPlaylist: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -275,7 +250,7 @@ fun ItemPlaylist(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data( R.drawable.img1 )
+                .data(R.drawable.img1)
                 .crossfade(true)
                 .error(R.drawable.img1)
                 .size(300, 300)

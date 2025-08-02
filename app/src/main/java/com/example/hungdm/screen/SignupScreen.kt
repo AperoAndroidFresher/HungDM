@@ -1,6 +1,5 @@
 package com.example.hungdm.screen
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -29,31 +28,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.UtilsFunction
 import com.example.hungdm.component.InputText
 import com.example.hungdm.component.Logo
 import com.example.hungdm.model.UserInfo
-import com.example.hungdm.mvi.MviState
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviViewModel
 
 
 @Preview
 @Composable
 fun SignupScreen(
     modifier: Modifier = Modifier,
-    state: MviState = MviState(),
-    onBack: () -> Unit = {},
-    onSigupClick: () -> Unit = { },
-    onValueChangeUsername: (String)->Unit={},
-    onValueChangePass: (String)->Unit={},
-    onValueChangePass2: (String)->Unit={},
-    onValueChangeEmail: (String)->Unit={},
-    checkSignup: ()->Unit = {}
+    viewModel: MviViewModel = MviViewModel(),
+//    onBack: () -> Unit = {},
+//    onSigupClick: () -> Unit = { },
+//    onValueChangeUsername: (String)->Unit={},
+//    onValueChangePass: (String)->Unit={},
+//    onValueChangePass2: (String)->Unit={},
+//    onValueChangeEmail: (String)->Unit={},
+//    checkSignup: ()->Unit = {}
 ) {
+    var userInfo by remember { mutableStateOf(UserInfo()) }
     var showPass by remember { mutableStateOf(false) }
     var showPass2 by remember { mutableStateOf(false) }
 
     BackHandler {
-        onBack()
-        Log.d("TAG","Back"+ state.backStack.size)
+        viewModel.removeLast()
     }
 
     Column(
@@ -66,26 +67,38 @@ fun SignupScreen(
         Logo(
             isSignup = true,
             title = "Sign up",
-            onBack = onBack
+            onBack = {
+                viewModel.removeLast()
+            }
         )
 
         Spacer(Modifier.size(40.dp))
         InputText(
             title = "Username",
-            value = state.userInfo.username,
-            isValid = state.userInfo.inputValid.userValid,
-            onValueChange = onValueChangeUsername
+            value = userInfo.username,
+            isValid = userInfo.inputValid.userValid,
+            onValueChange = {
+                userInfo = userInfo.copy(
+                    username = it,
+                    inputValid = userInfo.inputValid.copy(userValid = true)
+                )
+            }
         )
 
         Spacer(Modifier.size(10.dp))
         InputText(
             title = "Password",
-            value = state.userInfo.password,
-            isValid = state.userInfo.inputValid.passValid,
+            value = userInfo.password,
+            isValid = userInfo.inputValid.passValid,
             isPass = true,
             leadingIcon = Icons.Default.Lock,
             showPass = showPass,
-            onValueChange = onValueChangePass,
+            onValueChange = {
+                userInfo = userInfo.copy(
+                    password = it,
+                    inputValid = userInfo.inputValid.copy(passValid = true)
+                )
+            },
             onClickShowPass = {
                 showPass = !showPass
             }
@@ -94,12 +107,17 @@ fun SignupScreen(
         Spacer(Modifier.size(10.dp))
         InputText(
             title = "Confirm password",
-            value = state.userInfo.pass2,
-            isValid = state.userInfo.inputValid.pass2valid,
+            value = userInfo.pass2,
+            isValid = userInfo.inputValid.pass2valid,
             isPass = true,
             leadingIcon = Icons.Default.Lock,
             showPass = showPass2,
-            onValueChange = onValueChangePass2,
+            onValueChange = {
+                userInfo = userInfo.copy(
+                    pass2 = it,
+                    inputValid = userInfo.inputValid.copy(pass2valid = true)
+                )
+            },
             onClickShowPass = {
                 showPass2 = !showPass2
             }
@@ -108,10 +126,15 @@ fun SignupScreen(
         Spacer(Modifier.size(10.dp))
         InputText(
             title = "Email",
-            value = state.userInfo.email,
-            isValid = state.userInfo.inputValid.emailValid,
+            value = userInfo.email,
+            isValid = userInfo.inputValid.emailValid,
             leadingIcon = Icons.Default.Email,
-            onValueChange = onValueChangeEmail
+            onValueChange = {
+                userInfo = userInfo.copy(
+                    email = it,
+                    inputValid = userInfo.inputValid.copy(emailValid = true)
+                )
+            }
         )
 
         Spacer(Modifier.weight(1f))
@@ -120,7 +143,19 @@ fun SignupScreen(
                 .background(colorScheme.surfaceTint, RoundedCornerShape(30.dp))
                 .width(380.dp)
                 .height(60.dp),
-            onClick = onSigupClick
+            onClick = {
+                userInfo = userInfo.copy(
+                    inputValid = userInfo.inputValid.copy(
+                        userValid = UtilsFunction.isValid(userInfo.username),
+                        passValid = UtilsFunction.isValidPass(userInfo.password),
+                        pass2valid = UtilsFunction.isValidPass2(userInfo.password, userInfo.pass2),
+                        emailValid = UtilsFunction.isValidEmail(userInfo.email)
+                    )
+                )
+                if (userInfo.inputValid.userValid && userInfo.inputValid.passValid && userInfo.inputValid.pass2valid && userInfo.inputValid.emailValid) {
+                    viewModel.processIntent(MviIntent.CheckSignup(userInfo))
+                }
+            }
         ) {
             Text(
                 "Sign up",

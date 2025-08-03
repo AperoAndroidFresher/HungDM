@@ -21,6 +21,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -56,7 +58,8 @@ fun PlaylistScreen(
     val state = viewModel.state.collectAsState()
     val playlists = state.value.playlists
     var selectedPlaylist by remember { mutableStateOf<Playlist?>(null) }
-    var showCreatePlaylistDialod by remember { mutableStateOf(false) }
+    var showCreatePlaylistDialog by remember { mutableStateOf(false) }
+    var showRenamePlaylistDialog by remember { mutableStateOf(false) }
 
     BackHandler { onBack() }
 
@@ -69,7 +72,7 @@ fun PlaylistScreen(
     ) {
         PlaylistHeader(
             onClickNewPlaylist = {
-                showCreatePlaylistDialod = true
+                showCreatePlaylistDialog = true
             }
         )
 
@@ -86,6 +89,8 @@ fun PlaylistScreen(
                         showOption = showOption,
                         option1 = "Remove playlist",
                         option2 = "Rename",
+                        icon1 = Icons.Default.Delete,
+                        icon2 = Icons.Default.Edit,
                         onClickShowOption = {
                             showOption = true
                             selectedPlaylist = playlists[it]
@@ -94,7 +99,7 @@ fun PlaylistScreen(
                             viewModel.processIntent(MviIntent.RemovePlaylist(selectedPlaylist!!))
                         },
                         onClickOption2 = {
-
+                            showRenamePlaylistDialog = true
                         },
                         onDismissRequest = {
                             showOption = false
@@ -116,7 +121,7 @@ fun PlaylistScreen(
                     color = colorScheme.primary
                 )
                 IconButton(
-                    onClick = { showCreatePlaylistDialod = true },
+                    onClick = { showCreatePlaylistDialog = true },
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .size(48.dp)
@@ -129,13 +134,28 @@ fun PlaylistScreen(
     }
 
 
-    if (showCreatePlaylistDialod) {
-        AddNewPlaylistDialog(
-            onCreatePlaylist = {
+    if (showCreatePlaylistDialog) {
+        PlaylistDialog(
+            title = "New playlist",
+            actionStr = "Create",
+            onAction = {
                 viewModel.processIntent(MviIntent.CreatePlaylist(it))
             },
             onDismissRequest = {
-                showCreatePlaylistDialod = false
+                showCreatePlaylistDialog = false
+            }
+        )
+    }
+
+    if (showRenamePlaylistDialog) {
+        PlaylistDialog(
+            title = "Rename playlist",
+            actionStr = "Rename",
+            onAction = {
+                viewModel.processIntent(MviIntent.RenamePlaylist(it,selectedPlaylist!!))
+            },
+            onDismissRequest = {
+                showRenamePlaylistDialog = false
             }
         )
     }
@@ -143,9 +163,11 @@ fun PlaylistScreen(
 
 
 @Composable
-fun AddNewPlaylistDialog(
+fun PlaylistDialog(
     modifier: Modifier = Modifier,
-    onCreatePlaylist: (String) -> Unit = {},
+    title: String = "",
+    actionStr: String = "",
+    onAction: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {}
 ) {
     var playlistTitle by remember { mutableStateOf("") }
@@ -160,7 +182,7 @@ fun AddNewPlaylistDialog(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "New Playlist",
+                text = title,
                 color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
@@ -196,11 +218,11 @@ fun AddNewPlaylistDialog(
                 TextButton(
                     modifier = Modifier.width(145.dp),
                     onClick = {
-                        onCreatePlaylist(playlistTitle)
+                        onAction(playlistTitle)
                         onDismissRequest()
                     }
                 ) {
-                    Text("Create", color = Color.Cyan, fontWeight = FontWeight.Bold)
+                    Text(actionStr, color = Color.Cyan, fontWeight = FontWeight.Bold)
                 }
             }
         }

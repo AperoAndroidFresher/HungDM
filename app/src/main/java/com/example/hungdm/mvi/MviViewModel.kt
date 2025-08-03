@@ -4,12 +4,14 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
 import com.example.hungdm.model.getAlbumArt
 import com.example.hungdm.navigation.Destination
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -69,10 +71,13 @@ class MviViewModel : ViewModel() {
 
 
                 is MviIntent.LoadSong -> {
-                    _state.value = _state.value.copy(
-                        listSong = getAllSong(intent.context),
-                        isLoadSong = true
-                    )
+                    if(_state.value.selectedBottomBar==1 && !_state.value.isLoadSong){
+                        delay(1500)
+                        _state.value = _state.value.copy(
+                            listSong = getAllSong(intent.context),
+                            isLoadSong = true
+                        )
+                    }
                 }
 
                 is MviIntent.CreatePlaylist -> {
@@ -80,6 +85,14 @@ class MviViewModel : ViewModel() {
                     playlists.add(Playlist(title = intent.title))
                     _state.value = _state.value.copy(
                         playlists = playlists
+                    )
+                }
+
+                is MviIntent.RenamePlaylist -> {
+                    _state.value = _state.value.copy(
+                        playlists = _state.value.playlists.map {
+                            if(it.id==intent.playlist.id) it.copy(title = intent.title) else it
+                        }
                     )
                 }
 
@@ -92,19 +105,27 @@ class MviViewModel : ViewModel() {
                 is MviIntent.AddSongToPlaylist -> {
                     val playlists = _state.value.playlists.toMutableList()
                     val index = playlists.indexOfFirst { it.id == intent.playlist.id }
-
-                    if (index != -1) {
-                        val playlist = playlists[index]
-                        val newSongs = playlist.listSong.toMutableList()
-                        newSongs.add(intent.song)
-                        playlists[index] = playlist.copy(listSong = newSongs)
-                        _state.value = _state.value.copy(playlists = playlists)
-
+                    val oldPlaylist = playlists[index]
+                    val newListSong = oldPlaylist.listSong.toMutableList().apply {
+                        add(intent.song)
                     }
+                    val newPlaylist = oldPlaylist.copy(listSong = newListSong)
+
+                    playlists[index] = newPlaylist
+
+                    _state.value = _state.value.copy(playlists = playlists)
                 }
 
                 is MviIntent.RemoveSongInPlaylist -> {
-
+                    val playlists = _state.value.playlists.toMutableList()
+                    val index = playlists.indexOfFirst { it.id == intent.playlist.id }
+                    val oldPlaylist = playlists[index]
+                    val newListSong = oldPlaylist.listSong.toMutableList().apply {
+                        removeAt(intent.songIndex)
+                    }
+                    val newPlaylist = oldPlaylist.copy(listSong = newListSong)
+                    playlists[index] = newPlaylist
+                    _state.value = _state.value.copy(playlists = playlists)
                 }
 
                 is MviIntent.OnClickPlaylistDetail -> {

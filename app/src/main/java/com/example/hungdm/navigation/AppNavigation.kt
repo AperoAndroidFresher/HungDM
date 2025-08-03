@@ -59,12 +59,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     )
 
     LaunchedEffect(Unit) {
-        if(!state.isLoadSong){
-            viewModel.processIntent(MviIntent.LoadSong(context))
-        }
-    }
-
-    LaunchedEffect(Unit) {
         viewModel.event.collect{e->
             when(e){
                 is MviEvent.GotoLogin ->{
@@ -95,69 +89,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         dynamicColor = false
     ){
         Scaffold(
-//            topBar = {
-//                val showTopNav = state.backStack.lastOrNull()?.let {
-//                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile && it !is Destination.PlaylistDetail
-//                } ?: false
-//
-//                if (showTopNav) {
-//                    TopAppBar(
-//                        colors = TopAppBarDefaults.topAppBarColors(
-//                            containerColor = colorScheme.background
-//                        ),
-//                        title = {
-//                            when (state.selectedBottomBar) {
-//                                0 -> {
-//                                    Text("Home", color = colorScheme.primary)
-//                                }
-//
-//                                1 -> {
-//                                    Text("Library", color = colorScheme.primary)
-//                                }
-//
-//                                2 -> {
-//                                    Text("Playlist", color = colorScheme.primary)
-//                                }
-//                            }
-//                        },
-//                        actions = {
-//                            if(state.selectedBottomBar ==2){
-//                                IconButton(
-//                                    onClick = { viewModel.processIntent(MviIntent.ShowCreatePlaylistDialod) }
-//                                ) {
-//                                    Icon(
-//                                        imageVector = Icons.Default.Add,
-//                                        contentDescription = null,
-//                                        modifier = Modifier.size(20.dp),
-//                                    )
-//                                }
-//                            }
-//
-//                            IconButton(
-//                                onClick = { viewModel.processIntent(MviIntent.ChangeTheme) }
-//                            ) {
-//                                Icon(
-//                                    painter = painterResource(if(state.darkTheme) R.drawable.light else R.drawable.dark),
-//                                    contentDescription = null,
-//                                    modifier = Modifier.size(20.dp),
-//                                )
-//                            }
-//                            IconButton(
-//                                onClick = { viewModel.processIntent(MviIntent.OnClickProfile) }
-//                            ) {
-//                                Icon(
-//                                    imageVector = Icons.Default.AccountCircle,
-//                                    contentDescription = null,
-//                                    modifier = Modifier.size(20.dp),
-//                                )
-//                            }
-//                        }
-//                    )
-//                }
-//            },
             bottomBar = {
                 val showBottomNav = state.backStack.lastOrNull()?.let {
-                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile && it !is Destination.PlaylistDetail
+                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile
                 } ?: false
 
                 if (showBottomNav) {
@@ -171,6 +105,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 onClick = {
                                     viewModel.processIntent(MviIntent.OnClickItemBottomBar(index))
                                     viewModel.replace(item.destination)
+                                    viewModel.processIntent(MviIntent.LoadSong(context))
                                 },
                                 icon = { Icon(item.icon,null) },
                                 label = { Text(item.label, color = colorScheme.primary) }

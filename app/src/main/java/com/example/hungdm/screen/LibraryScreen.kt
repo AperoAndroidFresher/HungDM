@@ -134,10 +134,10 @@ fun LibraryScreen(
                     ItemLinear(
                         song = listSong[it],
                         showOption = showOption,
-                        icon1 = Icons.Default.AddCircle,
-                        icon2 = Icons.Default.Share,
                         option1 = "Add to playlist",
                         option2 = "Share",
+                        icon1 = Icons.Default.AddCircle,
+                        icon2 = Icons.Default.Share,
                         onClickShowOption = {
                             showOption = true
                             selectedSong = listSong[it]
@@ -182,7 +182,7 @@ fun LibraryScreen(
 @Composable
 fun AddSongDialog(
     modifier: Modifier = Modifier,
-    playlists: MutableList<Playlist> = mutableListOf(),
+    playlists: List<Playlist> = mutableListOf(),
     onClickNewPlaylist: () -> Unit = {},
     onAddSongToPlaylist: (Playlist) -> Unit = {},
     onDismiss: () -> Unit = {},

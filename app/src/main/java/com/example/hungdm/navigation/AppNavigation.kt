@@ -44,7 +44,6 @@ data class BottomItem(
 )
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
 
@@ -77,7 +76,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     viewModel.replace(Destination.Playlist)
                 }
                 is MviEvent.GotoPlaylistDetail->{
-                    viewModel.add(Destination.PlaylistDetail)
+                    viewModel.add(Destination.PlaylistDetail(e.playlistId))
                 }
             }
         }
@@ -169,9 +168,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         )
                     }
 
-                    entry<Destination.PlaylistDetail>{
+                    entry<Destination.PlaylistDetail>{ destination ->
                         PlaylistDetailScreen(
                             viewModel = viewModel,
+                            destination = destination,
                             onBack = {
                                 viewModel.removeLast()
                             }

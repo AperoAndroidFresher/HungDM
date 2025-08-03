@@ -40,13 +40,14 @@ import com.example.hungdm.navigation.Destination
 @Composable
 fun PlaylistDetailScreen(
     modifier: Modifier = Modifier,
+    destination: Destination.PlaylistDetail = Destination.PlaylistDetail(""),
     viewModel: MviViewModel = MviViewModel(),
     onBack: () -> Unit = {},
 ) {
 
     val context = LocalContext.current
     val state = viewModel.state.collectAsState()
-    val playlist = state.value.playlists.find { it.id == state.value.selectedPlaylist?.id }
+    val playlist = state.value.playlists.find { it.id == destination.playlistID }
 
 
 

@@ -129,10 +129,7 @@ class MviViewModel : ViewModel() {
                 }
 
                 is MviIntent.OnClickPlaylistDetail -> {
-                    _state.value = _state.value.copy(
-                        selectedPlaylist = intent.playlist
-                    )
-                    sendEvent(MviEvent.GotoPlaylistDetail)
+                    sendEvent(MviEvent.GotoPlaylistDetail(intent.playlistId))
                 }
             }
         }

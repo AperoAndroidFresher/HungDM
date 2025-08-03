@@ -29,7 +29,7 @@ sealed interface MviIntent{
     data class RemovePlaylist(val playlist: Playlist): MviIntent
     data class AddSongToPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class RemoveSongInPlaylist(val songIndex: Int, val playlist: Playlist): MviIntent
-    data class OnClickPlaylistDetail(val playlist: Playlist) : MviIntent
+    data class OnClickPlaylistDetail(val playlistId: String) : MviIntent
     data object ChangeTheme : MviIntent
     data class OnClickItemBottomBar(val index: Int): MviIntent
 }
@@ -40,7 +40,7 @@ sealed interface MviEvent{
     data object GotoSignup: MviEvent
     data object GotoProfile: MviEvent
     data object GotoPlaylist: MviEvent
-    data object GotoPlaylistDetail: MviEvent
+    data class GotoPlaylistDetail(val playlistId: String): MviEvent
 }
 
 

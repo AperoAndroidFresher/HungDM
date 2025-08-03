@@ -105,7 +105,7 @@ fun PlaylistScreen(
                             showOption = false
                         },
                         onCLickShowPlaylistDetail = {
-                            viewModel.processIntent(MviIntent.OnClickPlaylistDetail(playlists[it]))
+                            viewModel.processIntent(MviIntent.OnClickPlaylistDetail(playlists[it].id))
                         }
                     )
                 }

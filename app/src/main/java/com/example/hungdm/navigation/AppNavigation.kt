@@ -1,6 +1,8 @@
 package com.example.hungdm.navigation
 
 import android.app.Activity
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -36,6 +38,7 @@ import com.example.hungdm.screen.PlaylistScreen
 import com.example.hungdm.screen.ProfileScreen
 import com.example.hungdm.screen.SignupScreen
 import com.example.hungdm.ui.theme.AppTheme
+import org.koin.androidx.compose.koinViewModel
 
 data class BottomItem(
     var label: String,
@@ -47,7 +50,7 @@ data class BottomItem(
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
 
-    val viewModel: MviViewModel = viewModel()
+    val viewModel: MviViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
@@ -78,6 +81,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 is MviEvent.GotoPlaylistDetail->{
                     viewModel.add(Destination.PlaylistDetail(e.playlistId))
                 }
+                is MviEvent.ShowToast -> {
+                    Toast.makeText(context, e.mess, LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -104,7 +110,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 onClick = {
                                     viewModel.processIntent(MviIntent.OnClickItemBottomBar(index))
                                     viewModel.replace(item.destination)
-                                    viewModel.processIntent(MviIntent.LoadSong(context))
                                 },
                                 icon = { Icon(item.icon,null) },
                                 label = { Text(item.label, color = colorScheme.primary) }

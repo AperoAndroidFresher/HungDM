@@ -32,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +61,7 @@ import com.example.hungdm.UtilsFunction
 @Composable
 fun LibraryScreen(
     modifier: Modifier = Modifier,
-    viewModel: MviViewModel = MviViewModel(),
+    viewModel: MviViewModel,
     onBack: () -> Unit = {},
 ) {
     val state = viewModel.state.collectAsState()
@@ -69,6 +70,9 @@ fun LibraryScreen(
     var showAddSongToPlaylistDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        viewModel.processIntent(MviIntent.LoadSong(context))
+    }
 
     BackHandler { onBack() }
 

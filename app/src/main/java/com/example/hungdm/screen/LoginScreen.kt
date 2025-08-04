@@ -40,11 +40,10 @@ import com.example.hungdm.model.UserInfo
 import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
 
-@Preview
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: MviViewModel =MviViewModel()
+    viewModel: MviViewModel
 ) {
 
     var userInfo by remember { mutableStateOf(UserInfo()) }

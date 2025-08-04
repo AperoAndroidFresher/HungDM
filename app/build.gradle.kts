@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
+    id("kotlin-kapt")
 
 }
 
@@ -68,6 +69,15 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+//    implementation(libs.androidx.room.runtime.android)
+//    implementation(libs.androidx.room.runtime.jvm)
+    implementation("androidx.room:room-runtime:2.7.2")
+    kapt("androidx.room:room-compiler:2.7.2")
+
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation("io.insert-koin:koin-androidx-compose:4.1.0")
 
 
 

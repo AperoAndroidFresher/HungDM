@@ -1,5 +1,6 @@
 package com.example.hungdm.screen
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -60,6 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.UtilsFunction
@@ -72,22 +74,28 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    viewModel: MviViewModel = MviViewModel(),
+    viewModel: MviViewModel
 ) {
 
+    val context = LocalContext.current
     val state = viewModel.state.collectAsState()
     var userInfo by remember { mutableStateOf(state.value.userInfo) }
     var showPopup by remember { mutableStateOf(false) }
     var isEdit by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
+        contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri: Uri? ->
             uri?.let {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
                 userInfo = userInfo.copy(imgUri = it)
             }
         }
     )
+
     val focusManager = LocalFocusManager.current
 
     val scope = rememberCoroutineScope()
@@ -131,7 +139,7 @@ fun ProfileScreen(
         Avatar(
             isEdit = isEdit,
             onChangeAvatar = {
-                launcher.launch("image/*")
+                launcher.launch(arrayOf("image/*"))
             },
             imageUri = userInfo.imgUri ?: R.drawable.img
         )

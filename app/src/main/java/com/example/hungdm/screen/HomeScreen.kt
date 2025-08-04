@@ -44,7 +44,7 @@ data class BottomItem(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: MviViewModel = MviViewModel(),
+    viewModel: MviViewModel,
     onBack: () -> Unit = {},
 ) {
 

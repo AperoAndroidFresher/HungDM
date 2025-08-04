@@ -1,5 +1,8 @@
 [versions]
 agp = "8.11.1"
+koinAndroid = "4.1.0"
+koinCompose = "4.1.0"
+koinCore = "4.1.0"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -10,6 +13,8 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 navigation3UiKtx = "1.0.0-alpha01"
 navigation3UiAndroid = "1.0.0-alpha05"
+roomRuntimeAndroid = "2.7.2"
+roomRuntimeJvm = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,6 +34,11 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation3-ui-android = { group = "androidx.navigation3", name = "navigation3-ui-android", version.ref = "navigation3UiAndroid" }
+androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomRuntimeAndroid" }
+androidx-room-runtime-jvm = { group = "androidx.room", name = "room-runtime-jvm", version.ref = "roomRuntimeJvm" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -40,8 +40,8 @@ import com.example.hungdm.navigation.Destination
 @Composable
 fun PlaylistDetailScreen(
     modifier: Modifier = Modifier,
-    destination: Destination.PlaylistDetail = Destination.PlaylistDetail(""),
-    viewModel: MviViewModel = MviViewModel(),
+    destination: Destination.PlaylistDetail = Destination.PlaylistDetail(0),
+    viewModel: MviViewModel ,
     onBack: () -> Unit = {},
 ) {
 

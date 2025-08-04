@@ -7,10 +7,16 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hungdm.db.entity.PlaylistEntity
+import com.example.hungdm.db.entity.UserEntity
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
+import com.example.hungdm.model.UserInfo
 import com.example.hungdm.model.getAlbumArt
 import com.example.hungdm.navigation.Destination
+import com.example.hungdm.repo.PlaylistRepository
+import com.example.hungdm.repo.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +25,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class MviViewModel : ViewModel() {
+class MviViewModel(
+    private val userRepository: UserRepository,
+    private val playlistRepository: PlaylistRepository
+) : ViewModel() {
     private val _state = MutableStateFlow<MviState>(MviState())
     val state: StateFlow<MviState> = _state.asStateFlow()
     private val _event = MutableSharedFlow<MviEvent>()
@@ -34,18 +44,50 @@ class MviViewModel : ViewModel() {
                 }
 
                 is MviIntent.CheckLogin -> {
-                    //check db
-                    _state.value = _state.value.copy(
-                        userInfo = intent.userInfo
-                    )
-                    sendEvent(MviEvent.GotoHome)
+                    val user = withContext(Dispatchers.IO) {
+                        userRepository.login(intent.userInfo.username, intent.userInfo.password)
+                    }
+
+                    if (user != null) {
+                        _state.value = _state.value.copy(
+                            userInfo = UserInfo(
+                                id = user.id,
+                                username = user.username,
+                                password = user.password,
+                                email = user.email,
+                                name  = user.name,
+                                phone  = user.phone,
+                                uni  = user.uni,
+                                desc = user.desc,
+                                imgUri  = user.imgUri
+                            )
+                        )
+                        sendEvent(MviEvent.GotoHome)
+                    } else {
+                        sendEvent(MviEvent.ShowToast("Đăng nhập thất bại"))
+                    }
                 }
 
                 is MviIntent.CheckSignup -> {
-                    //check + luu vao db
-                    removeLast()
-                    sendEvent(MviEvent.GotoLogin)
-                    removeLast()
+                    val newUserInfo = intent.userInfo
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            userRepository.signup(
+                                username = newUserInfo.username,
+                                password = newUserInfo.password,
+                                email = newUserInfo.email
+                            )
+                        }
+                        if (result > 0) {
+                            removeLast()
+                            sendEvent(MviEvent.GotoLogin)
+                            removeLast()
+                        } else {
+                            sendEvent(MviEvent.ShowToast("Username đã tồn tại"))
+                        }
+                    } catch (e: Exception) {
+                        sendEvent(MviEvent.ShowToast("Đăng ký thất bại: ${e.message}"))
+                    }
                 }
 
                 is MviIntent.OnClickProfile -> {
@@ -53,6 +95,21 @@ class MviViewModel : ViewModel() {
                 }
 
                 is MviIntent.CheckEditProfile -> {
+                    withContext(Dispatchers.IO) {
+                        userRepository.updateUser(
+                            UserEntity(
+                                id = _state.value.userInfo.id,
+                                username = _state.value.userInfo.username,
+                                password = _state.value.userInfo.password,
+                                name = _state.value.userInfo.name,
+                                phone = _state.value.userInfo.phone,
+                                email = _state.value.userInfo.email,
+                                uni = _state.value.userInfo.uni,
+                                desc = _state.value.userInfo.desc,
+                                imgUri = _state.value.userInfo.imgUri
+                            )
+                        )
+                    }
                     _state.value = _state.value.copy(
                         userInfo = intent.userInfo
                     )
@@ -69,14 +126,28 @@ class MviViewModel : ViewModel() {
                     )
                 }
 
+                is MviIntent.LoadPlaylistsOfUser ->{
+                    val playlists = playlistRepository.getPlaylistsOfUser(_state.value.userInfo.id)
+                    _state.value = _state.value.copy(
+//                        playlists=playlists
+                    )
+                }
+
 
                 is MviIntent.LoadSong -> {
-                    if(_state.value.selectedBottomBar==1 && !_state.value.isLoadSong){
-                        delay(1500)
-                        _state.value = _state.value.copy(
-                            listSong = getAllSong(intent.context),
-                            isLoadSong = true
-                        )
+                    if (_state.value.selectedBottomBar == 1 && !_state.value.isLoadSong) {
+                        viewModelScope.launch {
+//                            delay(1500)
+
+                            val songs = withContext(Dispatchers.IO) {
+                                getAllSong(intent.context)
+                            }
+
+                            _state.value = _state.value.copy(
+                                listSong = songs,
+                                isLoadSong = true
+                            )
+                        }
                     }
                 }
 
@@ -86,12 +157,19 @@ class MviViewModel : ViewModel() {
                     _state.value = _state.value.copy(
                         playlists = playlists
                     )
+
+                    val playlistEntity = PlaylistEntity(
+                        title = intent.title,
+                        userId = _state.value.userInfo.id
+                    )
+
+                    playlistRepository.createPlaylist(playlistEntity)
                 }
 
                 is MviIntent.RenamePlaylist -> {
                     _state.value = _state.value.copy(
                         playlists = _state.value.playlists.map {
-                            if(it.id==intent.playlist.id) it.copy(title = intent.title) else it
+                            if (it.id == intent.playlist.id) it.copy(title = intent.title) else it
                         }
                     )
                 }
@@ -160,7 +238,7 @@ class MviViewModel : ViewModel() {
         }
     }
 
-    private fun getAllSong(context: Context): MutableList<Song> {
+    suspend fun getAllSong(context: Context): MutableList<Song> = withContext(Dispatchers.IO) {
         val songs = mutableListOf<Song>()
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
@@ -193,19 +271,18 @@ class MviViewModel : ViewModel() {
                 val albumId = it.getLong(albumIdColumn)
                 val albumArt = getAlbumArt(context, albumId)
 
-                val uri =
+                val songUri =
                     ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-
                 val albumArtUri = ContentUris.withAppendedId(
-                    Uri.parse("content://media/external/audio/albumart"),
-                    albumId
+                    Uri.parse("content://media/external/audio/albumart"), albumId
                 )
 
-                songs.add(Song(id, title, artist, duration, albumArt, uri, albumArtUri))
+                songs.add(Song(id, title, artist, duration, albumArt, songUri, albumArtUri))
             }
         }
 
-        return songs
+        songs
     }
+
 
 }

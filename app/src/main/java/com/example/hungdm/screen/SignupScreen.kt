@@ -36,11 +36,10 @@ import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
 
 
-@Preview
 @Composable
 fun SignupScreen(
     modifier: Modifier = Modifier,
-    viewModel: MviViewModel = MviViewModel(),
+    viewModel: MviViewModel ,
 //    onBack: () -> Unit = {},
 //    onSigupClick: () -> Unit = { },
 //    onValueChangeUsername: (String)->Unit={},

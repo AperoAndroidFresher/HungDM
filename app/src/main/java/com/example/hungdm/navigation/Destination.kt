@@ -35,4 +35,8 @@ sealed interface Destination: NavKey {
     @Serializable
     @SerialName("Library")
     data object Library : Destination
+
+    @Serializable
+    @SerialName("PlaylistDetail")
+    data class PlaylistDetail(val playlistID: String) : Destination
 }

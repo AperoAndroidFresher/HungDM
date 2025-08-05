@@ -65,7 +65,6 @@ fun PopUp(
                         fontWeight = FontWeight(400),
                         fontSize = 20.sp
                     )
-
                 }
             }
         }

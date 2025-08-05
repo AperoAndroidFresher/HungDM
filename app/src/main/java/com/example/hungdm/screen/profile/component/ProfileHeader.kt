@@ -42,8 +42,8 @@ fun ProfileHeader(
             text = "My information",
             fontSize = 24.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.align(Alignment.Center),
-            color = colorScheme.primary
+            color = colorScheme.primary,
+            modifier = Modifier.align(Alignment.Center)
         )
         if (!isEdit) {
             IconButton(
@@ -53,8 +53,8 @@ fun ProfileHeader(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = colorScheme.primary
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

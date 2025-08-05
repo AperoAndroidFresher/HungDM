@@ -23,11 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.hungdm.UtilsFunction
 import com.example.hungdm.model.UserInfo
-import com.example.hungdm.mvi.MviIntent
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileInput(
@@ -37,7 +33,6 @@ fun ProfileInput(
     onValueChangeName: (String) -> Unit ={},
     onValueChangePhone: (String) -> Unit ={},
     onValueChangeUni: (String) -> Unit ={},
-    onValueChangeEmail: (String) -> Unit ={},
     onValueChangeDesc: (String) -> Unit ={},
     onSubmit: () -> Unit = {}
 ) {
@@ -54,9 +49,7 @@ fun ProfileInput(
                 isEdit = isEdit,
                 onValueChange = onValueChangeName
             )
-
             Spacer(Modifier.weight(1f))
-
             ProfileInputItem(
                 modifier = Modifier.width(180.dp),
                 text = "Phone number".uppercase(),
@@ -68,9 +61,7 @@ fun ProfileInput(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
-
         Spacer(Modifier.size(10.dp))
-
         ProfileInputItem(
             modifier = Modifier.fillMaxWidth(),
             text = "University name".uppercase(),
@@ -80,34 +71,18 @@ fun ProfileInput(
             isEdit = isEdit,
             onValueChange = onValueChangeUni
         )
-
         Spacer(Modifier.size(10.dp))
-
-        ProfileInputItem(
-            modifier = Modifier.fillMaxWidth(),
-            text = "Email".uppercase(),
-            hint = "Your email...",
-            value = userInfo.email,
-            isValid = userInfo.inputValid.emailValid,
-            isEdit = isEdit,
-            onValueChange = onValueChangeEmail
-        )
-
-        Spacer(Modifier.size(10.dp))
-
         ProfileInputItem(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp),
+                .height(200.dp),
             text = "describe yourself".uppercase(),
             hint = "Enter a description about yourself...",
             value = userInfo.desc,
             isEdit = isEdit,
             onValueChange = onValueChangeDesc
         )
-
         Spacer(Modifier.size(20.dp))
-
         if (isEdit) {
             Button(
                 onClick = onSubmit,

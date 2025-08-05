@@ -115,11 +115,6 @@ fun ProfileScreen(
                     uni = it, inputValid = userInfo.inputValid.copy(uniValid = true)
                 )
             },
-            onValueChangeEmail = {
-                userInfo = userInfo.copy(
-                    email = it, inputValid = userInfo.inputValid.copy(emailValid = true)
-                )
-            },
             onValueChangeDesc = {
                 userInfo = userInfo.copy(desc = it)
             },
@@ -129,10 +124,9 @@ fun ProfileScreen(
                         nameValid = UtilsFunction.isValid(userInfo.name),
                         phoneValid = UtilsFunction.isValidPhone(userInfo.phone),
                         uniValid = UtilsFunction.isValid(userInfo.uni),
-                        emailValid = UtilsFunction.isValidEmail(userInfo.email)
                     )
                 )
-                if (userInfo.inputValid.nameValid && userInfo.inputValid.phoneValid && userInfo.inputValid.uniValid && userInfo.inputValid.emailValid) {
+                if (userInfo.inputValid.nameValid && userInfo.inputValid.phoneValid && userInfo.inputValid.uniValid) {
                     viewModel.processIntent(MviIntent.CheckEditProfile(userInfo))
                     scope.launch{
                         showPopup = true

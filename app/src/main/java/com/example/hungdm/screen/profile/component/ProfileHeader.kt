@@ -39,7 +39,7 @@ fun ProfileHeader(
             )
         }
         Text(
-            text = "My information",
+            text = "My Information",
             fontSize = 24.sp,
             fontWeight = FontWeight.Medium,
             color = colorScheme.primary,

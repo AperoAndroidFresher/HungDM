@@ -133,7 +133,6 @@ fun ProfileInputItem(
             enabled = isEdit,
         )
         Spacer(Modifier.size(4.dp))
-
         if (!isValid) {
             Text(
                 text = "Invalid format",

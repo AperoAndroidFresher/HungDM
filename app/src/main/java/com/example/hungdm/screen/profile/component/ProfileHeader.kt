@@ -47,8 +47,8 @@ fun ProfileHeader(
         )
         if (!isEdit) {
             IconButton(
-                modifier = Modifier.align(Alignment.TopEnd),
-                onClick = onEdit
+                onClick = onEdit,
+                modifier = Modifier.align(Alignment.TopEnd)
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,

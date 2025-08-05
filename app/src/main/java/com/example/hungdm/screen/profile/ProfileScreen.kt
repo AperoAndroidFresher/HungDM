@@ -137,7 +137,6 @@ fun ProfileScreen(
                 }
             }
         )
-
         PopUp(
             modifier = Modifier
                 .background(Color(0xFFFEFEFE), RoundedCornerShape(20.dp))

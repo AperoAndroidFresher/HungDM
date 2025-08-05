@@ -50,7 +50,6 @@ fun PopUp(
                         tint = Color(0xFF25AE88),
                         modifier = Modifier.size(97.dp)
                     )
-
                     Text(
                         text = "Success!",
                         fontSize = 36.sp,
@@ -58,7 +57,6 @@ fun PopUp(
                         color = Color(0xFF25AE88)
                     )
                     Spacer(Modifier.size(20.dp))
-
                     Text(
                         text = "Your information has \nbeen updated!",
                         textAlign = TextAlign.Center,

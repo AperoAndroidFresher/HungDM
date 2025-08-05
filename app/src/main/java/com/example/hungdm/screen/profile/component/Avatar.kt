@@ -56,7 +56,11 @@ fun Avatar(
                     .size(30.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                Icon(painterResource(R.drawable.outline_photo_camera_24), null, tint = Color.White)
+                Icon(
+                    painterResource(R.drawable.outline_photo_camera_24),
+                    contentDescription = null,
+                    tint = Color.White
+                )
             }
         }
     }

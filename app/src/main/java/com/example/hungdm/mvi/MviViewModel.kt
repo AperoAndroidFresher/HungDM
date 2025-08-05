@@ -101,15 +101,15 @@ class MviViewModel(
                     withContext(Dispatchers.IO) {
                         userRepository.updateUser(
                             UserEntity(
-                                userId = _state.value.userInfo.id,
-                                username = _state.value.userInfo.username,
-                                password = _state.value.userInfo.password,
-                                name = _state.value.userInfo.name,
-                                phone = _state.value.userInfo.phone,
-                                email = _state.value.userInfo.email,
-                                uni = _state.value.userInfo.uni,
-                                desc = _state.value.userInfo.desc,
-                                imgUri = _state.value.userInfo.imgUri
+                                userId = intent.userInfo.id,
+                                username = intent.userInfo.username,
+                                password = intent.userInfo.password,
+                                name = intent.userInfo.name,
+                                phone = intent.userInfo.phone,
+                                email = intent.userInfo.email,
+                                uni = intent.userInfo.uni,
+                                desc = intent.userInfo.desc,
+                                imgUri = intent.userInfo.imgUri
                             )
                         )
                     }

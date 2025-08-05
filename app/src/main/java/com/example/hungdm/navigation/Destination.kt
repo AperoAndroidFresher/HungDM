@@ -10,7 +10,6 @@ sealed interface Destination: NavKey {
 
     @Serializable
     @SerialName("Login")
-//    data class Login(var user: UserInfo): Destination
     data object Login: Destination
 
     @Serializable
@@ -19,12 +18,10 @@ sealed interface Destination: NavKey {
 
     @Serializable
     @SerialName("Home")
-//    data class Home(var user: UserInfo): Destination
     data object Home:Destination
 
     @Serializable
     @SerialName("Profile")
-//    data class Profile(var user: UserInfo): Destination
     data object Profile: Destination
 
 

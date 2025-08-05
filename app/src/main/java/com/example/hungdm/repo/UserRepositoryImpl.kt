@@ -3,12 +3,6 @@ package com.example.hungdm.repo
 import com.example.hungdm.db.dao.UserDao
 import com.example.hungdm.db.entity.UserEntity
 
-interface UserRepository{
-    suspend fun signup(username: String, password: String, email: String): Long
-    suspend fun login(username: String, password: String): UserEntity?
-    suspend fun updateUser(user: UserEntity)
-}
-
 class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
 
     override suspend fun signup(username: String, password: String, email: String): Long {

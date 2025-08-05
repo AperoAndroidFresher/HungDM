@@ -44,7 +44,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val viewModel: MviViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
-
     val bottomItem = listOf(
         BottomItem("Home", Icons.Default.Home, Destination.Home),
         BottomItem("Library", Icons.Default.DateRange, Destination.Library),
@@ -78,7 +77,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
         }
     }
-
 
     AppTheme (
         darkTheme = state.darkTheme,
@@ -120,13 +118,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             viewModel = viewModel
                         )
                     }
-
                     entry<Destination.Signup> {
                         SignupScreen(
                             viewModel = viewModel
                         )
                     }
-
                     entry<Destination.Home> {
                         val activity = context as? Activity
                         HomeScreen(
@@ -136,13 +132,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             }
                         )
                     }
-
                     entry<Destination.Profile> {
                         ProfileScreen(
                             viewModel = viewModel,
                         )
                     }
-
                     entry<Destination.Library> {
                         val activity = context as? Activity
                         LibraryScreen(
@@ -152,7 +146,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             }
                         )
                     }
-
                     entry<Destination.Playlist> {
                         val activity = context as? Activity
                         PlaylistScreen(
@@ -162,7 +155,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             }
                         )
                     }
-
                     entry<Destination.PlaylistDetail>{ destination ->
                         PlaylistDetailScreen(
                             viewModel = viewModel,

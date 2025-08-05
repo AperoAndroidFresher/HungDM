@@ -32,7 +32,7 @@ import androidx.compose.ui.window.Dialog
 fun PlaylistDialog(
     modifier: Modifier = Modifier,
     title: String = "",
-    text: String = "",
+    confirmText: String = "",
     onAction: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {}
 ) {
@@ -66,26 +66,41 @@ fun PlaylistDialog(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TextButton(
-                    onClick = onDismissRequest,
-                    modifier = Modifier.width(145.dp)
-                ) {
-                    Text("Cancel", color = Color.White)
-                }
-                TextButton(
-                    onClick = {
-                        onAction(playlistTitle)
-                        onDismissRequest()
-                    },
-                    modifier = Modifier.width(145.dp)
-                ) {
-                    Text(text, color = Color.Cyan, fontWeight = FontWeight.Bold)
-                }
-            }
+
+            DialogActionButtons(
+                confirmText = confirmText,
+                onConfirm = {
+                    onAction(playlistTitle)
+                    onDismissRequest()
+                },
+                onCancel = onDismissRequest
+            )
+        }
+    }
+}
+
+@Composable
+fun DialogActionButtons(
+    modifier: Modifier = Modifier,
+    confirmText: String = "",
+    onConfirm: () -> Unit = {},
+    onCancel: () -> Unit = {}
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextButton(
+            onClick = onCancel,
+            modifier = Modifier.width(145.dp)
+        ) {
+            Text("Cancel", color = Color.White)
+        }
+        TextButton(
+            onClick = onConfirm,
+            modifier = Modifier.width(145.dp)
+        ) {
+            Text(confirmText, color = Color.Cyan, fontWeight = FontWeight.Bold)
         }
     }
 }

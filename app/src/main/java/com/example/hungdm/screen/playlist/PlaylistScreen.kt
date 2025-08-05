@@ -104,32 +104,16 @@ fun PlaylistScreen(
                 }
             }
         } else {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    "You don’t have any playlists.\n Click the '+' button to add",
-                    color = colorScheme.primary
-                )
-                IconButton(
-                    onClick = { showCreatePlaylistDialog = true },
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .size(48.dp)
-                        .border(1.dp, colorScheme.primary, shape = CircleShape)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add", tint = colorScheme.primary)
-                }
-            }
+            EmptyPlaylist(
+                onClick = { showCreatePlaylistDialog = true }
+            )
         }
     }
 
     if (showCreatePlaylistDialog) {
         PlaylistDialog(
             title = "New playlist",
-            text = "Create",
+            confirmText = "Create",
             onAction = {
                 viewModel.processIntent(MviIntent.CreatePlaylist(it))
                 viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
@@ -142,7 +126,7 @@ fun PlaylistScreen(
     if (showRenamePlaylistDialog) {
         PlaylistDialog(
             title = "Rename playlist",
-            text = "Rename",
+            confirmText = "Rename",
             onAction = {
                 viewModel.processIntent(MviIntent.RenamePlaylist(it,selectedPlaylist!!))
             },
@@ -150,5 +134,31 @@ fun PlaylistScreen(
                 showRenamePlaylistDialog = false
             }
         )
+    }
+}
+
+@Composable
+fun EmptyPlaylist(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            "You don’t have any playlists.\n Click the '+' button to add",
+            color = colorScheme.primary
+        )
+        IconButton(
+            onClick = onClick,
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .size(48.dp)
+                .border(1.dp, colorScheme.primary, shape = CircleShape)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add", tint = colorScheme.primary)
+        }
     }
 }

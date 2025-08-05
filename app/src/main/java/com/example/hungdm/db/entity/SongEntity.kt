@@ -9,7 +9,7 @@ import com.example.hungdm.db.converters.Converters
 @Entity(tableName = "songs")
 @TypeConverters(Converters::class)
 data class SongEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long=0,
+    @PrimaryKey(autoGenerate = true) val songId: Long=0,
     val title: String,
     val artist: String,
     val duration: Long,

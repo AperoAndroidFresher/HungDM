@@ -9,7 +9,7 @@ import com.example.hungdm.db.converters.Converters
 @Entity(tableName = "users")
 @TypeConverters(Converters::class)
 data class UserEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int=0,
+    @PrimaryKey(autoGenerate = true) val userId: Long=0,
     val username: String = "",
     val password: String = "",
     val name: String = "",

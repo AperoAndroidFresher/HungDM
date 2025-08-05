@@ -1,4 +1,4 @@
-package com.example.hungdm.screen
+package com.example.hungdm.screen.profile
 
 import android.content.Intent
 import android.net.Uri
@@ -29,7 +29,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
@@ -61,7 +60,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.UtilsFunction

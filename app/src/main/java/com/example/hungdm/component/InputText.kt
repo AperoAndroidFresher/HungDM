@@ -60,7 +60,9 @@ fun InputText(
             },
             visualTransformation = if (isPass) {
                 if (showPass) VisualTransformation.None else PasswordVisualTransformation()
-            } else VisualTransformation.None,
+            } else {
+                VisualTransformation.None
+            },
             label = {
                 Text(
                     title,

@@ -1,4 +1,4 @@
-package com.example.hungdm.screen
+package com.example.hungdm.screen.playlist
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -63,7 +63,7 @@ fun PlaylistScreen(
     var showRenamePlaylistDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-
+        viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
     }
 
     BackHandler { onBack() }
@@ -81,7 +81,7 @@ fun PlaylistScreen(
             }
         )
 
-        if (playlists.size > 0) {
+        if (playlists.isNotEmpty()) {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -145,6 +145,7 @@ fun PlaylistScreen(
             actionStr = "Create",
             onAction = {
                 viewModel.processIntent(MviIntent.CreatePlaylist(it))
+                viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
             },
             onDismissRequest = {
                 showCreatePlaylistDialog = false
@@ -169,7 +170,6 @@ fun PlaylistScreen(
 
 @Composable
 fun PlaylistDialog(
-    modifier: Modifier = Modifier,
     title: String = "",
     actionStr: String = "",
     onAction: (String) -> Unit = {},

@@ -35,20 +35,19 @@ import com.example.hungdm.model.Song
 @Composable
 fun ItemLinear(
     modifier: Modifier = Modifier,
-    option1:String="",
-    option2:String="",
+    option1: String = "",
+    option2: String = "",
     icon1: ImageVector = Icons.Default.Delete,
     icon2: ImageVector = Icons.Default.Share,
-    song: Song = Song(100,"Noi nay co anh - Son Tung MTP","MTP", duration = 100000L,null),
+    song: Song = Song(100, "Noi nay co anh - Son Tung MTP", "MTP", duration = 100000L, null),
     playlist: Playlist? = null,
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
     onClickOption1: () -> Unit = {},
     onClickOption2: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
-    onCLickShowPlaylistDetail: ()->Unit = {}
+    onCLickShowPlaylistDetail: () -> Unit = {}
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -59,7 +58,7 @@ fun ItemLinear(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data( if(playlist!=null) R.drawable.img1 else song.albumArtUri)
+                .data(if (playlist != null) R.drawable.img1 else song.albumArtUri)
                 .crossfade(true)
                 .error(R.drawable.img1)
                 .size(300, 300)
@@ -67,6 +66,7 @@ fun ItemLinear(
             contentDescription = null,
             modifier = Modifier.size(54.dp)
         )
+
         Spacer(Modifier.size(8.dp))
 
         Column(
@@ -91,8 +91,10 @@ fun ItemLinear(
                 maxLines = 1,
             )
         }
+
         Spacer(Modifier.weight(1f))
-        if(playlist==null){
+
+        if (playlist == null) {
             Text(
                 text = song.time,
                 fontSize = 16.sp,
@@ -116,7 +118,7 @@ fun ItemLinear(
                     tint = colorScheme.primary
                 )
             }
-            Option(
+            Dropdown(
                 option1 = option1,
                 option2 = option2,
                 icon1 = icon1,
@@ -127,6 +129,5 @@ fun ItemLinear(
                 onDismissRequest = onDismissRequest,
             )
         }
-
     }
 }

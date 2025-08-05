@@ -14,10 +14,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun Splash(
     modifier: Modifier = Modifier,
-    run: ()-> Unit = {}
 ) {
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()

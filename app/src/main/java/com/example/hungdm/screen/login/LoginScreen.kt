@@ -1,4 +1,4 @@
-package com.example.hungdm.screen
+package com.example.hungdm.screen.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,7 +31,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.component.InputText
@@ -42,8 +41,8 @@ import com.example.hungdm.mvi.MviViewModel
 
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier,
-    viewModel: MviViewModel
+    viewModel: MviViewModel,
+    modifier: Modifier = Modifier
 ) {
 
     var userInfo by remember { mutableStateOf(UserInfo()) }
@@ -59,7 +58,6 @@ fun LoginScreen(
     ) {
         Logo()
         Spacer(Modifier.size(40.dp))
-
         InputText(
             title = "Username",
             value = userInfo.username,

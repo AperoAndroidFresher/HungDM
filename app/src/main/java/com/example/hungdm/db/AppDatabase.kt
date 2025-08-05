@@ -23,19 +23,4 @@ import com.example.hungdm.db.entity.UserEntity
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun playlistDao(): PlaylistDao
-
-//    companion object{
-//        @Volatile
-//        private var INSTANCES: AppDatabase?= null
-//        fun getInstance(context: Context): AppDatabase{
-//            return INSTANCES?: synchronized(this){
-//                INSTANCES?: Room.databaseBuilder(
-//                    context.applicationContext,
-//                    AppDatabase::class.java, ""
-//                ).fallbackToDestructiveMigration().build().also {
-//                    INSTANCES=it
-//                }
-//            }
-//        }
-//    }
 }

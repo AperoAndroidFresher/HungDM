@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.NavigationBar
@@ -23,29 +22,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.hungdm.mvi.MviEvent
 import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
-import com.example.hungdm.screen.HomeScreen
-import com.example.hungdm.screen.LibraryScreen
-import com.example.hungdm.screen.LoginScreen
-import com.example.hungdm.screen.PlaylistDetailScreen
-import com.example.hungdm.screen.PlaylistScreen
-import com.example.hungdm.screen.ProfileScreen
-import com.example.hungdm.screen.SignupScreen
+import com.example.hungdm.screen.home.HomeScreen
+import com.example.hungdm.screen.library.LibraryScreen
+import com.example.hungdm.screen.login.LoginScreen
+import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
+import com.example.hungdm.screen.playlist.PlaylistScreen
+import com.example.hungdm.screen.profile.ProfileScreen
+import com.example.hungdm.screen.signup.SignupScreen
 import com.example.hungdm.ui.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
-
-data class BottomItem(
-    var label: String,
-    var icon: ImageVector,
-    val destination: Destination
-)
-
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
@@ -115,7 +106,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 label = { Text(item.label, color = colorScheme.primary) }
                             )
                         }
-
                     }
                 }
             }
@@ -176,10 +166,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     entry<Destination.PlaylistDetail>{ destination ->
                         PlaylistDetailScreen(
                             viewModel = viewModel,
-                            destination = destination,
-                            onBack = {
-                                viewModel.removeLast()
-                            }
+                            destination = destination
                         )
                     }
                 }
@@ -187,3 +174,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
     }
 }
+
+data class BottomItem(
+    var label: String,
+    var icon: ImageVector,
+    val destination: Destination
+)

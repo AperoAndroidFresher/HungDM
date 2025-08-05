@@ -1,4 +1,4 @@
-package com.example.hungdm.screen
+package com.example.hungdm.screen.playlistdetail
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
@@ -30,10 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.UtilsFunction
 import com.example.hungdm.component.ItemLinear
-import com.example.hungdm.model.Playlist
-import com.example.hungdm.model.Song
 import com.example.hungdm.mvi.MviIntent
-import com.example.hungdm.mvi.MviState
 import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.navigation.Destination
 
@@ -42,7 +39,6 @@ fun PlaylistDetailScreen(
     modifier: Modifier = Modifier,
     destination: Destination.PlaylistDetail = Destination.PlaylistDetail(0),
     viewModel: MviViewModel ,
-    onBack: () -> Unit = {},
 ) {
 
     val context = LocalContext.current
@@ -52,7 +48,7 @@ fun PlaylistDetailScreen(
 
 
     BackHandler {
-        onBack()
+        viewModel.removeLast()
     }
 
     Column(
@@ -90,7 +86,7 @@ fun PlaylistDetailScreen(
                         Log.d("tag,", "PlaylistDetailScreen: $it")
                     },
                     onClickOption1 = {
-                        viewModel.processIntent(MviIntent.RemoveSongInPlaylist(it, playlist))
+                        viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
                     },
                     onClickOption2 = {
                         UtilsFunction.shareSong(context, playlist.listSong[it])

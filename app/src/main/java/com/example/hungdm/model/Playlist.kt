@@ -4,7 +4,7 @@ import java.util.UUID
 
 
 data class Playlist(
-    val id: Int = 0,
+    val id: Long = 0,
     val title:String ="",
     val listSong: MutableList<Song> = mutableListOf(),
 ) {

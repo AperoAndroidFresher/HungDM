@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 //@Serializable
 data class UserInfo(
-    var id: Int=0,
+    var id: Long=0,
     var username: String="",
     var password: String="",
     var pass2: String = "",

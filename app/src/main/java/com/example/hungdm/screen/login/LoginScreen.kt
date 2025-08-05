@@ -43,8 +43,7 @@ fun LoginScreen(
         Logo()
         Spacer(Modifier.size(40.dp))
         LoginInput(
-            username = userInfo.username,
-            password = userInfo.password,
+            userInfo = userInfo,
             showPass = showPass,
             onValueChangeUsername = {
                 userInfo = userInfo.copy(username = it)

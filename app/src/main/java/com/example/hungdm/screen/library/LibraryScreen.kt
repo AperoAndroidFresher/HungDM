@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.hungdm.component.ItemLinear
 import com.example.hungdm.model.Song
 import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
@@ -34,6 +33,7 @@ import com.example.hungdm.navigation.Destination
 import androidx.compose.runtime.collectAsState
 import com.example.hungdm.UtilsFunction
 import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
+import com.example.hungdm.screen.component.SongItemLinear
 import com.example.hungdm.screen.library.component.LibraryHeader
 
 @Composable
@@ -50,6 +50,7 @@ fun LibraryScreen(
 
     LaunchedEffect(Unit) {
         viewModel.processIntent(MviIntent.LoadSong(context))
+        viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
     }
 
     BackHandler { onBack() }
@@ -79,7 +80,7 @@ fun LibraryScreen(
             ) {
                 items(listSong.size) {
                     var showOption by remember { mutableStateOf(false) }
-                    ItemLinear(
+                    SongItemLinear(
                         song = listSong[it],
                         showOption = showOption,
                         option1 = "Add to playlist",

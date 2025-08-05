@@ -29,10 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.UtilsFunction
-import com.example.hungdm.component.ItemLinear
 import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.navigation.Destination
+import com.example.hungdm.screen.component.SongItemLinear
 
 @Composable
 fun PlaylistDetailScreen(
@@ -74,7 +74,7 @@ fun PlaylistDetailScreen(
         ) {
             items(playlist!!.listSong.size) {
                 var showOption by remember { mutableStateOf(false) }
-                ItemLinear(
+                SongItemLinear(
                     song = playlist.listSong[it],
                     showOption = showOption,
                     option1 = "Remove from playlist",

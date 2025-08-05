@@ -9,13 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.component.InputPassword
 import com.example.hungdm.component.InputText
+import com.example.hungdm.model.UserInfo
 
 
 @Composable
 fun LoginInput(
     modifier: Modifier = Modifier,
-    username: String = "",
-    password: String = "",
+    userInfo: UserInfo = UserInfo(),
     showPass: Boolean = false,
     onValueChangeUsername: (String) -> Unit = {},
     onValueChangePassword: (String) -> Unit = {},
@@ -26,13 +26,13 @@ fun LoginInput(
     ) {
         InputText(
             title = "Username",
-            value = username,
+            value = userInfo.username,
             onValueChange = onValueChangeUsername
         )
         Spacer(Modifier.size(10.dp))
         InputPassword(
             title = "Password",
-            value = password,
+            value = userInfo.password,
             showPass = showPass,
             onValueChange = onValueChangePassword,
             onClickShowPass = onClickShowPass

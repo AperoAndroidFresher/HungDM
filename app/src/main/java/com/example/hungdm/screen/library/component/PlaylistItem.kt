@@ -22,6 +22,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
 import com.example.hungdm.model.Playlist
+import com.example.hungdm.screen.component.PlaylistImage
+import com.example.hungdm.screen.component.PlaylistInfo
 
 @Composable
 fun PlaylistItem(
@@ -37,39 +39,12 @@ fun PlaylistItem(
                 onAddSongToPlaylist()
             }
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(R.drawable.img1)
-                .crossfade(true)
-                .error(R.drawable.img1)
-                .size(300, 300)
-                .build(),
-            contentDescription = null,
-            modifier = Modifier.size(54.dp)
-        )
+        PlaylistImage()
         Spacer(Modifier.size(8.dp))
 
-        Column(
-            modifier = Modifier
-                .padding(4.dp)
-                .width(210.dp)
-        ) {
-            Text(
-                text = playlist.title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = playlist.songNumberStr,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-            )
-        }
+        PlaylistInfo(
+            title = playlist.title,
+            songNumberStr = playlist.songNumberStr
+        )
     }
 }

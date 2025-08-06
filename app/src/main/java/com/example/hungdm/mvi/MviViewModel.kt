@@ -7,10 +7,18 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hungdm.db.entity.PlaylistEntity
+import com.example.hungdm.db.entity.PlaylistSongReference
+import com.example.hungdm.db.entity.SongEntity
+import com.example.hungdm.db.entity.UserEntity
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
+import com.example.hungdm.model.UserInfo
 import com.example.hungdm.model.getAlbumArt
 import com.example.hungdm.navigation.Destination
+import com.example.hungdm.repo.PlaylistRepository
+import com.example.hungdm.repo.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +27,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.core.net.toUri
 
-class MviViewModel : ViewModel() {
+class MviViewModel(
+    private val userRepository: UserRepository,
+    private val playlistRepository: PlaylistRepository
+) : ViewModel() {
     private val _state = MutableStateFlow<MviState>(MviState())
     val state: StateFlow<MviState> = _state.asStateFlow()
     private val _event = MutableSharedFlow<MviEvent>()
@@ -34,18 +47,50 @@ class MviViewModel : ViewModel() {
                 }
 
                 is MviIntent.CheckLogin -> {
-                    //check db
-                    _state.value = _state.value.copy(
-                        userInfo = intent.userInfo
-                    )
-                    sendEvent(MviEvent.GotoHome)
+                    val user = withContext(Dispatchers.IO) {
+                        userRepository.login(intent.userInfo.username, intent.userInfo.password)
+                    }
+
+                    if (user != null) {
+                        _state.value = _state.value.copy(
+                            userInfo = UserInfo(
+                                id = user.userId,
+                                username = user.username,
+                                password = user.password,
+                                email = user.email,
+                                name = user.name,
+                                phone = user.phone,
+                                uni = user.uni,
+                                desc = user.desc,
+                                imgUri = user.imgUri
+                            )
+                        )
+                        sendEvent(MviEvent.GotoHome)
+                    } else {
+                        sendEvent(MviEvent.ShowToast("Đăng nhập thất bại"))
+                    }
                 }
 
                 is MviIntent.CheckSignup -> {
-                    //check + luu vao db
-                    removeLast()
-                    sendEvent(MviEvent.GotoLogin)
-                    removeLast()
+                    val newUserInfo = intent.userInfo
+                    try {
+                        val result = withContext(Dispatchers.IO) {
+                            userRepository.signup(
+                                username = newUserInfo.username,
+                                password = newUserInfo.password,
+                                email = newUserInfo.email
+                            )
+                        }
+                        if (result > 0) {
+                            removeLast()
+                            sendEvent(MviEvent.GotoLogin)
+                            removeLast()
+                        } else {
+                            sendEvent(MviEvent.ShowToast("Username đã tồn tại"))
+                        }
+                    } catch (e: Exception) {
+                        sendEvent(MviEvent.ShowToast("Đăng ký thất bại: ${e.message}"))
+                    }
                 }
 
                 is MviIntent.OnClickProfile -> {
@@ -53,6 +98,21 @@ class MviViewModel : ViewModel() {
                 }
 
                 is MviIntent.CheckEditProfile -> {
+                    withContext(Dispatchers.IO) {
+                        userRepository.updateUser(
+                            UserEntity(
+                                userId = intent.userInfo.id,
+                                username = intent.userInfo.username,
+                                password = intent.userInfo.password,
+                                name = intent.userInfo.name,
+                                phone = intent.userInfo.phone,
+                                email = intent.userInfo.email,
+                                uni = intent.userInfo.uni,
+                                desc = intent.userInfo.desc,
+                                imgUri = intent.userInfo.imgUri
+                            )
+                        )
+                    }
                     _state.value = _state.value.copy(
                         userInfo = intent.userInfo
                     )
@@ -69,63 +129,68 @@ class MviViewModel : ViewModel() {
                     )
                 }
 
+                is MviIntent.LoadPlaylistsOfUser -> {
+                    _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
+                }
 
                 is MviIntent.LoadSong -> {
-                    if(_state.value.selectedBottomBar==1 && !_state.value.isLoadSong){
-                        delay(1500)
-                        _state.value = _state.value.copy(
-                            listSong = getAllSong(intent.context),
-                            isLoadSong = true
-                        )
+                    if (_state.value.selectedBottomBar == 1 && !_state.value.isLoadSong) {
+                        viewModelScope.launch {
+                            val songs = withContext(Dispatchers.IO) {
+                                getAllSong(intent.context)
+                            }
+                            _state.value = _state.value.copy(
+                                listSong = songs,
+                                isLoadSong = true
+                            )
+                        }
                     }
                 }
 
                 is MviIntent.CreatePlaylist -> {
-                    val playlists = _state.value.playlists.toMutableList()
-                    playlists.add(Playlist(title = intent.title))
-                    _state.value = _state.value.copy(
-                        playlists = playlists
+                    val playlistEntity = PlaylistEntity(
+                        title = intent.title,
+                        userId = _state.value.userInfo.id
                     )
+
+                    playlistRepository.createPlaylist(playlistEntity)
+                    _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
 
                 is MviIntent.RenamePlaylist -> {
+                    playlistRepository.renamePlaylist(intent.playlist.id, intent.title)
                     _state.value = _state.value.copy(
-                        playlists = _state.value.playlists.map {
-                            if(it.id==intent.playlist.id) it.copy(title = intent.title) else it
-                        }
+                        playlists = loadPlaylistOfUser()
                     )
                 }
 
                 is MviIntent.RemovePlaylist -> {
-                    val playlists = _state.value.playlists.toMutableList()
-                    playlists.remove(intent.playlist)
-                    _state.value = _state.value.copy(playlists = playlists)
+                    playlistRepository.removePlaylist(intent.playlist.id)
+                    playlistRepository.removeAllSongInPlaylist(intent.playlist.id)
+                    _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
 
                 is MviIntent.AddSongToPlaylist -> {
-                    val playlists = _state.value.playlists.toMutableList()
-                    val index = playlists.indexOfFirst { it.id == intent.playlist.id }
-                    val oldPlaylist = playlists[index]
-                    val newListSong = oldPlaylist.listSong.toMutableList().apply {
-                        add(intent.song)
-                    }
-                    val newPlaylist = oldPlaylist.copy(listSong = newListSong)
+                    val id = playlistRepository.addSong(
+                        SongEntity(
+                            title = intent.song.title,
+                            artist = intent.song.artist,
+                            duration = intent.song.duration,
+                            albumArt = intent.song.albumArt,
+                            uri = intent.song.uri,
+                            albumArtUri = intent.song.albumArtUri!!
+                        )
+                    )
 
-                    playlists[index] = newPlaylist
-
-                    _state.value = _state.value.copy(playlists = playlists)
+                    playlistRepository.addSongToPlaylist(
+                        PlaylistSongReference(intent.playlist.id, id)
+                    )
+                    _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
 
                 is MviIntent.RemoveSongInPlaylist -> {
-                    val playlists = _state.value.playlists.toMutableList()
-                    val index = playlists.indexOfFirst { it.id == intent.playlist.id }
-                    val oldPlaylist = playlists[index]
-                    val newListSong = oldPlaylist.listSong.toMutableList().apply {
-                        removeAt(intent.songIndex)
-                    }
-                    val newPlaylist = oldPlaylist.copy(listSong = newListSong)
-                    playlists[index] = newPlaylist
-                    _state.value = _state.value.copy(playlists = playlists)
+                    playlistRepository.removeSongInPlaylist(intent.song.id, intent.playlist.id)
+                    _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
 
                 is MviIntent.OnClickPlaylistDetail -> {
@@ -160,52 +225,73 @@ class MviViewModel : ViewModel() {
         }
     }
 
-    private fun getAllSong(context: Context): MutableList<Song> {
-        val songs = mutableListOf<Song>()
-        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    private suspend fun getAllSong(context: Context): MutableList<Song> =
+        withContext(Dispatchers.IO) {
+            val songs = mutableListOf<Song>()
+            val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
-        val projection = arrayOf(
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Albums.ALBUM_ID
-        )
+            val projection = arrayOf(
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Albums.ALBUM_ID
+            )
 
-        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
+            val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
 
-        val cursor = context.contentResolver.query(
-            uri, projection, selection, null, null
-        )
+            val cursor = context.contentResolver.query(
+                uri, projection, selection, null, null
+            )
 
-        cursor?.use {
-            val idColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-            val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-            val artistColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-            val durationColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-            val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            cursor?.use {
+                val idColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+                val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+                val artistColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+                val durationColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
 
-            while (it.moveToNext()) {
-                val id = it.getLong(idColumn)
-                val title = it.getString(titleColumn)
-                val artist = it.getString(artistColumn)
-                val duration = it.getLong(durationColumn)
-                val albumId = it.getLong(albumIdColumn)
-                val albumArt = getAlbumArt(context, albumId)
+                while (it.moveToNext()) {
+                    val id = it.getLong(idColumn)
+                    val title = it.getString(titleColumn)
+                    val artist = it.getString(artistColumn)
+                    val duration = it.getLong(durationColumn)
+                    val albumId = it.getLong(albumIdColumn)
+                    val albumArt = getAlbumArt(context, albumId)
 
-                val uri =
-                    ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                    val songUri =
+                        ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                    val albumArtUri = ContentUris.withAppendedId(
+                        "content://media/external/audio/albumart".toUri(), albumId
+                    )
 
-                val albumArtUri = ContentUris.withAppendedId(
-                    Uri.parse("content://media/external/audio/albumart"),
-                    albumId
-                )
-
-                songs.add(Song(id, title, artist, duration, albumArt, uri, albumArtUri))
+                    songs.add(Song(id, title, artist, duration, albumArt, songUri, albumArtUri))
+                }
             }
+
+            songs
         }
 
-        return songs
+    private suspend fun loadPlaylistOfUser(): List<Playlist> = withContext(Dispatchers.IO) {
+        val playlistWithSongsList =
+            playlistRepository.getPlaylistsWithSongsOfUser(_state.value.userInfo.id)
+        return@withContext playlistWithSongsList.map { playlistWithSongs ->
+            val songs = playlistWithSongs.songs.map { songEntity ->
+                Song(
+                    id = songEntity.songId,
+                    title = songEntity.title,
+                    artist = songEntity.artist,
+                    duration = songEntity.duration,
+                    albumArt = songEntity.albumArt,
+                    uri = songEntity.uri,
+                    albumArtUri = songEntity.albumArtUri
+                )
+            }
+            Playlist(
+                id = playlistWithSongs.playlist.playlistId,
+                title = playlistWithSongs.playlist.title,
+                listSong = songs.toMutableList()
+            )
+        }
     }
-
 }

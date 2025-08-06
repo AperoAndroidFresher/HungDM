@@ -8,20 +8,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.hungdm.component.Logo
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hungdm.db.AppDatabase
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.navigation.AppNavigation
-import kotlinx.coroutines.delay
+import com.example.hungdm.repo.UserRepository
+import com.example.hungdm.repo.UserRepositoryImpl
+import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -44,24 +40,3 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Composable
-fun Splash(
-    modifier: Modifier = Modifier,
-    run: ()-> Unit = {}
-) {
-
-    LaunchedEffect(Unit) {
-        delay(3000L)
-        run()
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Logo(title = "Apero Music")
-    }
-}

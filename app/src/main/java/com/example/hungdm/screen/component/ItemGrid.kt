@@ -1,4 +1,4 @@
-package com.example.hungdm.component
+package com.example.hungdm.screen.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
+import com.example.hungdm.component.Dropdown
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
 
@@ -40,7 +41,7 @@ fun ItemGrid(
     option2:String="",
     icon1: ImageVector = Icons.Default.Delete,
     icon2: ImageVector = Icons.Default.Share,
-    song: Song = Song(100,"Noi nay co anh - Son Tung MTP","MTP", duration = 100000L ,null),
+    song: Song = Song(100,"Noi nay co anh","MTP", duration = 100000L ,null),
     playlist: Playlist? = null,
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
@@ -84,7 +85,7 @@ fun ItemGrid(
                         tint = Color.White
                     )
                 }
-                Option(
+                Dropdown(
                     expanded = showOption,
                     option1 = option1,
                     option2 = option2,

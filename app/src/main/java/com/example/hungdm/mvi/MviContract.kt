@@ -13,8 +13,7 @@ data class MviState(
     val userInfo: UserInfo = UserInfo(),
     var backStack: List<Destination> = mutableListOf(Destination.Login),
     val listSong: List<Song> = mutableListOf<Song>(),
-    val playlists: List<Playlist> = mutableListOf(),
-    val selectedPlaylist: Playlist? = null
+    val playlists: List<Playlist> = mutableListOf()
 )
 
 sealed interface MviIntent{
@@ -24,12 +23,13 @@ sealed interface MviIntent{
     data object OnClickProfile: MviIntent
     data class CheckEditProfile(val userInfo: UserInfo) : MviIntent
     data class LoadSong(val context: Context) : MviIntent
+    data object LoadPlaylistsOfUser: MviIntent
     data class CreatePlaylist(val title: String): MviIntent
     data class RenamePlaylist(val title: String, val playlist: Playlist): MviIntent
     data class RemovePlaylist(val playlist: Playlist): MviIntent
     data class AddSongToPlaylist(val song: Song, val playlist: Playlist): MviIntent
-    data class RemoveSongInPlaylist(val songIndex: Int, val playlist: Playlist): MviIntent
-    data class OnClickPlaylistDetail(val playlistId: String) : MviIntent
+    data class RemoveSongInPlaylist(val song: Song, val playlist: Playlist): MviIntent
+    data class OnClickPlaylistDetail(val playlistId: Long) : MviIntent
     data object ChangeTheme : MviIntent
     data class OnClickItemBottomBar(val index: Int): MviIntent
 }
@@ -40,7 +40,8 @@ sealed interface MviEvent{
     data object GotoSignup: MviEvent
     data object GotoProfile: MviEvent
     data object GotoPlaylist: MviEvent
-    data class GotoPlaylistDetail(val playlistId: String): MviEvent
+    data class GotoPlaylistDetail(val playlistId: Long): MviEvent
+    data class ShowToast(val mess: String): MviEvent
 }
 
 

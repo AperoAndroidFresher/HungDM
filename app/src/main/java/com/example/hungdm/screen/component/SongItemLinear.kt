@@ -1,5 +1,6 @@
-package com.example.hungdm.component
+package com.example.hungdm.screen.component
 
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,26 +30,24 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
-import com.example.hungdm.model.Playlist
+import com.example.hungdm.component.Dropdown
 import com.example.hungdm.model.Song
 
 @Composable
-fun ItemLinear(
+fun SongItemLinear(
     modifier: Modifier = Modifier,
-    option1:String="",
-    option2:String="",
+    option1: String = "",
+    option2: String = "",
     icon1: ImageVector = Icons.Default.Delete,
     icon2: ImageVector = Icons.Default.Share,
-    song: Song = Song(100,"Noi nay co anh - Son Tung MTP","MTP", duration = 100000L,null),
-    playlist: Playlist? = null,
+    song: Song = Song(0, "Noi nay co anh", "MTP", duration = 100000L, null),
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
     onClickOption1: () -> Unit = {},
     onClickOption2: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
-    onCLickShowPlaylistDetail: ()->Unit = {}
+    onCLickShowPlaylistDetail: () -> Unit = {}
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -57,50 +56,26 @@ fun ItemLinear(
                 onCLickShowPlaylistDetail()
             }
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data( if(playlist!=null) R.drawable.img1 else song.albumArtUri)
-                .crossfade(true)
-                .error(R.drawable.img1)
-                .size(300, 300)
-                .build(),
-            contentDescription = null,
-            modifier = Modifier.size(54.dp)
+        SongImage(
+            uri = song.albumArtUri
         )
+
         Spacer(Modifier.size(8.dp))
 
-        Column(
-            modifier = Modifier
-                .padding(4.dp)
-                .width(210.dp)
-        ) {
-            Text(
-                text = playlist?.title ?: song.title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.primary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = playlist?.songNumberStr ?: song.artist,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.primary,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-            )
-        }
+        SongInfo(
+            title = song.title,
+            artist = song.artist
+        )
+
         Spacer(Modifier.weight(1f))
-        if(playlist==null){
-            Text(
-                text = song.time,
-                fontSize = 16.sp,
-                fontWeight = FontWeight(400),
-                color = colorScheme.primary,
-                modifier = Modifier.padding(10.dp)
-            )
-        }
+
+        Text(
+            text = song.time,
+            fontSize = 16.sp,
+            fontWeight = FontWeight(400),
+            color = colorScheme.primary,
+            modifier = Modifier.padding(10.dp)
+        )
 
         Box() {
             IconButton(
@@ -116,7 +91,7 @@ fun ItemLinear(
                     tint = colorScheme.primary
                 )
             }
-            Option(
+            Dropdown(
                 option1 = option1,
                 option2 = option2,
                 icon1 = icon1,
@@ -127,6 +102,52 @@ fun ItemLinear(
                 onDismissRequest = onDismissRequest,
             )
         }
+    }
+}
 
+@Composable
+fun SongImage(
+    modifier: Modifier = Modifier,
+    uri: Uri? = null
+) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(uri)
+            .crossfade(true)
+            .error(R.drawable.img1)
+            .size(300, 300)
+            .build(),
+        contentDescription = null,
+        modifier = Modifier.size(54.dp)
+    )
+}
+
+@Composable
+fun SongInfo(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    artist: String = ""
+) {
+    Column(
+        modifier = Modifier
+            .padding(4.dp)
+            .width(210.dp)
+    ) {
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.primary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = artist,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.primary,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+        )
     }
 }

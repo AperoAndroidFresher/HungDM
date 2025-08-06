@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 //@Serializable
 data class UserInfo(
+    var id: Long=0,
     var username: String="",
     var password: String="",
     var pass2: String = "",
@@ -16,4 +17,3 @@ data class UserInfo(
     var inputValid: InputValid = InputValid(),
     var imgUri: Uri? = null
 )
-

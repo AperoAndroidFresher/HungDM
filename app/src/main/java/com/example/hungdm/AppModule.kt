@@ -1,9 +1,9 @@
 package com.example.hungdm
 
 import androidx.room.Room
-import com.example.hungdm.db.AppDatabase
-import com.example.hungdm.db.dao.PlaylistDao
-import com.example.hungdm.db.dao.UserDao
+import com.example.hungdm.data.db.AppDatabase
+import com.example.hungdm.data.db.dao.PlaylistDao
+import com.example.hungdm.data.db.dao.UserDao
 import org.koin.androidx.viewmodel.dsl.viewModel
 import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.repo.PlaylistRepository

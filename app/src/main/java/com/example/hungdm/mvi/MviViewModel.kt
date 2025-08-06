@@ -7,10 +7,10 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hungdm.db.entity.PlaylistEntity
-import com.example.hungdm.db.entity.PlaylistSongReference
-import com.example.hungdm.db.entity.SongEntity
-import com.example.hungdm.db.entity.UserEntity
+import com.example.hungdm.data.db.entity.PlaylistEntity
+import com.example.hungdm.data.db.entity.PlaylistSongReference
+import com.example.hungdm.data.db.entity.SongEntity
+import com.example.hungdm.data.db.entity.UserEntity
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
 import com.example.hungdm.model.UserInfo
@@ -29,6 +29,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.net.toUri
+import com.example.hungdm.retrofit.ApiClient
+import com.example.hungdm.retrofit.SongRemote
+import okhttp3.Request
+import okio.Timeout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MviViewModel(
     private val userRepository: UserRepository,
@@ -133,17 +140,24 @@ class MviViewModel(
                     _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
 
-                is MviIntent.LoadSong -> {
-                    if (_state.value.selectedBottomBar == 1 && !_state.value.isLoadSong) {
+                is MviIntent.LoadSongLocal -> {
                         viewModelScope.launch {
                             val songs = withContext(Dispatchers.IO) {
-                                getAllSong(intent.context)
+                                getSongLocal(intent.context)
                             }
                             _state.value = _state.value.copy(
-                                listSong = songs,
-                                isLoadSong = true
+                                listSongLocal = songs,
                             )
                         }
+                }
+
+                is MviIntent.LoadSongRemote -> {
+                    viewModelScope.launch {
+                        val songs = getSongRemote()
+                        delay(1000)
+                        _state.value = _state.value.copy(
+                            listSongRemote = songs,
+                        )
                     }
                 }
 
@@ -225,7 +239,7 @@ class MviViewModel(
         }
     }
 
-    private suspend fun getAllSong(context: Context): MutableList<Song> =
+    private suspend fun getSongLocal(context: Context): MutableList<Song> =
         withContext(Dispatchers.IO) {
             val songs = mutableListOf<Song>()
             val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -293,5 +307,37 @@ class MviViewModel(
                 listSong = songs.toMutableList()
             )
         }
+    }
+
+    private suspend fun getSongRemote(): MutableList<Song> = withContext(Dispatchers.IO) {
+        val songs = mutableListOf<Song>()
+        val callApi = ApiClient.build().getSongRemote()
+        callApi.enqueue(object : Callback<List<SongRemote>> {
+            override fun onFailure(call: Call<List<SongRemote>>, t: Throwable) {
+                Log.d("tag", "onfailure: ${t.message}")
+            }
+
+            override fun onResponse(
+                call: Call<List<SongRemote>>,
+                response: Response<List<SongRemote>>
+            ) {
+                when {
+                    response.isSuccessful -> {
+                        val data = response.body()
+                        data?.forEach {
+                            songs.add(
+                                Song(
+                                    title = it.title,
+                                    artist = it.artist,
+                                    duration = it.duration.toLong()
+                                )
+                            )
+                            Log.d("tag",it.title)
+                        }
+                    }
+                }
+            }
+        })
+        songs
     }
 }

@@ -1,11 +1,11 @@
-package com.example.hungdm.db.dao
+package com.example.hungdm.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.hungdm.db.entity.UserEntity
+import com.example.hungdm.data.db.entity.UserEntity
 
 
 @Dao

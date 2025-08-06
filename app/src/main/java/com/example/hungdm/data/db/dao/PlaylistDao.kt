@@ -1,4 +1,4 @@
-package com.example.hungdm.db.dao
+package com.example.hungdm.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,10 +6,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.example.hungdm.db.entity.PlaylistEntity
-import com.example.hungdm.db.entity.PlaylistSongReference
-import com.example.hungdm.db.entity.PlaylistWithSongs
-import com.example.hungdm.db.entity.SongEntity
+import com.example.hungdm.data.db.entity.PlaylistEntity
+import com.example.hungdm.data.db.entity.PlaylistSongReference
+import com.example.hungdm.data.db.entity.PlaylistWithSongs
+import com.example.hungdm.data.db.entity.SongEntity
 
 @Dao
 interface PlaylistDao {

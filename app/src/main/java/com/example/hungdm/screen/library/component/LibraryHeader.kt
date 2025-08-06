@@ -12,6 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun LibraryHeader(
     modifier: Modifier = Modifier,
+    selectedLocal: Boolean = true,
     onClickLocal: () -> Unit = {},
     onClickRemote: () -> Unit = {},
 ) {
@@ -35,31 +38,32 @@ fun LibraryHeader(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Home",
+            text = "Library",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
         )
         Spacer(Modifier.size(20.dp))
-
         Row {
             Button(
                 onClick = onClickLocal,
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(colorScheme.surfaceTint),
+                colors = ButtonDefaults.buttonColors(
+                    if(selectedLocal) colorScheme.surfaceTint else Color.DarkGray
+                ),
                 modifier = Modifier
                     .width(140.dp)
                     .height(50.dp)
             ) {
                 Text(text = "Local", fontSize = 16.sp, color = Color.White)
             }
-
             Spacer(Modifier.size(30.dp))
-
             Button(
                 onClick = onClickRemote,
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(Color.DarkGray),
+                colors = ButtonDefaults.buttonColors(
+                    if(!selectedLocal) colorScheme.surfaceTint else Color.DarkGray
+                ),
                 modifier = Modifier
                     .width(140.dp)
                     .height(50.dp)
@@ -67,5 +71,6 @@ fun LibraryHeader(
                 Text(text = "Remote", fontSize = 16.sp, color = Color.White)
             }
         }
+
     }
 }

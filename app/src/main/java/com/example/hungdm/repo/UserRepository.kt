@@ -1,6 +1,6 @@
 package com.example.hungdm.repo
 
-import com.example.hungdm.db.entity.UserEntity
+import com.example.hungdm.data.db.entity.UserEntity
 
 interface UserRepository{
     suspend fun signup(username: String, password: String, email: String): Long

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Share
@@ -31,10 +32,16 @@ import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.navigation.Destination
 import androidx.compose.runtime.collectAsState
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.hungdm.R
 import com.example.hungdm.UtilsFunction
 import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
 import com.example.hungdm.screen.component.SongItemLinear
 import com.example.hungdm.screen.library.component.LibraryHeader
+import kotlinx.coroutines.delay
 
 @Composable
 fun LibraryScreen(
@@ -43,15 +50,28 @@ fun LibraryScreen(
     onBack: () -> Unit = {},
 ) {
     val state = viewModel.state.collectAsState()
-    val listSong = state.value.listSong
+    val listSongLocal = state.value.listSongLocal
+    val listSongRemote = state.value.listSongRemote
     var selectedSong by remember { mutableStateOf<Song?>(null) }
     var showAddSongToPlaylistDialog by remember { mutableStateOf(false) }
+    var selectedLocal by remember { mutableStateOf(true) }
     val context = LocalContext.current
+    var isLoadSong by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        viewModel.processIntent(MviIntent.LoadSong(context))
+        viewModel.processIntent(MviIntent.LoadSongLocal(context))
+        viewModel.processIntent(MviIntent.LoadSongRemote)
         viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
     }
+
+    LaunchedEffect(key1 = isLoadSong) {
+        if (isLoadSong) {
+            delay(2000)
+            isLoadSong = false
+        }
+    }
+
+
 
     BackHandler { onBack() }
 
@@ -63,25 +83,36 @@ fun LibraryScreen(
             .padding(start = 8.dp, end = 8.dp)
     ) {
         LibraryHeader(
-            onClickLocal = {},
-            onClickRemote = {}
+            selectedLocal = selectedLocal,
+            onClickLocal = {
+                selectedLocal = true
+            },
+            onClickRemote = {
+                selectedLocal = false
+                isLoadSong = true
+            }
         )
 
         Spacer(Modifier.size(10.dp))
 
-        if (!state.value.isLoadSong) {
+        if (isLoadSong) {
             Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.lottie_remote_item_loading))
+                val progress by animateLottieCompositionAsState(composition)
+                LottieAnimation(
+                    composition = composition,
+                    progress = { progress },
+                )
             }
         } else {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(listSong.size) {
+                items(if (selectedLocal) listSongLocal else listSongRemote) {
                     var showOption by remember { mutableStateOf(false) }
                     SongItemLinear(
-                        song = listSong[it],
+                        song = it,
                         showOption = showOption,
                         option1 = "Add to playlist",
                         option2 = "Share",
@@ -89,7 +120,7 @@ fun LibraryScreen(
                         icon2 = Icons.Default.Share,
                         onClickShowOption = {
                             showOption = true
-                            selectedSong = listSong[it]
+                            selectedSong = it
                         },
                         onClickOption1 = {
                             showAddSongToPlaylistDialog = true

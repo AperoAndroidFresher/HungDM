@@ -47,6 +47,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val viewModel: MviViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val activity = context as? Activity
     val bottomItem = listOf(
         BottomItem("Home", Icons.Default.Home, Destination.Home),
         BottomItem("Library", Icons.Default.DateRange, Destination.Library),
@@ -133,7 +134,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         )
                     }
                     entry<Destination.Home> {
-                        val activity = context as? Activity
                         HomeScreen(
                             viewModel = viewModel,
                             onBack = { activity?.finish() }
@@ -146,7 +146,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         )
                     }
                     entry<Destination.Library> {
-                        val activity = context as? Activity
                         LibraryScreen(
                             viewModel = viewModel,
                             onClickNewPlaylist = {
@@ -158,7 +157,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         )
                     }
                     entry<Destination.Playlist> {
-                        val activity = context as? Activity
                         PlaylistScreen(
                             viewModel = viewModel,
                             onBack = { activity?.finish() }

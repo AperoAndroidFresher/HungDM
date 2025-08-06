@@ -41,6 +41,7 @@ import com.example.hungdm.UtilsFunction
 import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
 import com.example.hungdm.screen.component.SongItemLinear
 import com.example.hungdm.screen.library.component.LibraryHeader
+import com.example.hungdm.screen.library.component.ListSongEmpty
 import kotlinx.coroutines.delay
 
 @Composable
@@ -60,12 +61,12 @@ fun LibraryScreen(
 
     LaunchedEffect(Unit) {
         viewModel.processIntent(MviIntent.LoadSongLocal(context))
-        viewModel.processIntent(MviIntent.LoadSongRemote)
         viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
     }
 
     LaunchedEffect(key1 = isLoadSong) {
         if (isLoadSong) {
+            viewModel.processIntent(MviIntent.LoadSongRemote)
             delay(2000)
             isLoadSong = false
         }
@@ -105,34 +106,40 @@ fun LibraryScreen(
                 )
             }
         } else {
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(if (selectedLocal) listSongLocal else listSongRemote) {
-                    var showOption by remember { mutableStateOf(false) }
-                    SongItemLinear(
-                        song = it,
-                        showOption = showOption,
-                        option1 = "Add to playlist",
-                        option2 = "Share",
-                        icon1 = Icons.Default.AddCircle,
-                        icon2 = Icons.Default.Share,
-                        onClickShowOption = {
-                            showOption = true
-                            selectedSong = it
-                        },
-                        onClickOption1 = {
-                            showAddSongToPlaylistDialog = true
-                        },
-                        onClickOption2 = {
-                            UtilsFunction.shareSong(context, selectedSong!!)
-                        },
-                        onDismissRequest = {
-                            showOption = false
-                        }
-                    )
+            if(listSongRemote.isNotEmpty() || selectedLocal){
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(if (selectedLocal) listSongLocal else listSongRemote) {
+                        var showOption by remember { mutableStateOf(false) }
+                        SongItemLinear(
+                            song = it,
+                            showOption = showOption,
+                            option1 = "Add to playlist",
+                            option2 = "Share",
+                            icon1 = Icons.Default.AddCircle,
+                            icon2 = Icons.Default.Share,
+                            onClickShowOption = {
+                                showOption = true
+                                selectedSong = it
+                            },
+                            onClickOption1 = {
+                                showAddSongToPlaylistDialog = true
+                            },
+                            onClickOption2 = {
+                                UtilsFunction.shareSong(context, selectedSong!!)
+                            },
+                            onDismissRequest = {
+                                showOption = false
+                            }
+                        )
+                    }
                 }
+            } else {
+                ListSongEmpty(
+                    onCLick = { isLoadSong = true }
+                )
             }
 
         }

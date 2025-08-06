@@ -141,14 +141,14 @@ class MviViewModel(
                 }
 
                 is MviIntent.LoadSongLocal -> {
-                        viewModelScope.launch {
-                            val songs = withContext(Dispatchers.IO) {
-                                getSongLocal(intent.context)
-                            }
-                            _state.value = _state.value.copy(
-                                listSongLocal = songs,
-                            )
+                    viewModelScope.launch {
+                        val songs = withContext(Dispatchers.IO) {
+                            getSongLocal(intent.context)
                         }
+                        _state.value = _state.value.copy(
+                            listSongLocal = songs,
+                        )
+                    }
                 }
 
                 is MviIntent.LoadSongRemote -> {
@@ -166,7 +166,6 @@ class MviViewModel(
                         title = intent.title,
                         userId = _state.value.userInfo.id
                     )
-
                     playlistRepository.createPlaylist(playlistEntity)
                     _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
@@ -195,7 +194,6 @@ class MviViewModel(
                             albumArtUri = intent.song.albumArtUri!!
                         )
                     )
-
                     playlistRepository.addSongToPlaylist(
                         PlaylistSongReference(intent.playlist.id, id)
                     )

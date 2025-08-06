@@ -36,19 +36,18 @@ import com.example.hungdm.screen.component.SongItemLinear
 
 @Composable
 fun PlaylistDetailScreen(
+    viewModel: MviViewModel ,
     modifier: Modifier = Modifier,
     destination: Destination.PlaylistDetail = Destination.PlaylistDetail(0),
-    viewModel: MviViewModel ,
+    onBack: () -> Unit = {}
 ) {
 
     val context = LocalContext.current
     val state = viewModel.state.collectAsState()
     val playlist = state.value.playlists.find { it.id == destination.playlistID }
 
-
-
     BackHandler {
-        viewModel.removeLast()
+        onBack()
     }
 
     Column(

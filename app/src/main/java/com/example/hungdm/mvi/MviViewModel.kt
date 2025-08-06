@@ -89,9 +89,7 @@ class MviViewModel(
                             )
                         }
                         if (result > 0) {
-                            removeLast()
                             sendEvent(MviEvent.GotoLogin)
-                            removeLast()
                         } else {
                             sendEvent(MviEvent.ShowToast("Username đã tồn tại"))
                         }
@@ -123,17 +121,10 @@ class MviViewModel(
                     _state.value = _state.value.copy(
                         userInfo = intent.userInfo
                     )
-
                 }
 
                 is MviIntent.ChangeTheme -> {
                     _state.value = _state.value.copy(darkTheme = !_state.value.darkTheme)
-                }
-
-                is MviIntent.OnClickItemBottomBar -> {
-                    _state.value = _state.value.copy(
-                        selectedBottomBar = intent.index
-                    )
                 }
 
                 is MviIntent.LoadPlaylistsOfUser -> {
@@ -210,25 +201,6 @@ class MviViewModel(
                 }
             }
         }
-    }
-
-    fun add(destination: Destination) {
-        val newBackStack = _state.value.backStack.toMutableList().apply {
-            add(destination)
-        }
-        _state.value = _state.value.copy(backStack = newBackStack)
-    }
-
-    fun removeLast() {
-        val newBackStack = _state.value.backStack.toMutableList().apply {
-            removeLastOrNull()
-        }
-        _state.value = _state.value.copy(backStack = newBackStack)
-    }
-
-    fun replace(destination: Destination) {
-        val newBackStack = mutableListOf<Destination>(destination)
-        _state.value = _state.value.copy(backStack = newBackStack)
     }
 
     private fun sendEvent(event: MviEvent) {

@@ -48,6 +48,7 @@ import kotlinx.coroutines.delay
 fun LibraryScreen(
     viewModel: MviViewModel,
     modifier: Modifier = Modifier,
+    onClickNewPlaylist: () -> Unit = {},
     onBack: () -> Unit = {},
 ) {
     val state = viewModel.state.collectAsState()
@@ -71,8 +72,6 @@ fun LibraryScreen(
             isLoadSong = false
         }
     }
-
-
 
     BackHandler { onBack() }
 
@@ -150,8 +149,7 @@ fun LibraryScreen(
             playlists = state.value.playlists,
             onClickNewPlaylist = {
                 showAddSongToPlaylistDialog = false
-                viewModel.processIntent(MviIntent.OnClickItemBottomBar(2))
-                viewModel.replace(Destination.Playlist)
+                onClickNewPlaylist()
             },
             onAddSongToPlaylist = {
                 selectedSong?.let { selectedSong ->

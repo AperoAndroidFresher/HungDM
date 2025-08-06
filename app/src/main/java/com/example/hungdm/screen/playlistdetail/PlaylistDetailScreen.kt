@@ -11,9 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.R
 import com.example.hungdm.UtilsFunction
 import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
@@ -78,8 +76,8 @@ fun PlaylistDetailScreen(
                     showOption = showOption,
                     option1 = "Remove from playlist",
                     option2 = "Share",
-                    icon1 = Icons.Default.Delete,
-                    icon2 = Icons.Default.Share,
+                    icon1 = R.drawable.outline_delete_24,
+                    icon2 = R.drawable.outline_share_24,
                     onClickShowOption = {
                         showOption = true
                         Log.d("tag,", "PlaylistDetailScreen: $it")

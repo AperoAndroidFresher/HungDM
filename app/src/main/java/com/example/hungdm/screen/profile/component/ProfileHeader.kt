@@ -3,8 +3,6 @@ package com.example.hungdm.screen.profile.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -51,7 +49,7 @@ fun ProfileHeader(
                 modifier = Modifier.align(Alignment.TopEnd)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
+                    painter = painterResource(R.drawable.outline_edit_24),
                     contentDescription = null,
                     tint = colorScheme.primary,
                     modifier = Modifier.size(20.dp)

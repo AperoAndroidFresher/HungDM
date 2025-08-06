@@ -12,10 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -29,7 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.hungdm.R
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
@@ -82,8 +80,8 @@ fun PlaylistScreen(
                         showOption = showOption,
                         option1 = "Remove playlist",
                         option2 = "Rename",
-                        icon1 = Icons.Default.Delete,
-                        icon2 = Icons.Default.Edit,
+                        icon1 = R.drawable.outline_delete_24,
+                        icon2 = R.drawable.outline_edit_24,
                         onClickShowOption = {
                             showOption = true
                             selectedPlaylist = playlists[it]
@@ -158,7 +156,7 @@ fun EmptyPlaylist(
                 .size(48.dp)
                 .border(1.dp, colorScheme.primary, shape = CircleShape)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Add", tint = colorScheme.primary)
+            Icon(painterResource(R.drawable.outline_add_24), contentDescription = "Add", tint = colorScheme.primary)
         }
     }
 }

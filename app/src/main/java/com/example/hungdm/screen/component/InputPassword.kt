@@ -38,7 +38,7 @@ fun InputPassword(
     Column {
         OutlinedTextField(
             value = value,
-            leadingIcon = { Icon(Icons.Default.Lock, null, tint = colorScheme.primary) },
+            leadingIcon = { Icon(painterResource(R.drawable.outline_lock_24), null, tint = colorScheme.primary) },
             onValueChange = onValueChange,
             trailingIcon = {
                 Icon(

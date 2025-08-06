@@ -12,10 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.example.hungdm.model.Song
 import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
-import com.example.hungdm.navigation.Destination
 import androidx.compose.runtime.collectAsState
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -117,8 +112,8 @@ fun LibraryScreen(
                             showOption = showOption,
                             option1 = "Add to playlist",
                             option2 = "Share",
-                            icon1 = Icons.Default.AddCircle,
-                            icon2 = Icons.Default.Share,
+                            icon1 = R.drawable.outline_add_24,
+                            icon2 = R.drawable.outline_share_24,
                             onClickShowOption = {
                                 showOption = true
                                 selectedSong = it

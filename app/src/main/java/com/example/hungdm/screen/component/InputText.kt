@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
@@ -16,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -30,7 +27,7 @@ fun InputText(
     modifier: Modifier = Modifier,
     title: String = "",
     value: String = "",
-    leadingIcon: ImageVector = Icons.Default.AccountCircle,
+    leadingIcon: Int = R.drawable.outline_account_circle_24,
     isValid: Boolean = true,
     isPass: Boolean = false,
     showPass: Boolean = false,
@@ -44,7 +41,7 @@ fun InputText(
                 .width(380.dp)
                 .height(60.dp),
             value = value,
-            leadingIcon = { Icon(leadingIcon, null, tint = colorScheme.primary) },
+            leadingIcon = { Icon(painterResource(leadingIcon), null, tint = colorScheme.primary) },
             onValueChange = onValueChange,
             trailingIcon = {
                 if (isPass) {

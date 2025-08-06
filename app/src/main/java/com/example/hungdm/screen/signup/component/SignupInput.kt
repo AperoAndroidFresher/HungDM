@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.hungdm.R
 import com.example.hungdm.component.InputPassword
 import com.example.hungdm.component.InputText
 import com.example.hungdm.model.UserInfo
@@ -61,7 +62,7 @@ fun SignupInput(
             title = "Email",
             value = userInfo.email,
             isValid = userInfo.inputValid.emailValid,
-            leadingIcon = Icons.Default.Email,
+            leadingIcon = R.drawable.outline_mail_24,
             onValueChange = onValueChangeEmail
         )
     }

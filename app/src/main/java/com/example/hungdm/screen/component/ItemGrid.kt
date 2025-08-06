@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -19,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,8 +35,8 @@ fun ItemGrid(
     modifier: Modifier = Modifier,
     option1:String="",
     option2:String="",
-    icon1: ImageVector = Icons.Default.Delete,
-    icon2: ImageVector = Icons.Default.Share,
+    icon1: Int = R.drawable.outline_delete_24,
+    icon2: Int = R.drawable.outline_share_24,
     song: Song = Song(100,"Noi nay co anh","MTP", duration = 100000L ,null),
     playlist: Playlist? = null,
     showOption: Boolean = false,

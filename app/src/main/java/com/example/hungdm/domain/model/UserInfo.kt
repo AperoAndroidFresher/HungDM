@@ -15,5 +15,5 @@ data class UserInfo(
     var uni: String ="",
     var desc: String ="",
     var inputValid: InputValid = InputValid(),
-    var imgUri: Uri? = null
+    var img: ByteArray? = null
 )

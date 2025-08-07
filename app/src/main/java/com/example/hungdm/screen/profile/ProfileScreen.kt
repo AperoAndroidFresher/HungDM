@@ -60,7 +60,12 @@ fun ProfileScreen(
                     it,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                userInfo = userInfo.copy(imgUri = it)
+                val inputStream = context.contentResolver.openInputStream(it)
+                val byteArray = inputStream?.use { stream -> stream.readBytes() }
+
+                byteArray?.let {
+                    userInfo = userInfo.copy(img = it)
+                }
             }
         }
     )
@@ -95,7 +100,7 @@ fun ProfileScreen(
             onChangeAvatar = {
                 launcher.launch(arrayOf("image/*"))
             },
-            imageUri = userInfo.imgUri ?: R.drawable.img
+            imageUri = userInfo.img ?: R.drawable.img
         )
         Spacer(Modifier.size(20.dp))
         ProfileInput(

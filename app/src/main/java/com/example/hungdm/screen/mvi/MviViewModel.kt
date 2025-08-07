@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.net.http.HttpException
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -40,7 +41,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
+import java.net.UnknownHostException
 
 class MviViewModel(
     private val userRepository: UserRepository,
@@ -303,10 +306,18 @@ class MviViewModel(
     }
 
     private suspend fun getSongRemote(): MutableList<Song> = withContext(Dispatchers.IO) {
-        val songs = mutableListOf<Song>()
-        val callApi = ApiClient.build().getSongRemote()
-        for(i in callApi) songs.add(i.toSong())
-        songs
+        return@withContext try {
+            ApiClient.build().getSongRemote().map { it.toSong() }.toMutableList()
+        } catch (e: UnknownHostException) {
+            Log.d("API_ERROR", "Khong co mang: ${e.message}")
+            mutableListOf()
+        } catch (e: IOException) {
+            Log.d("API_ERROR", "Loi IO: ${e.message}")
+            mutableListOf()
+        } catch (e: Exception) {
+            Log.d("API_ERROR", "Loi khac: ${e.message}")
+            mutableListOf()
+        }
     }
 
     private suspend fun downloadSongToInternalStorage(

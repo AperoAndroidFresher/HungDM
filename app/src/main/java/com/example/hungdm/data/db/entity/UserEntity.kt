@@ -17,5 +17,5 @@ data class UserEntity(
     val email: String = "",
     val uni: String = "",
     val desc: String = "",
-    val imgUri: Uri? = null
+    val img: ByteArray? = null
 )

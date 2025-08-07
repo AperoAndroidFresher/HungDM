@@ -47,7 +47,7 @@ fun UserInfo.toUserEntity(): UserEntity {
         email = email,
         uni = uni,
         desc = desc,
-        imgUri = imgUri
+        img = img
     )
 }
 
@@ -61,6 +61,6 @@ fun UserEntity.toUserInfo(): UserInfo {
         phone = phone,
         uni = uni,
         desc = desc,
-        imgUri = imgUri
+        img = img
     )
 }

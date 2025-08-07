@@ -1,10 +1,10 @@
-package com.example.hungdm.db.entity
+package com.example.hungdm.data.db.entity
 
 import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.hungdm.db.converters.Converters
+import com.example.hungdm.data.db.converters.Converters
 
 @Entity(tableName = "users")
 @TypeConverters(Converters::class)

@@ -1,9 +1,6 @@
 package com.example.hungdm.component
 
 import androidx.compose.foundation.background
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -11,7 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import com.example.hungdm.R
 
 @Composable
 fun Dropdown(
@@ -22,8 +20,8 @@ fun Dropdown(
     onDismissRequest: () -> Unit = {},
     option1: String = "",
     option2: String = "",
-    icon1: ImageVector = Icons.Default.Delete,
-    icon2: ImageVector = Icons.Default.Create
+    icon1: Int = R.drawable.outline_delete_24,
+    icon2: Int = R.drawable.outline_edit_24
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -37,7 +35,7 @@ fun Dropdown(
                 onDismissRequest()
             },
             leadingIcon = {
-                Icon(icon1, null, tint = Color.White)
+                Icon(painterResource(icon1), null, tint = Color.White)
             }
         )
         DropdownMenuItem(
@@ -47,7 +45,7 @@ fun Dropdown(
                 onDismissRequest()
             },
             leadingIcon = {
-                Icon(icon2, null, tint = Color.White)
+                Icon(painterResource(icon2), null, tint = Color.White)
             }
         )
     }

@@ -27,14 +27,15 @@ import com.example.hungdm.screen.signup.component.SignupInput
 @Composable
 fun SignupScreen(
     viewModel: MviViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit = {}
 ) {
     var userInfo by remember { mutableStateOf(UserInfo()) }
     var showPass by remember { mutableStateOf(false) }
     var showPass2 by remember { mutableStateOf(false) }
 
     BackHandler {
-        viewModel.removeLast()
+        onBack()
     }
 
     Column(
@@ -47,9 +48,7 @@ fun SignupScreen(
         Logo(
             isSignup = true,
             title = "Sign up",
-            onBack = {
-                viewModel.removeLast()
-            }
+            onBack = onBack
         )
         Spacer(Modifier.size(40.dp))
         SignupInput(

@@ -1,15 +1,15 @@
-package com.example.hungdm.db
+package com.example.hungdm.data.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.hungdm.db.dao.PlaylistDao
-import com.example.hungdm.db.dao.UserDao
-import com.example.hungdm.db.entity.PlaylistEntity
-import com.example.hungdm.db.entity.PlaylistSongReference
-import com.example.hungdm.db.entity.SongEntity
-import com.example.hungdm.db.entity.UserEntity
+import com.example.hungdm.data.db.dao.PlaylistDao
+import com.example.hungdm.data.db.dao.UserDao
+import com.example.hungdm.data.db.entity.PlaylistEntity
+import com.example.hungdm.data.db.entity.PlaylistSongReference
+import com.example.hungdm.data.db.entity.SongEntity
+import com.example.hungdm.data.db.entity.UserEntity
 
 @Database(
     entities = [

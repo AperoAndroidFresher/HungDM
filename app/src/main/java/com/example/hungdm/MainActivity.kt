@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hungdm.db.AppDatabase
+import com.example.hungdm.data.db.AppDatabase
 import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.navigation.AppNavigation
 import com.example.hungdm.repo.UserRepository

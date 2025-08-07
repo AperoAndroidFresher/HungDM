@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -34,7 +32,7 @@ fun Logo(
     ) {
         if(isSignup){
             Icon(
-                Icons.Default.KeyboardArrowLeft,
+                painterResource(R.drawable.outline_arrow_back_ios_24),
                 null,
                 tint = Color.White,
                 modifier = Modifier

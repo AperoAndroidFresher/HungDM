@@ -12,9 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.R
 
 @Composable
 fun PlaylistHeader(
@@ -37,7 +39,7 @@ fun PlaylistHeader(
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
+                painter = painterResource(R.drawable.outline_add_24),
                 contentDescription = null,
                 tint = colorScheme.primary,
                 modifier = Modifier.size(20.dp)

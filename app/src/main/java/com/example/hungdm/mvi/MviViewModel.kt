@@ -7,10 +7,10 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hungdm.db.entity.PlaylistEntity
-import com.example.hungdm.db.entity.PlaylistSongReference
-import com.example.hungdm.db.entity.SongEntity
-import com.example.hungdm.db.entity.UserEntity
+import com.example.hungdm.data.db.entity.PlaylistEntity
+import com.example.hungdm.data.db.entity.PlaylistSongReference
+import com.example.hungdm.data.db.entity.SongEntity
+import com.example.hungdm.data.db.entity.UserEntity
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
 import com.example.hungdm.model.UserInfo
@@ -29,6 +29,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.net.toUri
+import com.example.hungdm.retrofit.ApiClient
+import com.example.hungdm.retrofit.SongRemote
+import okhttp3.Request
+import okio.Timeout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MviViewModel(
     private val userRepository: UserRepository,
@@ -82,9 +89,7 @@ class MviViewModel(
                             )
                         }
                         if (result > 0) {
-                            removeLast()
                             sendEvent(MviEvent.GotoLogin)
-                            removeLast()
                         } else {
                             sendEvent(MviEvent.ShowToast("Username đã tồn tại"))
                         }
@@ -116,34 +121,34 @@ class MviViewModel(
                     _state.value = _state.value.copy(
                         userInfo = intent.userInfo
                     )
-
                 }
 
                 is MviIntent.ChangeTheme -> {
                     _state.value = _state.value.copy(darkTheme = !_state.value.darkTheme)
                 }
 
-                is MviIntent.OnClickItemBottomBar -> {
-                    _state.value = _state.value.copy(
-                        selectedBottomBar = intent.index
-                    )
-                }
-
                 is MviIntent.LoadPlaylistsOfUser -> {
                     _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
 
-                is MviIntent.LoadSong -> {
-                    if (_state.value.selectedBottomBar == 1 && !_state.value.isLoadSong) {
-                        viewModelScope.launch {
-                            val songs = withContext(Dispatchers.IO) {
-                                getAllSong(intent.context)
-                            }
-                            _state.value = _state.value.copy(
-                                listSong = songs,
-                                isLoadSong = true
-                            )
+                is MviIntent.LoadSongLocal -> {
+                    viewModelScope.launch {
+                        val songs = withContext(Dispatchers.IO) {
+                            getSongLocal(intent.context)
                         }
+                        _state.value = _state.value.copy(
+                            listSongLocal = songs,
+                        )
+                    }
+                }
+
+                is MviIntent.LoadSongRemote -> {
+                    viewModelScope.launch {
+                        val songs = getSongRemote()
+                        delay(1000)
+                        _state.value = _state.value.copy(
+                            listSongRemote = songs,
+                        )
                     }
                 }
 
@@ -152,7 +157,6 @@ class MviViewModel(
                         title = intent.title,
                         userId = _state.value.userInfo.id
                     )
-
                     playlistRepository.createPlaylist(playlistEntity)
                     _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
@@ -181,7 +185,6 @@ class MviViewModel(
                             albumArtUri = intent.song.albumArtUri!!
                         )
                     )
-
                     playlistRepository.addSongToPlaylist(
                         PlaylistSongReference(intent.playlist.id, id)
                     )
@@ -200,32 +203,13 @@ class MviViewModel(
         }
     }
 
-    fun add(destination: Destination) {
-        val newBackStack = _state.value.backStack.toMutableList().apply {
-            add(destination)
-        }
-        _state.value = _state.value.copy(backStack = newBackStack)
-    }
-
-    fun removeLast() {
-        val newBackStack = _state.value.backStack.toMutableList().apply {
-            removeLastOrNull()
-        }
-        _state.value = _state.value.copy(backStack = newBackStack)
-    }
-
-    fun replace(destination: Destination) {
-        val newBackStack = mutableListOf<Destination>(destination)
-        _state.value = _state.value.copy(backStack = newBackStack)
-    }
-
     private fun sendEvent(event: MviEvent) {
         viewModelScope.launch {
             _event.emit(event)
         }
     }
 
-    private suspend fun getAllSong(context: Context): MutableList<Song> =
+    private suspend fun getSongLocal(context: Context): MutableList<Song> =
         withContext(Dispatchers.IO) {
             val songs = mutableListOf<Song>()
             val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -293,5 +277,37 @@ class MviViewModel(
                 listSong = songs.toMutableList()
             )
         }
+    }
+
+    private suspend fun getSongRemote(): MutableList<Song> = withContext(Dispatchers.IO) {
+        val songs = mutableListOf<Song>()
+        val callApi = ApiClient.build().getSongRemote()
+        callApi.enqueue(object : Callback<List<SongRemote>> {
+            override fun onFailure(call: Call<List<SongRemote>>, t: Throwable) {
+                Log.d("tag", "onfailure: ${t.message}")
+            }
+
+            override fun onResponse(
+                call: Call<List<SongRemote>>,
+                response: Response<List<SongRemote>>
+            ) {
+                when {
+                    response.isSuccessful -> {
+                        val data = response.body()
+                        data?.forEach {
+                            songs.add(
+                                Song(
+                                    title = it.title,
+                                    artist = it.artist,
+                                    duration = it.duration.toLong()
+                                )
+                            )
+                            Log.d("tag",it.title)
+                        }
+                    }
+                }
+            }
+        })
+        songs
     }
 }

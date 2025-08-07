@@ -44,7 +44,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileScreen(
     viewModel: MviViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val state = viewModel.state.collectAsState()
@@ -66,7 +67,7 @@ fun ProfileScreen(
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
 
-    BackHandler { viewModel.removeLast() }
+    BackHandler { onBack() }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

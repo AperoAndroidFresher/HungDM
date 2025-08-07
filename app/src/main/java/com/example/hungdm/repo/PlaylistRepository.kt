@@ -1,9 +1,9 @@
 package com.example.hungdm.repo
 
-import com.example.hungdm.db.entity.PlaylistEntity
-import com.example.hungdm.db.entity.PlaylistSongReference
-import com.example.hungdm.db.entity.PlaylistWithSongs
-import com.example.hungdm.db.entity.SongEntity
+import com.example.hungdm.data.db.entity.PlaylistEntity
+import com.example.hungdm.data.db.entity.PlaylistSongReference
+import com.example.hungdm.data.db.entity.PlaylistWithSongs
+import com.example.hungdm.data.db.entity.SongEntity
 
 interface PlaylistRepository{
     suspend fun createPlaylist(playlist: PlaylistEntity): Long

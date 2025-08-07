@@ -6,11 +6,11 @@ import android.provider.MediaStore
 import androidx.core.net.toUri
 
 data class Song(
-    val id: Long,
+    val id: Long = 0,
     val title: String,
     val artist: String,
     val duration: Long,
-    val albumArt: String?,
+    val albumArt: String? = "",
     val uri: Uri = "".toUri(),
     val albumArtUri: Uri? = null
 ){

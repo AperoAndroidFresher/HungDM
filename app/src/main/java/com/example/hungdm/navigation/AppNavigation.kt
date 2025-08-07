@@ -19,6 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -26,7 +30,6 @@ import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.hungdm.mvi.MviEvent
-import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen
 import com.example.hungdm.screen.library.LibraryScreen
@@ -44,33 +47,38 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val viewModel: MviViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val activity = context as? Activity
     val bottomItem = listOf(
         BottomItem("Home", Icons.Default.Home, Destination.Home),
         BottomItem("Library", Icons.Default.DateRange, Destination.Library),
         BottomItem("Playlist", Icons.Default.PlayArrow, Destination.Playlist)
     )
+    val backStack = remember { mutableStateListOf<Destination>(Destination.Login) }
+    var selectedBottomBar by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        viewModel.event.collect{e->
-            when(e){
-                is MviEvent.GotoLogin ->{
-                    viewModel.add(Destination.Login)
+        viewModel.event.collect { e ->
+            when (e) {
+                is MviEvent.GotoLogin -> {
+                    backStack.add(Destination.Login)
                 }
-                is MviEvent.GotoSignup ->{
-                    viewModel.add(Destination.Signup)
+
+                is MviEvent.GotoSignup -> {
+                    backStack.add(Destination.Signup)
                 }
-                is MviEvent.GotoHome->{
-                    viewModel.add(Destination.Home)
+
+                is MviEvent.GotoHome -> {
+                    backStack.add(Destination.Home)
                 }
-                is MviEvent.GotoProfile ->{
-                    viewModel.add(Destination.Profile)
+
+                is MviEvent.GotoProfile -> {
+                    backStack.add(Destination.Profile)
                 }
-                is MviEvent.GotoPlaylist ->{
-                    viewModel.replace(Destination.Playlist)
+
+                is MviEvent.GotoPlaylistDetail -> {
+                    backStack.add(Destination.PlaylistDetail(e.playlistId))
                 }
-                is MviEvent.GotoPlaylistDetail->{
-                    viewModel.add(Destination.PlaylistDetail(e.playlistId))
-                }
+
                 is MviEvent.ShowToast -> {
                     Toast.makeText(context, e.mess, LENGTH_SHORT).show()
                 }
@@ -78,13 +86,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
     }
 
-    AppTheme (
+    AppTheme(
         darkTheme = state.darkTheme,
         dynamicColor = false
-    ){
+    ) {
         Scaffold(
             bottomBar = {
-                val showBottomNav = state.backStack.lastOrNull()?.let {
+                val showBottomNav = backStack.lastOrNull()?.let {
                     it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile
                 } ?: false
 
@@ -95,12 +103,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     ) {
                         bottomItem.forEachIndexed { index, item ->
                             NavigationBarItem(
-                                selected = state.selectedBottomBar==index,
+                                selected = selectedBottomBar == index,
                                 onClick = {
-                                    viewModel.processIntent(MviIntent.OnClickItemBottomBar(index))
-                                    viewModel.replace(item.destination)
+                                    selectedBottomBar = index
+                                    backStack.clear()
+                                    backStack.add(item.destination)
                                 },
-                                icon = { Icon(item.icon,null) },
+                                icon = { Icon(item.icon, null) },
                                 label = { Text(item.label, color = colorScheme.primary) }
                             )
                         }
@@ -110,8 +119,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         ) { p ->
             NavDisplay(
                 modifier = Modifier.padding(p),
-                backStack = state.backStack,
-                onBack = { viewModel.removeLast() },
+                backStack = backStack,
+                onBack = { backStack.removeLastOrNull() },
                 entryProvider = entryProvider {
                     entry<Destination.Login> {
                         LoginScreen(
@@ -120,45 +129,44 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     }
                     entry<Destination.Signup> {
                         SignupScreen(
-                            viewModel = viewModel
+                            viewModel = viewModel,
+                            onBack = { backStack.removeLastOrNull() }
                         )
                     }
                     entry<Destination.Home> {
-                        val activity = context as? Activity
                         HomeScreen(
                             viewModel = viewModel,
-                            onBack = {
-                                activity?.finish()
-                            }
+                            onBack = { activity?.finish() }
                         )
                     }
                     entry<Destination.Profile> {
                         ProfileScreen(
                             viewModel = viewModel,
+                            onBack = { backStack.removeLastOrNull() }
                         )
                     }
                     entry<Destination.Library> {
-                        val activity = context as? Activity
                         LibraryScreen(
                             viewModel = viewModel,
-                            onBack = {
-                                activity?.finish()
-                            }
+                            onClickNewPlaylist = {
+                                backStack.clear()
+                                backStack.add(Destination.Playlist)
+                                selectedBottomBar = 2
+                            },
+                            onBack = { activity?.finish() }
                         )
                     }
                     entry<Destination.Playlist> {
-                        val activity = context as? Activity
                         PlaylistScreen(
                             viewModel = viewModel,
-                            onBack = {
-                                activity?.finish()
-                            }
+                            onBack = { activity?.finish() }
                         )
                     }
-                    entry<Destination.PlaylistDetail>{ destination ->
+                    entry<Destination.PlaylistDetail> { destination ->
                         PlaylistDetailScreen(
                             viewModel = viewModel,
-                            destination = destination
+                            destination = destination,
+                            onBack = { backStack.removeLastOrNull() }
                         )
                     }
                 }

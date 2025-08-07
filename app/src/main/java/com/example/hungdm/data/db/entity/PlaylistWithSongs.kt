@@ -1,4 +1,4 @@
-package com.example.hungdm.db.entity
+package com.example.hungdm.data.db.entity
 
 import androidx.room.Embedded
 import androidx.room.Junction

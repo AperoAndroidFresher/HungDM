@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.component.InputPassword
 import com.example.hungdm.component.InputText
-import com.example.hungdm.model.UserInfo
+import com.example.hungdm.domain.model.UserInfo
 
 
 @Composable

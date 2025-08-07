@@ -1,4 +1,4 @@
-package com.example.hungdm.model
+package com.example.hungdm.domain.model
 
 import java.util.UUID
 

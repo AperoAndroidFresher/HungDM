@@ -6,9 +6,9 @@ import com.example.hungdm.data.db.dao.PlaylistDao
 import com.example.hungdm.data.db.dao.UserDao
 import org.koin.androidx.viewmodel.dsl.viewModel
 import com.example.hungdm.screen.mvi.MviViewModel
-import com.example.hungdm.data.db.repo.PlaylistRepository
+import com.example.hungdm.domain.repo.PlaylistRepository
 import com.example.hungdm.data.db.repo.PlaylistRepositoryImpl
-import com.example.hungdm.data.db.repo.UserRepository
+import com.example.hungdm.domain.repo.UserRepository
 import com.example.hungdm.data.db.repo.UserRepositoryImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module

@@ -23,7 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.hungdm.model.Song
+import com.example.hungdm.domain.model.Song
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
@@ -32,7 +32,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hungdm.R
-import com.example.hungdm.AppUtils
+import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
 import com.example.hungdm.screen.component.SongItemLinear
 import com.example.hungdm.screen.library.component.LibraryHeader

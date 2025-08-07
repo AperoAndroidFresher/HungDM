@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
-import com.example.hungdm.model.Playlist
+import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.playlist.component.PlaylistDialog

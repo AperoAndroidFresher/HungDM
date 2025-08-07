@@ -29,9 +29,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.example.hungdm.AppUtils
-import com.example.hungdm.UserPreferences
-import com.example.hungdm.data.db.mapper.toUserInfo
+import com.example.hungdm.utils.UserPreferences
+import com.example.hungdm.data.mapper.toUserInfo
 import com.example.hungdm.screen.mvi.MviEvent
 import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen

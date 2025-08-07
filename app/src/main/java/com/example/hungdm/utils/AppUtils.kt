@@ -1,8 +1,8 @@
-package com.example.hungdm
+package com.example.hungdm.utils
 
 import android.content.Context
 import android.content.Intent
-import com.example.hungdm.model.Song
+import com.example.hungdm.domain.model.Song
 
 object AppUtils {
 

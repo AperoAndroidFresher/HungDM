@@ -1,4 +1,4 @@
-package com.example.hungdm.model
+package com.example.hungdm.domain.model
 
 import android.net.Uri
 import kotlinx.serialization.Serializable

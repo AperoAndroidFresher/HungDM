@@ -8,16 +8,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hungdm.data.db.AppDatabase
-import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.navigation.AppNavigation
-import com.example.hungdm.data.db.repo.UserRepository
-import com.example.hungdm.data.db.repo.UserRepositoryImpl
-import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

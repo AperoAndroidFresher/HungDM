@@ -27,8 +27,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
 import com.example.hungdm.component.Dropdown
-import com.example.hungdm.model.Playlist
-import com.example.hungdm.model.Song
+import com.example.hungdm.domain.model.Playlist
+import com.example.hungdm.domain.model.Song
 
 @Composable
 fun ItemGrid(

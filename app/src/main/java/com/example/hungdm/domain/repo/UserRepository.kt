@@ -1,4 +1,4 @@
-package com.example.hungdm.data.db.repo
+package com.example.hungdm.domain.repo
 
 import com.example.hungdm.data.db.entity.UserEntity
 

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hungdm.R
-import com.example.hungdm.model.Playlist
+import com.example.hungdm.domain.model.Playlist
 
 @Composable
 fun AddSongToPlaylistDialog(

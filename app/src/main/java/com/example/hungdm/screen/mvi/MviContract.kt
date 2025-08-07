@@ -1,9 +1,9 @@
 package com.example.hungdm.screen.mvi
 
 import android.content.Context
-import com.example.hungdm.model.Playlist
-import com.example.hungdm.model.Song
-import com.example.hungdm.model.UserInfo
+import com.example.hungdm.domain.model.Playlist
+import com.example.hungdm.domain.model.Song
+import com.example.hungdm.domain.model.UserInfo
 
 data class MviState(
     val darkTheme: Boolean = true,

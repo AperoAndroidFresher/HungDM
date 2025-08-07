@@ -1,4 +1,4 @@
-package com.example.hungdm
+package com.example.hungdm.utils
 
 import android.content.Context
 import com.example.hungdm.data.db.entity.UserEntity

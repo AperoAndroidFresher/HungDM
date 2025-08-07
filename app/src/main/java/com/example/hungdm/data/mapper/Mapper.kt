@@ -1,9 +1,9 @@
-package com.example.hungdm.data.db.mapper
+package com.example.hungdm.data.mapper
 
 import com.example.hungdm.data.db.entity.SongEntity
 import com.example.hungdm.data.db.entity.UserEntity
-import com.example.hungdm.model.Song
-import com.example.hungdm.model.UserInfo
+import com.example.hungdm.domain.model.Song
+import com.example.hungdm.domain.model.UserInfo
 
 fun Song.toSongEntity(): SongEntity {
     return SongEntity(

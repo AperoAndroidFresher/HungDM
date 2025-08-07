@@ -2,7 +2,7 @@ package com.example.hungdm.screen.mvi
 
 import android.content.ContentUris
 import android.content.Context
-import android.net.Uri
+import android.media.MediaMetadataRetriever
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -10,12 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.hungdm.data.db.entity.PlaylistEntity
 import com.example.hungdm.data.db.entity.PlaylistSongReference
 import com.example.hungdm.data.db.entity.SongEntity
-import com.example.hungdm.data.db.entity.UserEntity
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
-import com.example.hungdm.model.UserInfo
 import com.example.hungdm.model.getAlbumArt
-import com.example.hungdm.screen.navigation.Destination
 import com.example.hungdm.data.db.repo.PlaylistRepository
 import com.example.hungdm.data.db.repo.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -28,26 +25,35 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.core.net.toUri
+import com.example.hungdm.AppUtils
+import com.example.hungdm.UserPreferences
+import com.example.hungdm.data.db.mapper.toUserEntity
+import com.example.hungdm.data.db.mapper.toUserInfo
 import com.example.hungdm.retrofit.ApiClient
 import com.example.hungdm.retrofit.SongRemote
-import okhttp3.Request
-import okio.Timeout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MviViewModel(
     private val userRepository: UserRepository,
     private val playlistRepository: PlaylistRepository
 ) : ViewModel() {
+
     private val _state = MutableStateFlow<MviState>(MviState())
     val state: StateFlow<MviState> = _state.asStateFlow()
     private val _event = MutableSharedFlow<MviEvent>()
     val event: SharedFlow<MviEvent> = _event.asSharedFlow()
 
+    @androidx.annotation.RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
     fun processIntent(intent: MviIntent) {
-        viewModelScope.launch {
+        viewModelScope.launch  {
             when (intent) {
                 is MviIntent.OnClickSignup -> {
                     sendEvent(MviEvent.GotoSignup)
@@ -60,18 +66,9 @@ class MviViewModel(
 
                     if (user != null) {
                         _state.value = _state.value.copy(
-                            userInfo = UserInfo(
-                                id = user.userId,
-                                username = user.username,
-                                password = user.password,
-                                email = user.email,
-                                name = user.name,
-                                phone = user.phone,
-                                uni = user.uni,
-                                desc = user.desc,
-                                imgUri = user.imgUri
-                            )
+                            userInfo = user.toUserInfo()
                         )
+                        UserPreferences.saveUser(intent.context, user)
                         sendEvent(MviEvent.GotoHome)
                     } else {
                         sendEvent(MviEvent.ShowToast("Đăng nhập thất bại"))
@@ -102,21 +99,9 @@ class MviViewModel(
                     sendEvent(MviEvent.GotoProfile)
                 }
 
-                is MviIntent.CheckEditProfile -> {
+                is MviIntent.EditProfile -> {
                     withContext(Dispatchers.IO) {
-                        userRepository.updateUser(
-                            UserEntity(
-                                userId = intent.userInfo.id,
-                                username = intent.userInfo.username,
-                                password = intent.userInfo.password,
-                                name = intent.userInfo.name,
-                                phone = intent.userInfo.phone,
-                                email = intent.userInfo.email,
-                                uni = intent.userInfo.uni,
-                                desc = intent.userInfo.desc,
-                                imgUri = intent.userInfo.imgUri
-                            )
-                        )
+                        userRepository.updateUser(intent.userInfo.toUserEntity())
                     }
                     _state.value = _state.value.copy(
                         userInfo = intent.userInfo
@@ -132,22 +117,27 @@ class MviViewModel(
                 }
 
                 is MviIntent.LoadSongLocal -> {
-                    viewModelScope.launch {
-                        val songs = withContext(Dispatchers.IO) {
-                            getSongLocal(intent.context)
-                        }
-                        _state.value = _state.value.copy(
-                            listSongLocal = songs,
-                        )
+                    val songs = withContext(Dispatchers.IO) {
+                        getSongExternal(intent.context)
                     }
+                    _state.value = _state.value.copy(
+                        listSongLocal = songs,
+                    )
                 }
 
                 is MviIntent.LoadSongRemote -> {
-                    viewModelScope.launch {
+                    val isNetwork = AppUtils.isNetworkAvailable(intent.context)
+                    if (isNetwork) {
+                        val songInternal = getSongInternal(intent.context, _state.value.userInfo.username)
+                        delay(1000)
+                        _state.value = _state.value.copy(
+                            listSongRemote = songInternal,
+                        )
+                    } else {
                         val songs = getSongRemote()
                         delay(1000)
                         _state.value = _state.value.copy(
-                            listSongRemote = songs,
+                            listSongRemote = songs
                         )
                     }
                 }
@@ -175,14 +165,19 @@ class MviViewModel(
                 }
 
                 is MviIntent.AddSongToPlaylist -> {
+                    val folderName = _state.value.userInfo.username
+                    val fileName = intent.song.title
+                    val url = intent.song.path
+                    if(intent.isDownload){
+                        downloadSongToInternalStorage(intent.context, url!!, folderName, fileName)
+                    }
                     val id = playlistRepository.addSong(
                         SongEntity(
                             title = intent.song.title,
                             artist = intent.song.artist,
                             duration = intent.song.duration,
-                            albumArt = intent.song.albumArt,
                             uri = intent.song.uri,
-                            albumArtUri = intent.song.albumArtUri!!
+                            img = intent.song.img
                         )
                     )
                     playlistRepository.addSongToPlaylist(
@@ -209,11 +204,38 @@ class MviViewModel(
         }
     }
 
-    private suspend fun getSongLocal(context: Context): MutableList<Song> =
+    private suspend fun loadPlaylistOfUser(): List<Playlist> {
+        val playlists = mutableListOf<Playlist>()
         withContext(Dispatchers.IO) {
-            val songs = mutableListOf<Song>()
-            val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            val playlistWithSongsList =
+                playlistRepository.getPlaylistsWithSongsOfUser(_state.value.userInfo.id)
+            playlistWithSongsList.map {
+                val songs = it.songs.map { songEntity ->
+                    Song(
+                        id = songEntity.songId,
+                        title = songEntity.title,
+                        artist = songEntity.artist,
+                        duration = songEntity.duration,
+                        uri = songEntity.uri,
+                        img = songEntity.img
+                    )
+                }
+                playlists.add(
+                    Playlist(
+                        id = it.playlist.playlistId,
+                        title = it.playlist.title,
+                        listSong = songs.toMutableList()
+                    )
+                )
+            }
+        }
+        return playlists
+    }
 
+    private suspend fun getSongExternal(context: Context): MutableList<Song> {
+        val songs = mutableListOf<Song>()
+        withContext(Dispatchers.IO) {
+            val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
             val projection = arrayOf(
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.TITLE,
@@ -227,7 +249,6 @@ class MviViewModel(
             val cursor = context.contentResolver.query(
                 uri, projection, selection, null, null
             )
-
             cursor?.use {
                 val idColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
                 val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
@@ -241,42 +262,46 @@ class MviViewModel(
                     val artist = it.getString(artistColumn)
                     val duration = it.getLong(durationColumn)
                     val albumId = it.getLong(albumIdColumn)
-                    val albumArt = getAlbumArt(context, albumId)
-
                     val songUri =
                         ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-                    val albumArtUri = ContentUris.withAppendedId(
-                        "content://media/external/audio/albumart".toUri(), albumId
-                    )
-
-                    songs.add(Song(id, title, artist, duration, albumArt, songUri, albumArtUri))
+                    val img = getAlbumArt(context, albumId)
+                    songs.add(Song(id, title, artist, duration, songUri, img))
                 }
             }
-
-            songs
         }
+        return songs
+    }
 
-    private suspend fun loadPlaylistOfUser(): List<Playlist> = withContext(Dispatchers.IO) {
-        val playlistWithSongsList =
-            playlistRepository.getPlaylistsWithSongsOfUser(_state.value.userInfo.id)
-        return@withContext playlistWithSongsList.map { playlistWithSongs ->
-            val songs = playlistWithSongs.songs.map { songEntity ->
-                Song(
-                    id = songEntity.songId,
-                    title = songEntity.title,
-                    artist = songEntity.artist,
-                    duration = songEntity.duration,
-                    albumArt = songEntity.albumArt,
-                    uri = songEntity.uri,
-                    albumArtUri = songEntity.albumArtUri
-                )
+    private suspend fun getSongInternal(context: Context, folderName: String): MutableList<Song> {
+        val songs = mutableListOf<Song>()
+        val dir = File(context.filesDir, folderName)
+        if (!dir.exists()) return mutableListOf()
+        val mp3 = dir.listFiles() ?: return mutableListOf()
+
+        withContext(Dispatchers.IO) {
+            val retriever = MediaMetadataRetriever()
+            for (i in mp3) {
+                try {
+                    retriever.setDataSource(i.absolutePath)
+                    val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+                    val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                    val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    val path = i.absolutePath
+                    songs.add(
+                        Song(
+                            title = title!!,
+                            artist = artist!!,
+                            duration = duration!!.toLong(),
+                            path = path
+                        )
+                    )
+                    Log.d("tag","getSongInternal $title")
+                } catch (e: Exception) {
+                    Log.d("getSongInternal", e.toString())
+                }
             }
-            Playlist(
-                id = playlistWithSongs.playlist.playlistId,
-                title = playlistWithSongs.playlist.title,
-                listSong = songs.toMutableList()
-            )
         }
+        return songs
     }
 
     private suspend fun getSongRemote(): MutableList<Song> = withContext(Dispatchers.IO) {
@@ -299,15 +324,63 @@ class MviViewModel(
                                 Song(
                                     title = it.title,
                                     artist = it.artist,
-                                    duration = it.duration.toLong()
+                                    duration = it.duration.toLong(),
+                                    kind = it.kind,
+                                    path = it.path
                                 )
                             )
-                            Log.d("tag",it.title)
+                            Log.d("tag",it.toString())
                         }
                     }
                 }
             }
         })
         songs
+    }
+
+    private suspend fun downloadSongToInternalStorage(
+        context: Context,
+        fileUrl: String,
+        folderName: String,
+        fileName: String
+    ): File? {
+        val dir = File(context.filesDir, folderName)
+        if (!dir.exists()) dir.mkdir()
+        val file = File(dir, "$fileName.mp3")
+        if (file.exists()) return null
+
+        return try {
+            withContext(Dispatchers.IO){
+                val url = URL(fileUrl)
+                val connection = withContext(Dispatchers.IO) {
+                    url.openConnection()
+                } as HttpURLConnection
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
+                connection.requestMethod = "GET"
+                connection.doInput = true
+                connection.connect()
+
+
+                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                    throw IOException("HTTP error code: ${connection.responseCode}")
+                }
+
+                val inputStream = BufferedInputStream(connection.inputStream)
+                val outputStream = FileOutputStream(file)
+
+
+                inputStream.use { input ->
+                    outputStream.use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            }
+
+            file
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

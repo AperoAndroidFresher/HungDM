@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
-import com.example.hungdm.UtilsFunction
+import com.example.hungdm.AppUtils
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.navigation.Destination
@@ -86,7 +86,7 @@ fun PlaylistDetailScreen(
                         viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
                     },
                     onClickOption2 = {
-                        UtilsFunction.shareSong(context, playlist.listSong[it])
+                        AppUtils.shareSong(context, playlist.listSong[it])
                     },
                     onDismissRequest = {
                         showOption = false

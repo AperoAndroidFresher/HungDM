@@ -30,7 +30,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import com.example.hungdm.UtilsFunction
+import com.example.hungdm.AppUtils
 import com.example.hungdm.R
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
@@ -122,13 +122,13 @@ fun ProfileScreen(
             onSubmit = {
                 userInfo = userInfo.copy(
                     inputValid = userInfo.inputValid.copy(
-                        nameValid = UtilsFunction.isValid(userInfo.name),
-                        phoneValid = UtilsFunction.isValidPhone(userInfo.phone),
-                        uniValid = UtilsFunction.isValid(userInfo.uni),
+                        nameValid = AppUtils.isValid(userInfo.name),
+                        phoneValid = AppUtils.isValidPhone(userInfo.phone),
+                        uniValid = AppUtils.isValid(userInfo.uni),
                     )
                 )
                 if (userInfo.inputValid.nameValid && userInfo.inputValid.phoneValid && userInfo.inputValid.uniValid) {
-                    viewModel.processIntent(MviIntent.CheckEditProfile(userInfo))
+                    viewModel.processIntent(MviIntent.EditProfile(userInfo))
                     scope.launch{
                         showPopup = true
                         delay(1500)

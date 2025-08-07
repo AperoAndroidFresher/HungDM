@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.component.Logo
 import com.example.hungdm.model.UserInfo
@@ -32,6 +33,7 @@ fun LoginScreen(
     var userInfo by remember { mutableStateOf(UserInfo()) }
     var showPass by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,7 +66,7 @@ fun LoginScreen(
         Spacer(Modifier.size(30.dp))
         LoginButton(
             onClick = {
-                viewModel.processIntent(MviIntent.CheckLogin(userInfo))
+                viewModel.processIntent(MviIntent.CheckLogin(userInfo, context))
             }
         )
         Spacer(Modifier.weight(1f))

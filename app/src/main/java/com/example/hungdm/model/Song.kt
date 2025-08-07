@@ -1,5 +1,6 @@
 package com.example.hungdm.model
 
+import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
@@ -10,9 +11,10 @@ data class Song(
     val title: String,
     val artist: String,
     val duration: Long,
-    val albumArt: String? = "",
-    val uri: Uri = "".toUri(),
-    val albumArtUri: Uri? = null
+    val uri: Uri? = null,
+    val img: ByteArray? = null,
+    val kind: String? = null,
+    val path: String? = null
 ){
     val time = formatDuration(duration)
 }
@@ -23,16 +25,16 @@ fun formatDuration(durationMs: Long): String {
     return "%d:%02d".format(minutes, seconds)
 }
 
-fun getAlbumArt(context: Context, albumId: Long): String? {
-    val uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
-    val projection = arrayOf(MediaStore.Audio.Albums.ALBUM_ART)
-    val selection = "${MediaStore.Audio.Albums._ID}=?"
-    val selectionArgs = arrayOf(albumId.toString())
+fun getAlbumArt(context: Context, albumId: Long): ByteArray? {
+    val albumArtUri = ContentUris.withAppendedId(
+        Uri.parse("content://media/external/audio/albumart"), albumId
+    )
 
-    context.contentResolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
-        if (cursor.moveToFirst()) {
-            return cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM_ART))
+    return try {
+        context.contentResolver.openInputStream(albumArtUri)?.use { inputStream ->
+            inputStream.readBytes()
         }
+    } catch (e: Exception) {
+        null
     }
-    return null
 }

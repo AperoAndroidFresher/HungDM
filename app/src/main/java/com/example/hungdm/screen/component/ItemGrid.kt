@@ -53,7 +53,7 @@ fun ItemGrid(
         Box() {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data( if(playlist!=null) R.drawable.img1 else song.albumArtUri)
+                    .data( if(playlist!=null) R.drawable.img1 else song.img)
                     .crossfade(true)
                     .error(R.drawable.img1)
                     .size(300, 300)

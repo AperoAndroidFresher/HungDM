@@ -16,7 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.hungdm.UtilsFunction
+import com.example.hungdm.AppUtils
 import com.example.hungdm.component.Logo
 import com.example.hungdm.model.UserInfo
 import com.example.hungdm.screen.mvi.MviIntent
@@ -91,10 +91,10 @@ fun SignupScreen(
             onClick = {
                 userInfo = userInfo.copy(
                     inputValid = userInfo.inputValid.copy(
-                        userValid = UtilsFunction.isValid(userInfo.username),
-                        passValid = UtilsFunction.isValidPass(userInfo.password),
-                        pass2valid = UtilsFunction.isValidPass2(userInfo.password, userInfo.pass2),
-                        emailValid = UtilsFunction.isValidEmail(userInfo.email)
+                        userValid = AppUtils.isValid(userInfo.username),
+                        passValid = AppUtils.isValidPass(userInfo.password),
+                        pass2valid = AppUtils.isValidPass2(userInfo.password, userInfo.pass2),
+                        emailValid = AppUtils.isValidEmail(userInfo.email)
                     )
                 )
                 if (userInfo.inputValid.userValid && userInfo.inputValid.passValid && userInfo.inputValid.pass2valid && userInfo.inputValid.emailValid) {

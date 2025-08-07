@@ -1,10 +1,15 @@
 package com.example.hungdm
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import androidx.annotation.RequiresPermission
 import com.example.hungdm.model.Song
 
-object UtilsFunction {
+object AppUtils {
+
     fun isValid(s: String): Boolean {
         return s.matches("^[a-zA-Z0-9]+$".toRegex()) && noSpace(s)
     }
@@ -39,6 +44,14 @@ object UtilsFunction {
         }
 
         context.startActivity(Intent.createChooser(shareIntent, "Send"))
+    }
+
+    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     private fun noSpace(input: String): Boolean {

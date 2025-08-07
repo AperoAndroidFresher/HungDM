@@ -13,7 +13,6 @@ data class SongEntity(
     val title: String,
     val artist: String,
     val duration: Long,
-    val albumArt: String?,
-    val uri: Uri,
-    val albumArtUri: Uri
+    val uri: Uri?,
+    val img: ByteArray?
 )

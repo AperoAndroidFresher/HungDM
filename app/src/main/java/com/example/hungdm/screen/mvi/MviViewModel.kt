@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hungdm.data.db.entity.PlaylistEntity
 import com.example.hungdm.data.db.entity.PlaylistSongReference
+import com.example.hungdm.data.mapper.toSong
 import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.domain.model.Song
 import com.example.hungdm.domain.model.getAlbumArt
@@ -128,7 +129,7 @@ class MviViewModel(
                     val dir = File(intent.context.filesDir, _state.value.userInfo.username)
                     if (!dir.exists()) {
                         val songApi = getSongRemote()
-                        delay(1000) // neu k co delay thi songApi = null, vi interface ApiService dunng Call<List<SongRemote>>
+                        //delay(1000) // neu k co delay thi songApi = null, vi interface ApiService dunng Call<List<SongRemote>>
                         val songInternal = mutableListOf<Song>()
                         withContext(Dispatchers.IO){
                             for (i in songApi) {
@@ -304,33 +305,7 @@ class MviViewModel(
     private suspend fun getSongRemote(): MutableList<Song> = withContext(Dispatchers.IO) {
         val songs = mutableListOf<Song>()
         val callApi = ApiClient.build().getSongRemote()
-        callApi.enqueue(object : Callback<List<SongRemote>> {
-            override fun onFailure(call: Call<List<SongRemote>>, t: Throwable) {
-                Log.d("tag", "getSongRemote onfailure: ${t.message}")
-            }
-
-            override fun onResponse(
-                call: Call<List<SongRemote>>,
-                response: Response<List<SongRemote>>
-            ) {
-                when {
-                    response.isSuccessful -> {
-                        val data = response.body()
-                        data?.forEach {
-                            songs.add(
-                                Song(
-                                    title = it.title,
-                                    artist = it.artist,
-                                    duration = it.duration.toLong(),
-                                    kind = it.kind,
-                                    path = it.path
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        })
+        for(i in callApi) songs.add(i.toSong())
         songs
     }
 
@@ -389,7 +364,6 @@ class MviViewModel(
                     path = path
                 )
             }
-            Log.d("tag", "downloadSongToInternalStorage: $file")
             song
         } catch (e: Exception) {
             e.printStackTrace()

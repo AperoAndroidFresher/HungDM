@@ -2,6 +2,7 @@ package com.example.hungdm.data.mapper
 
 import com.example.hungdm.data.db.entity.SongEntity
 import com.example.hungdm.data.db.entity.UserEntity
+import com.example.hungdm.data.remote.SongRemote
 import com.example.hungdm.domain.model.Song
 import com.example.hungdm.domain.model.UserInfo
 
@@ -23,6 +24,16 @@ fun SongEntity.toSong(): Song {
         duration = duration,
         uri = uri,
         img = img
+    )
+}
+
+fun SongRemote.toSong(): Song {
+    return Song(
+        title = title,
+        artist = artist,
+        duration = duration.toLong(),
+        kind = kind,
+        path = path
     )
 }
 

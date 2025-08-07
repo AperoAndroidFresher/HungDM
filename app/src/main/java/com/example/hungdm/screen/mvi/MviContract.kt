@@ -1,10 +1,10 @@
-package com.example.hungdm.mvi
+package com.example.hungdm.screen.mvi
 
 import android.content.Context
 import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
 import com.example.hungdm.model.UserInfo
-import com.example.hungdm.navigation.Destination
+import com.example.hungdm.screen.navigation.Destination
 
 data class MviState(
     val darkTheme: Boolean = true,

@@ -27,14 +27,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
 import com.example.hungdm.UtilsFunction
-import com.example.hungdm.mvi.MviIntent
-import com.example.hungdm.mvi.MviViewModel
-import com.example.hungdm.navigation.Destination
+import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.screen.navigation.Destination
 import com.example.hungdm.screen.component.SongItemLinear
 
 @Composable
 fun PlaylistDetailScreen(
-    viewModel: MviViewModel ,
+    viewModel: MviViewModel,
     modifier: Modifier = Modifier,
     destination: Destination.PlaylistDetail = Destination.PlaylistDetail(0),
     onBack: () -> Unit = {}

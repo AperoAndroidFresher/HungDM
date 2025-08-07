@@ -1,4 +1,4 @@
-package com.example.hungdm.navigation
+package com.example.hungdm.screen.navigation
 
 import android.app.Activity
 import android.widget.Toast
@@ -29,8 +29,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.example.hungdm.mvi.MviEvent
-import com.example.hungdm.mvi.MviViewModel
+import com.example.hungdm.screen.mvi.MviEvent
+import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen
 import com.example.hungdm.screen.library.LibraryScreen
 import com.example.hungdm.screen.login.LoginScreen

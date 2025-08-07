@@ -1,15 +1,15 @@
-package com.example.hungdm
+package com.example.hungdm.di
 
 import androidx.room.Room
 import com.example.hungdm.data.db.AppDatabase
 import com.example.hungdm.data.db.dao.PlaylistDao
 import com.example.hungdm.data.db.dao.UserDao
 import org.koin.androidx.viewmodel.dsl.viewModel
-import com.example.hungdm.mvi.MviViewModel
-import com.example.hungdm.repo.PlaylistRepository
-import com.example.hungdm.repo.PlaylistRepositoryImpl
-import com.example.hungdm.repo.UserRepository
-import com.example.hungdm.repo.UserRepositoryImpl
+import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.data.db.repo.PlaylistRepository
+import com.example.hungdm.data.db.repo.PlaylistRepositoryImpl
+import com.example.hungdm.data.db.repo.UserRepository
+import com.example.hungdm.data.db.repo.UserRepositoryImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

@@ -15,10 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.hungdm.mvi.MviViewModel
+import com.example.hungdm.screen.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.dp
-import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.home.component.HomeHeader
 
 @Composable

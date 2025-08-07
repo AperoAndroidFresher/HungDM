@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.UtilsFunction
-import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.screen.mvi.MviIntent
 
 @Composable
 fun SignupButton(

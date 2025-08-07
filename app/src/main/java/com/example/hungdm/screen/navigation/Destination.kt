@@ -1,4 +1,4 @@
-package com.example.hungdm.navigation
+package com.example.hungdm.screen.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.example.hungdm.model.UserInfo
@@ -18,7 +18,7 @@ sealed interface Destination: NavKey {
 
     @Serializable
     @SerialName("Home")
-    data object Home:Destination
+    data object Home: Destination
 
     @Serializable
     @SerialName("Profile")

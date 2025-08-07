@@ -1,4 +1,4 @@
-package com.example.hungdm.mvi
+package com.example.hungdm.screen.mvi
 
 import android.content.ContentUris
 import android.content.Context
@@ -15,9 +15,9 @@ import com.example.hungdm.model.Playlist
 import com.example.hungdm.model.Song
 import com.example.hungdm.model.UserInfo
 import com.example.hungdm.model.getAlbumArt
-import com.example.hungdm.navigation.Destination
-import com.example.hungdm.repo.PlaylistRepository
-import com.example.hungdm.repo.UserRepository
+import com.example.hungdm.screen.navigation.Destination
+import com.example.hungdm.data.db.repo.PlaylistRepository
+import com.example.hungdm.data.db.repo.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

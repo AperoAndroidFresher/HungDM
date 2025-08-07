@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.example.hungdm.UtilsFunction
 import com.example.hungdm.component.Logo
 import com.example.hungdm.model.UserInfo
-import com.example.hungdm.mvi.MviIntent
-import com.example.hungdm.mvi.MviViewModel
+import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.signup.component.SignupButton
 import com.example.hungdm.screen.signup.component.SignupInput
 

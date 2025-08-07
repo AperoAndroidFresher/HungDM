@@ -29,8 +29,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
 import com.example.hungdm.model.Playlist
-import com.example.hungdm.mvi.MviIntent
-import com.example.hungdm.mvi.MviViewModel
+import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.playlist.component.PlaylistDialog
 import com.example.hungdm.screen.playlist.component.PlaylistHeader
 import com.example.hungdm.screen.playlist.component.PlaylistItemLinear
@@ -38,7 +38,7 @@ import com.example.hungdm.screen.playlist.component.PlaylistItemLinear
 @Composable
 fun PlaylistScreen(
     modifier: Modifier = Modifier,
-    viewModel: MviViewModel ,
+    viewModel: MviViewModel,
     onBack: () -> Unit = {},
 ) {
 

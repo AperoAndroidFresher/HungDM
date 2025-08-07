@@ -1,4 +1,4 @@
-package com.example.hungdm.repo
+package com.example.hungdm.data.db.repo
 
 import com.example.hungdm.data.db.dao.UserDao
 import com.example.hungdm.data.db.entity.UserEntity

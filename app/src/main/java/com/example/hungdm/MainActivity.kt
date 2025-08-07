@@ -13,10 +13,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hungdm.data.db.AppDatabase
-import com.example.hungdm.mvi.MviViewModel
-import com.example.hungdm.navigation.AppNavigation
-import com.example.hungdm.repo.UserRepository
-import com.example.hungdm.repo.UserRepositoryImpl
+import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.screen.navigation.AppNavigation
+import com.example.hungdm.data.db.repo.UserRepository
+import com.example.hungdm.data.db.repo.UserRepositoryImpl
 import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {

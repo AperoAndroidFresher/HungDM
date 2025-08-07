@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.example.hungdm.AppUtils
 import com.example.hungdm.UserPreferences
 import com.example.hungdm.data.db.mapper.toUserEntity
 import com.example.hungdm.data.db.mapper.toUserInfo
@@ -51,7 +50,6 @@ class MviViewModel(
     private val _event = MutableSharedFlow<MviEvent>()
     val event: SharedFlow<MviEvent> = _event.asSharedFlow()
 
-    @androidx.annotation.RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
     fun processIntent(intent: MviIntent) {
         viewModelScope.launch  {
             when (intent) {
@@ -126,20 +124,16 @@ class MviViewModel(
                 }
 
                 is MviIntent.LoadSongRemote -> {
-                    val isNetwork = AppUtils.isNetworkAvailable(intent.context)
-                    if (isNetwork) {
-                        val songInternal = getSongInternal(intent.context, _state.value.userInfo.username)
-                        delay(1000)
-                        _state.value = _state.value.copy(
-                            listSongRemote = songInternal,
-                        )
-                    } else {
-                        val songs = getSongRemote()
-                        delay(1000)
-                        _state.value = _state.value.copy(
-                            listSongRemote = songs
-                        )
-                    }
+                    val songs = getSongRemote()
+                    delay(1000)
+                    _state.value = _state.value.copy(listSongRemote = songs)
+
+                }
+
+                is MviIntent.LoadSongInternal -> {
+                    val songInternal = getSongInternal(intent.context, _state.value.userInfo.username)
+                    delay(1000)
+                    _state.value = _state.value.copy(listSongRemote = songInternal)
                 }
 
                 is MviIntent.CreatePlaylist -> {

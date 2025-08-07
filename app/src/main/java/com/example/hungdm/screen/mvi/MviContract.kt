@@ -21,12 +21,11 @@ sealed interface MviIntent{
     data class EditProfile(val userInfo: UserInfo) : MviIntent
     data class LoadSongLocal(val context: Context) : MviIntent
     data class LoadSongRemote(val context: Context) : MviIntent
-    data class LoadSongInternal(val context: Context) : MviIntent
     data object LoadPlaylistsOfUser: MviIntent
     data class CreatePlaylist(val title: String): MviIntent
     data class RenamePlaylist(val title: String, val playlist: Playlist): MviIntent
     data class RemovePlaylist(val playlist: Playlist): MviIntent
-    data class AddSongToPlaylist(val context: Context, val song: Song, val playlist: Playlist, val isDownload: Boolean): MviIntent
+    data class AddSongToPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class RemoveSongInPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class OnClickPlaylistDetail(val playlistId: Long) : MviIntent
     data object ChangeTheme : MviIntent

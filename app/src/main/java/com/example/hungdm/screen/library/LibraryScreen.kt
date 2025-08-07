@@ -101,66 +101,32 @@ fun LibraryScreen(
             }
         } else {
             if(selectedLocal){
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items( listSongLocal) {
-                        var showOption by remember { mutableStateOf(false) }
-                        SongItemLinear(
-                            song = it,
-                            showOption = showOption,
-                            option1 = "Add to playlist",
-                            option2 = "Share",
-                            icon1 = R.drawable.outline_add_24,
-                            icon2 = R.drawable.outline_share_24,
-                            onClickShowOption = {
-                                showOption = true
-                                selectedSong = it
-                            },
-                            onClickOption1 = {
-                                showAddSongToPlaylistDialog = true
-                            },
-                            onClickOption2 = {
-                                AppUtils.shareSong(context, selectedSong!!)
-                            },
-                            onDismissRequest = {
-                                showOption = false
-                            }
-                        )
+                LibraryContent(
+                    listSong = listSongLocal,
+                    onClickShowOption = {
+                        selectedSong = it
+                    },
+                    onClickOption1 = {
+                        showAddSongToPlaylistDialog = true
+                    },
+                    onClickOption2 = {
+                        AppUtils.shareSong(context, selectedSong!!)
                     }
-                }
+                )
             } else {
                 if(listSongRemote.isNotEmpty()){
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(listSongRemote) {
-                            var showOption by remember { mutableStateOf(false) }
-                            SongItemLinear(
-                                song = it,
-                                showOption = showOption,
-                                option1 = "Add to playlist",
-                                option2 = "Share",
-                                icon1 = R.drawable.outline_add_24,
-                                icon2 = R.drawable.outline_share_24,
-                                onClickShowOption = {
-                                    showOption = true
-                                    selectedSong = it
-                                },
-                                onClickOption1 = {
-                                    showAddSongToPlaylistDialog = true
-                                },
-                                onClickOption2 = {
-                                    AppUtils.shareSong(context, selectedSong!!)
-                                },
-                                onDismissRequest = {
-                                    showOption = false
-                                }
-                            )
+                    LibraryContent(
+                        listSong = listSongRemote,
+                        onClickShowOption = {
+                            selectedSong = it
+                        },
+                        onClickOption1 = {
+                            showAddSongToPlaylistDialog = true
+                        },
+                        onClickOption2 = {
+                            AppUtils.shareSong(context, selectedSong!!)
                         }
-                    }
+                    )
                 } else {
                     ListSongEmpty(
                         onCLick = { isLoadSong = true }
@@ -179,19 +145,46 @@ fun LibraryScreen(
                 onClickNewPlaylist()
             },
             onAddSongToPlaylist = {
-                if(selectedLocal){
-                    selectedSong?.let { selectedSong ->
-                        viewModel.processIntent(MviIntent.AddSongToPlaylist(context, selectedSong, it, false))
-                    }
-                } else {
-                    selectedSong?.let { selectedSong ->
-                        viewModel.processIntent(MviIntent.AddSongToPlaylist(context, selectedSong, it, true))
-                    }
-                }
+                viewModel.processIntent(MviIntent.AddSongToPlaylist(selectedSong!!, it))
                 showAddSongToPlaylistDialog = false
                 selectedSong = null
             },
             onDismiss = { showAddSongToPlaylistDialog = false }
         )
+    }
+}
+
+@Composable
+fun LibraryContent(
+    modifier: Modifier = Modifier,
+    listSong: List<Song> = emptyList(),
+    onClickShowOption: (Song) -> Unit = {},
+    onClickOption1: () -> Unit = {},
+    onClickOption2: () -> Unit = {}
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(listSong) {
+            var showOption by remember { mutableStateOf(false) }
+            SongItemLinear(
+                song = it,
+                showOption = showOption,
+                option1 = "Add to playlist",
+                option2 = "Share",
+                icon1 = R.drawable.outline_add_24,
+                icon2 = R.drawable.outline_share_24,
+                onClickShowOption = {
+                    showOption = true
+                    onClickShowOption(it)
+                },
+                onClickOption1 = onClickOption1,
+                onClickOption2 = onClickOption2,
+                onDismissRequest = {
+                    showOption = false
+                }
+            )
+        }
     }
 }

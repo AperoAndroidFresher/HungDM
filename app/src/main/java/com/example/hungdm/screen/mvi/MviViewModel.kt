@@ -125,16 +125,28 @@ class MviViewModel(
                 }
 
                 is MviIntent.LoadSongRemote -> {
-                    val songs = getSongRemote()
-                    delay(1000)
-                    _state.value = _state.value.copy(listSongRemote = songs)
-
-                }
-
-                is MviIntent.LoadSongInternal -> {
-                    val songInternal = getSongAllInternal(intent.context, _state.value.userInfo.username)
-                    delay(1000)
-                    _state.value = _state.value.copy(listSongRemote = songInternal)
+                    val dir = File(intent.context.filesDir, _state.value.userInfo.username)
+                    if (!dir.exists()) {
+                        val songApi = getSongRemote()
+                        delay(1000) // neu k co delay thi songApi = null, vi interface ApiService dunng Call<List<SongRemote>>
+                        val songInternal = mutableListOf<Song>()
+                        withContext(Dispatchers.IO){
+                            for (i in songApi) {
+                                songInternal.add(
+                                    downloadSongToInternalStorage(
+                                        intent.context,
+                                        i.path!!,
+                                        _state.value.userInfo.username,
+                                        i.title + ".mp3"
+                                    )!!
+                                )
+                            }
+                        }
+                        _state.value = _state.value.copy(listSongRemote = songInternal)
+                    } else {
+                        val songs = getALlSongInternal(intent.context, _state.value.userInfo.username)
+                        _state.value = _state.value.copy(listSongRemote = songs)
+                    }
                 }
 
                 is MviIntent.CreatePlaylist -> {
@@ -160,22 +172,10 @@ class MviViewModel(
                 }
 
                 is MviIntent.AddSongToPlaylist -> {
-                    val folderName = _state.value.userInfo.username
-                    val fileName = intent.song.title+".mp3"
-                    val url = intent.song.path
-                    if(intent.isDownload){
-                        downloadSongToInternalStorage(intent.context, url!!, folderName, fileName)
-                        val song = getSongInternal(intent.context,folderName,fileName)
-                        val id = playlistRepository.addSong(song.toSongEntity())
-                        playlistRepository.addSongToPlaylist(
-                            PlaylistSongReference(intent.playlist.id, id)
-                        )
-                    } else {
-                        val id = playlistRepository.addSong(intent.song.toSongEntity())
-                        playlistRepository.addSongToPlaylist(
-                            PlaylistSongReference(intent.playlist.id, id)
-                        )
-                    }
+                    val id = playlistRepository.addSong(intent.song.toSongEntity())
+                    playlistRepository.addSongToPlaylist(
+                        PlaylistSongReference(intent.playlist.id, id)
+                    )
                     _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
 
@@ -265,45 +265,9 @@ class MviViewModel(
         return songs
     }
 
-    private suspend fun getSongInternal(
-        context: Context,
-        folderName: String,
-        fileName: String
-    ): Song {
-        var song: Song?
-        val dir = File(context.filesDir, folderName)
-        val file = File(dir, fileName)
-
-        withContext(Dispatchers.IO) {
-            delay(1000)
-            val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(file.absolutePath)
-
-            val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-            val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            val path = file.absolutePath
-            val uri = Uri.fromFile(file)
-            val img = retriever.embeddedPicture
-            Log.d("tag",title.toString())
-            retriever.release()
-            song = Song(
-                title = fileName,
-                artist = artist!!,
-                duration = duration!!.toLong(),
-                path = path,
-                uri = uri,
-                img = img
-            )
-        }
-        return song!!
-    }
-
-
-    private suspend fun getSongAllInternal(context: Context, folderName: String): MutableList<Song> {
+    private suspend fun getALlSongInternal(context: Context, folderName: String): MutableList<Song> {
         val songs = mutableListOf<Song>()
         val dir = File(context.filesDir, folderName)
-        if (!dir.exists()) return mutableListOf()
         val mp3 = dir.listFiles() ?: return mutableListOf()
 
         withContext(Dispatchers.IO) {
@@ -312,15 +276,18 @@ class MviViewModel(
                 try {
                     retriever.setDataSource(i.absolutePath)
                     val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+                        ?: i.nameWithoutExtension
                     val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+                        ?: "Unknown Artist"
                     val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                        ?.toLongOrNull() ?: 0L
                     val path = i.absolutePath
                     val img = retriever.embeddedPicture
                     songs.add(
                         Song(
-                            title = title!!,
-                            artist = artist!!,
-                            duration = duration!!.toLong(),
+                            title = title,
+                            artist = artist,
+                            duration = duration,
                             uri = Uri.fromFile(i),
                             img = img,
                             path = path
@@ -339,7 +306,7 @@ class MviViewModel(
         val callApi = ApiClient.build().getSongRemote()
         callApi.enqueue(object : Callback<List<SongRemote>> {
             override fun onFailure(call: Call<List<SongRemote>>, t: Throwable) {
-                Log.d("tag", "onfailure: ${t.message}")
+                Log.d("tag", "getSongRemote onfailure: ${t.message}")
             }
 
             override fun onResponse(
@@ -372,13 +339,14 @@ class MviViewModel(
         fileUrl: String,
         folderName: String,
         fileName: String
-    ): File? {
+    ): Song? {
         val dir = File(context.filesDir, folderName)
         if (!dir.exists()) dir.mkdir()
         val file = File(dir, fileName)
         if (file.exists()) return null
 
         return try {
+            var song: Song?
             withContext(Dispatchers.IO){
                 val url = URL(fileUrl)
                 val connection = withContext(Dispatchers.IO) {
@@ -390,7 +358,6 @@ class MviViewModel(
                 connection.doInput = true
                 connection.connect()
 
-
                 if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                     throw IOException("HTTP error code: ${connection.responseCode}")
                 }
@@ -398,15 +365,32 @@ class MviViewModel(
                 val inputStream = BufferedInputStream(connection.inputStream)
                 val outputStream = FileOutputStream(file)
 
-
                 inputStream.use { input ->
                     outputStream.use { output ->
                         input.copyTo(output)
                     }
                 }
-            }
 
-            file
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(file.absolutePath)
+
+                val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: file.nameWithoutExtension
+                val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: "Unknown Artist"
+                val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+                val uri = Uri.fromFile(file)
+                val img = retriever.embeddedPicture
+                val path = file.absolutePath
+                song = Song(
+                    title = title,
+                    artist = artist,
+                    duration = duration,
+                    uri = uri,
+                    img = img,
+                    path = path
+                )
+            }
+            Log.d("tag", "downloadSongToInternalStorage: $file")
+            song
         } catch (e: Exception) {
             e.printStackTrace()
             null

@@ -2,9 +2,10 @@ package com.example.hungdm.screen.mvi
 
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.net.http.HttpException
+import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -18,7 +19,6 @@ import com.example.hungdm.domain.model.getAlbumArt
 import com.example.hungdm.domain.repo.PlaylistRepository
 import com.example.hungdm.domain.repo.UserRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -32,16 +32,12 @@ import com.example.hungdm.data.mapper.toSongEntity
 import com.example.hungdm.data.mapper.toUserEntity
 import com.example.hungdm.data.mapper.toUserInfo
 import com.example.hungdm.data.remote.ApiClient
-import com.example.hungdm.data.remote.SongRemote
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.hungdm.service.AppService
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
-import java.net.SocketTimeoutException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -58,6 +54,15 @@ class MviViewModel(
     fun processIntent(intent: MviIntent) {
         viewModelScope.launch  {
             when (intent) {
+                is MviIntent.GetUser -> {
+                    val user =  withContext(Dispatchers.IO) {
+                        userRepository.getUserById(intent.userId)
+                    }
+                    _state.value = _state.value.copy(
+                        userInfo = user!!.toUserInfo()
+                    )
+                }
+
                 is MviIntent.OnClickSignup -> {
                     sendEvent(MviEvent.GotoSignup)
                 }
@@ -71,7 +76,7 @@ class MviViewModel(
                         _state.value = _state.value.copy(
                             userInfo = user.toUserInfo()
                         )
-                        UserPreferences.saveUser(intent.context, user)
+                        UserPreferences.saveUser(intent.context, user.userId)
                         sendEvent(MviEvent.GotoHome)
                     } else {
                         sendEvent(MviEvent.ShowToast("Đăng nhập thất bại"))
@@ -116,6 +121,7 @@ class MviViewModel(
                 }
 
                 is MviIntent.LoadPlaylistsOfUser -> {
+
                     _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
                 }
 
@@ -190,6 +196,43 @@ class MviViewModel(
 
                 is MviIntent.OnClickPlaylistDetail -> {
                     sendEvent(MviEvent.GotoPlaylistDetail(intent.playlistId))
+                }
+
+                is MviIntent.OnClickSongPlay -> {
+                    if(intent.song==null){
+                        val tmp = Intent(intent.context, AppService::class.java).apply {
+                            action = AppService.ACTION_CLOSE
+                        }
+                        intent.context.startService(tmp)
+                        _state.value = _state.value.copy(songPlay = null, isPlay = false)
+                    } else {
+                        val tmp = Intent(intent.context, AppService::class.java).apply {
+                            action = AppService.ACTION_PLAY
+                            putExtra(AppService.EXTRA_URI, intent.song.uri)
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            intent.context.startForegroundService(tmp)
+                        } else {
+                            intent.context.startService(tmp)
+                        }
+                        _state.value = _state.value.copy(songPlay = intent.song, isPlay = true)
+                    }
+
+                }
+
+                is MviIntent.OnChangeSongPlayState -> {
+                    if(_state.value.isPlay){
+                        val tmp = Intent(intent.context, AppService::class.java).apply {
+                            action = AppService.ACTION_PAUSE
+                        }
+                        intent.context.startService(tmp)
+                    } else {
+                        val tmp = Intent(intent.context, AppService::class.java).apply {
+                            action = AppService.ACTION_RESUME
+                        }
+                        intent.context.startService(tmp)
+                    }
+                    _state.value = _state.value.copy(isPlay = !_state.value.isPlay)
                 }
             }
         }

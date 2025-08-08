@@ -6,6 +6,10 @@ import com.example.hungdm.domain.repo.UserRepository
 
 class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
 
+    override suspend fun getUserById(userId: Long): UserEntity? {
+        return userDao.getUserById(userId)
+    }
+
     override suspend fun signup(username: String, password: String, email: String): Long {
         val user = userDao.getUserByUsername(username)
         if (user != null) {

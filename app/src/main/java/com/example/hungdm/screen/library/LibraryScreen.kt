@@ -1,5 +1,7 @@
 package com.example.hungdm.screen.library
 
+import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +39,7 @@ import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
 import com.example.hungdm.screen.component.SongItemLinear
 import com.example.hungdm.screen.library.component.LibraryHeader
 import com.example.hungdm.screen.library.component.ListSongEmpty
+import com.example.hungdm.service.AppService
 import kotlinx.coroutines.delay
 
 @Composable
@@ -111,6 +114,9 @@ fun LibraryScreen(
                     },
                     onClickOption2 = {
                         AppUtils.shareSong(context, selectedSong!!)
+                    },
+                    onCLickSongPlay = {
+                        viewModel.processIntent(MviIntent.OnClickSongPlay(it,context))
                     }
                 )
             } else {
@@ -125,6 +131,18 @@ fun LibraryScreen(
                         },
                         onClickOption2 = {
                             AppUtils.shareSong(context, selectedSong!!)
+                        },
+                        onCLickSongPlay = {
+                            viewModel.processIntent(MviIntent.OnClickSongPlay(it,context))
+//                            val intent = Intent(context, AppService::class.java).apply {
+//                                action = AppService.ACTION_PLAY
+//                                putExtra(AppService.EXTRA_URI, it.uri)
+//                            }
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                                context.startForegroundService(intent)
+//                            } else {
+//                                context.startService(intent)
+//                            }
                         }
                     )
                 } else {
@@ -160,7 +178,8 @@ fun LibraryContent(
     listSong: List<Song> = emptyList(),
     onClickShowOption: (Song) -> Unit = {},
     onClickOption1: () -> Unit = {},
-    onClickOption2: () -> Unit = {}
+    onClickOption2: () -> Unit = {},
+    onCLickSongPlay: (Song) -> Unit = {}
 ) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
@@ -183,7 +202,8 @@ fun LibraryContent(
                 onClickOption2 = onClickOption2,
                 onDismissRequest = {
                     showOption = false
-                }
+                },
+                onCLickSongPlay = { onCLickSongPlay(it) }
             )
         }
     }

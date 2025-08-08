@@ -1,8 +1,10 @@
 package com.example.hungdm.screen.navigation
 
 import android.app.Activity
+import android.content.Intent
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -31,6 +33,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.hungdm.utils.UserPreferences
 import com.example.hungdm.data.mapper.toUserInfo
+import com.example.hungdm.screen.component.MusicPlayer
 import com.example.hungdm.screen.mvi.MviEvent
 import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen
@@ -41,6 +44,7 @@ import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen
 import com.example.hungdm.screen.profile.ProfileScreen
 import com.example.hungdm.screen.signup.SignupScreen
+import com.example.hungdm.service.AppService
 import com.example.hungdm.ui.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -60,12 +64,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     var selectedBottomBar by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        val user = UserPreferences.getUser(context)
+        val userId = UserPreferences.getUser(context)
 
-        if (user != null) {
+        if (userId != null) {
             backStack.clear()
             backStack.add(Destination.Home)
-            viewModel.processIntent(MviIntent.EditProfile(user.toUserInfo()))
+            viewModel.processIntent(MviIntent.GetUser(userId))
         }
     }
 
@@ -110,21 +114,35 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 } ?: false
 
                 if (showBottomNav) {
-                    NavigationBar(
-                        windowInsets = NavigationBarDefaults.windowInsets,
-                        containerColor = colorScheme.background
-                    ) {
-                        bottomItem.forEachIndexed { index, item ->
-                            NavigationBarItem(
-                                selected = selectedBottomBar == index,
-                                onClick = {
-                                    selectedBottomBar = index
-                                    backStack.clear()
-                                    backStack.add(item.destination)
+                    Column {
+                        if(state.songPlay!=null){
+                            MusicPlayer(
+                                song = state.songPlay!!,
+                                isPlay = state.isPlay,
+                                onPlayPauseClick = {
+                                    viewModel.processIntent(MviIntent.OnChangeSongPlayState(context))
                                 },
-                                icon = { Icon(item.icon, null) },
-                                label = { Text(item.label, color = colorScheme.primary) }
+                                onCloseClick = {
+                                    viewModel.processIntent(MviIntent.OnClickSongPlay(null,context))
+                                }
                             )
+                        }
+                        NavigationBar(
+                            windowInsets = NavigationBarDefaults.windowInsets,
+                            containerColor = colorScheme.background
+                        ) {
+                            bottomItem.forEachIndexed { index, item ->
+                                NavigationBarItem(
+                                    selected = selectedBottomBar == index,
+                                    onClick = {
+                                        selectedBottomBar = index
+                                        backStack.clear()
+                                        backStack.add(item.destination)
+                                    },
+                                    icon = { Icon(item.icon, null) },
+                                    label = { Text(item.label, color = colorScheme.primary) }
+                                )
+                            }
                         }
                     }
                 }

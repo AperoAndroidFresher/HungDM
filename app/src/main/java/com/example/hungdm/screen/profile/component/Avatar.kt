@@ -25,7 +25,7 @@ fun Avatar(
     modifier: Modifier = Modifier,
     isEdit: Boolean = false,
     onChangeAvatar: () -> Unit = {},
-    imageUri: Any = R.drawable.img
+    image: Any = R.drawable.img
 ) {
     Box(
         modifier = modifier.clickable {
@@ -36,7 +36,7 @@ fun Avatar(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUri)
+                .data(image)
                 .crossfade(true)
                 .placeholder(R.drawable.outline_photo_camera_24)
                 .error(R.drawable.outline_photo_camera_24)

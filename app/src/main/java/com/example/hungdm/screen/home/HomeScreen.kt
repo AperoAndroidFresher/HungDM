@@ -3,7 +3,9 @@ package com.example.hungdm.screen.home
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.hungdm.screen.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -33,6 +36,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = {},
 ) {
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
     if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_AUDIO)
@@ -45,6 +49,7 @@ fun HomeScreen(
         )
     }
 
+
     BackHandler { onBack() }
 
     Column(
@@ -55,6 +60,8 @@ fun HomeScreen(
             .padding(start = 8.dp, end = 8.dp),
     ) {
         HomeHeader(
+            userName = state.userInfo.username,
+            image = state.userInfo.img,
             onClick = {
                 viewModel.processIntent(MviIntent.OnClickProfile)
             }
@@ -62,17 +69,5 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.size(20.dp))
 
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = viewModel.state.collectAsState().value.userInfo.username + " --- " +
-                        viewModel.state.collectAsState().value.userInfo.name
-            )
-        }
     }
 }

@@ -10,10 +10,13 @@ data class MviState(
     val userInfo: UserInfo = UserInfo(),
     val listSongLocal: List<Song> = mutableListOf<Song>(),
     val listSongRemote: List<Song> = mutableListOf<Song>(),
-    val playlists: List<Playlist> = mutableListOf()
+    val playlists: List<Playlist> = mutableListOf(),
+    val songPlay: Song? = null,
+    val isPlay: Boolean = false
 )
 
 sealed interface MviIntent{
+    data class GetUser(val userId: Long) : MviIntent
     data object OnClickSignup : MviIntent
     data class CheckLogin(val userInfo: UserInfo, val context: Context) : MviIntent
     data class CheckSignup(val userInfo: UserInfo) : MviIntent
@@ -28,6 +31,8 @@ sealed interface MviIntent{
     data class AddSongToPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class RemoveSongInPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class OnClickPlaylistDetail(val playlistId: Long) : MviIntent
+    data class OnClickSongPlay(val song: Song?, val context: Context) : MviIntent
+    data class OnChangeSongPlayState(val context: Context): MviIntent
     data object ChangeTheme : MviIntent
 }
 

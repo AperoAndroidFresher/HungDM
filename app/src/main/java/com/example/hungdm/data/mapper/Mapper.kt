@@ -2,7 +2,7 @@ package com.example.hungdm.data.mapper
 
 import com.example.hungdm.data.db.entity.SongEntity
 import com.example.hungdm.data.db.entity.UserEntity
-import com.example.hungdm.data.remote.SongRemote
+import com.example.hungdm.data.remote.dto.SongDTO
 import com.example.hungdm.domain.model.Song
 import com.example.hungdm.domain.model.UserInfo
 
@@ -27,7 +27,7 @@ fun SongEntity.toSong(): Song {
     )
 }
 
-fun SongRemote.toSong(): Song {
+fun SongDTO.toSong(): Song {
     return Song(
         title = title,
         artist = artist,

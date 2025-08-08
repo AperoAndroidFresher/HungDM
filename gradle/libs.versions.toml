@@ -19,6 +19,7 @@ okhttp = "5.1.0"
 retrofit = "3.0.0"
 roomRuntimeAndroid = "2.7.2"
 roomRuntimeJvm = "2.7.2"
+lifecycleService = "2.9.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleService" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

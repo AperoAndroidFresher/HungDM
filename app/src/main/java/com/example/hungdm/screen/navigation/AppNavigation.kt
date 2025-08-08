@@ -40,6 +40,7 @@ import com.example.hungdm.screen.home.HomeScreen
 import com.example.hungdm.screen.library.LibraryScreen
 import com.example.hungdm.screen.login.LoginScreen
 import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.screen.player.PlayerScreen
 import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen
 import com.example.hungdm.screen.profile.ProfileScreen
@@ -110,7 +111,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         Scaffold(
             bottomBar = {
                 val showBottomNav = backStack.lastOrNull()?.let {
-                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile
+                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile && it !is Destination.Player
                 } ?: false
 
                 if (showBottomNav) {
@@ -119,6 +120,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             MusicPlayer(
                                 song = state.songPlay!!,
                                 isPlay = state.isPlay,
+                                onClick = {
+                                    backStack.add(Destination.Player)
+                                },
                                 onPlayPauseClick = {
                                     viewModel.processIntent(MviIntent.OnChangeSongPlayState(context))
                                 },
@@ -198,6 +202,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             viewModel = viewModel,
                             destination = destination,
                             onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+                    entry<Destination.Player> {
+                        PlayerScreen(
+
                         )
                     }
                 }

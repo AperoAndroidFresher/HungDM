@@ -1,6 +1,7 @@
 package com.example.hungdm.screen.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,14 +29,19 @@ fun MusicPlayer(
     song: Song,
     isPlay: Boolean = false,
     progress: Float = 0.8f,
+    onClick: () -> Unit = {},
     onPlayPauseClick: () -> Unit = {},
     onCloseClick: () -> Unit = {}
 ) {
     val icon = if(isPlay) R.drawable.outline_pause_24 else R.drawable.outline_play_arrow_24
+
     Column (
         modifier = Modifier
             .fillMaxWidth()
             .background(colorScheme.background)
+            .clickable {
+                onClick()
+            }
     ) {
         LinearProgressIndicator(
             progress = progress,

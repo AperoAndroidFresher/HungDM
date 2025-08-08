@@ -1,4 +1,4 @@
-package com.example.hungdm.retrofit
+package com.example.hungdm.data.remote
 
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit

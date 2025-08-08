@@ -1,13 +1,10 @@
-package com.example.hungdm
+package com.example.hungdm.utils
 
 import android.content.Context
 import android.content.Intent
-import com.example.hungdm.model.Song
+import com.example.hungdm.domain.model.Song
 
-object UtilsFunction {
-    fun noSpace(input: String): Boolean {
-        return !input.contains("\\s".toRegex())
-    }
+object AppUtils {
 
     fun isValid(s: String): Boolean {
         return s.matches("^[a-zA-Z0-9]+$".toRegex()) && noSpace(s)
@@ -43,5 +40,9 @@ object UtilsFunction {
         }
 
         context.startActivity(Intent.createChooser(shareIntent, "Send"))
+    }
+
+    private fun noSpace(input: String): Boolean {
+        return !input.contains("\\s".toRegex())
     }
 }

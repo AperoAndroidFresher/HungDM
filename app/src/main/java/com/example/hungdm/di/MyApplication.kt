@@ -1,4 +1,4 @@
-package com.example.hungdm
+package com.example.hungdm.di
 
 import android.app.Application
 import org.koin.android.ext.koin.androidContext

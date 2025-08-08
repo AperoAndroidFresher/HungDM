@@ -27,7 +27,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
 import com.example.hungdm.component.Dropdown
-import com.example.hungdm.model.Song
+import com.example.hungdm.domain.model.Song
 
 @Composable
 fun SongItemLinear(
@@ -53,7 +53,7 @@ fun SongItemLinear(
             }
     ) {
         SongImage(
-            uri = song.albumArtUri
+            img = song.img
         )
 
         Spacer(Modifier.size(8.dp))
@@ -104,11 +104,11 @@ fun SongItemLinear(
 @Composable
 fun SongImage(
     modifier: Modifier = Modifier,
-    uri: Uri? = null
+    img: ByteArray? = null
 ) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(uri)
+            .data(img)
             .crossfade(true)
             .error(R.drawable.img1)
             .size(300, 300)

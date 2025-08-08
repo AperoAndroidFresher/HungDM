@@ -1,7 +1,8 @@
-package com.example.hungdm.repo
+package com.example.hungdm.data.db.repo
 
 import com.example.hungdm.data.db.dao.UserDao
 import com.example.hungdm.data.db.entity.UserEntity
+import com.example.hungdm.domain.repo.UserRepository
 
 class UserRepositoryImpl(private val userDao: UserDao): UserRepository {
 

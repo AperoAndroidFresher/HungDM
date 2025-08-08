@@ -1,9 +1,9 @@
-package com.example.hungdm.retrofit
+package com.example.hungdm.data.remote
 
 import retrofit2.Call
 import retrofit2.http.GET
 
 interface ApiService {
     @GET("techtrek/Remote_audio.json")
-    fun getSongRemote(): Call<List<SongRemote>>
+    suspend fun getSongRemote(): List<SongRemote>
 }

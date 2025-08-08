@@ -1,4 +1,4 @@
-package com.example.hungdm.model
+package com.example.hungdm.domain.model
 
 import android.net.Uri
 import kotlinx.serialization.Serializable
@@ -15,5 +15,5 @@ data class UserInfo(
     var uni: String ="",
     var desc: String ="",
     var inputValid: InputValid = InputValid(),
-    var imgUri: Uri? = null
+    var img: ByteArray? = null
 )

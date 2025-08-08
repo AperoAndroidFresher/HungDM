@@ -30,10 +30,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import com.example.hungdm.UtilsFunction
+import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.R
-import com.example.hungdm.mvi.MviIntent
-import com.example.hungdm.mvi.MviViewModel
+import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.profile.component.Avatar
 import com.example.hungdm.screen.profile.component.PopUp
 import com.example.hungdm.screen.profile.component.ProfileHeader
@@ -60,7 +60,12 @@ fun ProfileScreen(
                     it,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                userInfo = userInfo.copy(imgUri = it)
+                val inputStream = context.contentResolver.openInputStream(it)
+                val byteArray = inputStream?.use { stream -> stream.readBytes() }
+
+                byteArray?.let {
+                    userInfo = userInfo.copy(img = it)
+                }
             }
         }
     )
@@ -95,7 +100,7 @@ fun ProfileScreen(
             onChangeAvatar = {
                 launcher.launch(arrayOf("image/*"))
             },
-            imageUri = userInfo.imgUri ?: R.drawable.img
+            imageUri = userInfo.img ?: R.drawable.img
         )
         Spacer(Modifier.size(20.dp))
         ProfileInput(
@@ -122,13 +127,13 @@ fun ProfileScreen(
             onSubmit = {
                 userInfo = userInfo.copy(
                     inputValid = userInfo.inputValid.copy(
-                        nameValid = UtilsFunction.isValid(userInfo.name),
-                        phoneValid = UtilsFunction.isValidPhone(userInfo.phone),
-                        uniValid = UtilsFunction.isValid(userInfo.uni),
+                        nameValid = AppUtils.isValid(userInfo.name),
+                        phoneValid = AppUtils.isValidPhone(userInfo.phone),
+                        uniValid = AppUtils.isValid(userInfo.uni),
                     )
                 )
                 if (userInfo.inputValid.nameValid && userInfo.inputValid.phoneValid && userInfo.inputValid.uniValid) {
-                    viewModel.processIntent(MviIntent.CheckEditProfile(userInfo))
+                    viewModel.processIntent(MviIntent.EditProfile(userInfo))
                     scope.launch{
                         showPopup = true
                         delay(1500)

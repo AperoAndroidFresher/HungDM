@@ -1,4 +1,4 @@
-package com.example.hungdm.navigation
+package com.example.hungdm.screen.navigation
 
 import android.app.Activity
 import android.widget.Toast
@@ -29,11 +29,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.example.hungdm.mvi.MviEvent
-import com.example.hungdm.mvi.MviViewModel
+import com.example.hungdm.utils.UserPreferences
+import com.example.hungdm.data.mapper.toUserInfo
+import com.example.hungdm.screen.mvi.MviEvent
+import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen
 import com.example.hungdm.screen.library.LibraryScreen
 import com.example.hungdm.screen.login.LoginScreen
+import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen
 import com.example.hungdm.screen.profile.ProfileScreen
@@ -55,6 +58,16 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     )
     val backStack = remember { mutableStateListOf<Destination>(Destination.Login) }
     var selectedBottomBar by remember { mutableStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        val user = UserPreferences.getUser(context)
+
+        if (user != null) {
+            backStack.clear()
+            backStack.add(Destination.Home)
+            viewModel.processIntent(MviIntent.EditProfile(user.toUserInfo()))
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.event.collect { e ->

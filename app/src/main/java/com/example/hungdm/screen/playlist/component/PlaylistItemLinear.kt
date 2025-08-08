@@ -22,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
 import com.example.hungdm.component.Dropdown
-import com.example.hungdm.model.Playlist
+import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.screen.component.PlaylistImage
 import com.example.hungdm.screen.component.PlaylistInfo
 

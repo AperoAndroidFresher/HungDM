@@ -1,10 +1,9 @@
-package com.example.hungdm.mvi
+package com.example.hungdm.screen.mvi
 
 import android.content.Context
-import com.example.hungdm.model.Playlist
-import com.example.hungdm.model.Song
-import com.example.hungdm.model.UserInfo
-import com.example.hungdm.navigation.Destination
+import com.example.hungdm.domain.model.Playlist
+import com.example.hungdm.domain.model.Song
+import com.example.hungdm.domain.model.UserInfo
 
 data class MviState(
     val darkTheme: Boolean = true,
@@ -16,12 +15,12 @@ data class MviState(
 
 sealed interface MviIntent{
     data object OnClickSignup : MviIntent
-    data class CheckLogin(val userInfo: UserInfo) : MviIntent
+    data class CheckLogin(val userInfo: UserInfo, val context: Context) : MviIntent
     data class CheckSignup(val userInfo: UserInfo) : MviIntent
     data object OnClickProfile: MviIntent
-    data class CheckEditProfile(val userInfo: UserInfo) : MviIntent
+    data class EditProfile(val userInfo: UserInfo) : MviIntent
     data class LoadSongLocal(val context: Context) : MviIntent
-    data object LoadSongRemote : MviIntent
+    data class LoadSongRemote(val context: Context) : MviIntent
     data object LoadPlaylistsOfUser: MviIntent
     data class CreatePlaylist(val title: String): MviIntent
     data class RenamePlaylist(val title: String, val playlist: Playlist): MviIntent

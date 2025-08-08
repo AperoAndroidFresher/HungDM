@@ -27,8 +27,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
 import com.example.hungdm.component.Dropdown
-import com.example.hungdm.model.Playlist
-import com.example.hungdm.model.Song
+import com.example.hungdm.domain.model.Playlist
+import com.example.hungdm.domain.model.Song
 
 @Composable
 fun ItemGrid(
@@ -53,7 +53,7 @@ fun ItemGrid(
         Box() {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data( if(playlist!=null) R.drawable.img1 else song.albumArtUri)
+                    .data( if(playlist!=null) R.drawable.img1 else song.img)
                     .crossfade(true)
                     .error(R.drawable.img1)
                     .size(300, 300)

@@ -1,4 +1,4 @@
-package com.example.hungdm.retrofit
+package com.example.hungdm.data.remote
 
 data class SongRemote(
     val title: String,

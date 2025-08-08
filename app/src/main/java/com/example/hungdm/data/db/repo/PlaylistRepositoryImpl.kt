@@ -1,12 +1,13 @@
-package com.example.hungdm.repo
+package com.example.hungdm.data.db.repo
 
 import com.example.hungdm.data.db.dao.PlaylistDao
 import com.example.hungdm.data.db.entity.PlaylistEntity
 import com.example.hungdm.data.db.entity.PlaylistSongReference
 import com.example.hungdm.data.db.entity.PlaylistWithSongs
 import com.example.hungdm.data.db.entity.SongEntity
+import com.example.hungdm.domain.repo.PlaylistRepository
 
-class PlaylistRepositoryImpl(private val playlistDao: PlaylistDao): PlaylistRepository{
+class PlaylistRepositoryImpl(private val playlistDao: PlaylistDao): PlaylistRepository {
     override suspend fun createPlaylist(playlist: PlaylistEntity): Long {
         return playlistDao.createPlaylist(playlist)
     }

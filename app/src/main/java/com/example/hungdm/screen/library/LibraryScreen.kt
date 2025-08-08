@@ -23,16 +23,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.hungdm.model.Song
-import com.example.hungdm.mvi.MviIntent
-import com.example.hungdm.mvi.MviViewModel
+import com.example.hungdm.domain.model.Song
+import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.screen.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hungdm.R
-import com.example.hungdm.UtilsFunction
+import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
 import com.example.hungdm.screen.component.SongItemLinear
 import com.example.hungdm.screen.library.component.LibraryHeader
@@ -62,7 +62,7 @@ fun LibraryScreen(
 
     LaunchedEffect(key1 = isLoadSong) {
         if (isLoadSong) {
-            viewModel.processIntent(MviIntent.LoadSongRemote)
+            viewModel.processIntent(MviIntent.LoadSongRemote(context))
             delay(2000)
             isLoadSong = false
         }
@@ -100,40 +100,38 @@ fun LibraryScreen(
                 )
             }
         } else {
-            if(listSongRemote.isNotEmpty() || selectedLocal){
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(if (selectedLocal) listSongLocal else listSongRemote) {
-                        var showOption by remember { mutableStateOf(false) }
-                        SongItemLinear(
-                            song = it,
-                            showOption = showOption,
-                            option1 = "Add to playlist",
-                            option2 = "Share",
-                            icon1 = R.drawable.outline_add_24,
-                            icon2 = R.drawable.outline_share_24,
-                            onClickShowOption = {
-                                showOption = true
-                                selectedSong = it
-                            },
-                            onClickOption1 = {
-                                showAddSongToPlaylistDialog = true
-                            },
-                            onClickOption2 = {
-                                UtilsFunction.shareSong(context, selectedSong!!)
-                            },
-                            onDismissRequest = {
-                                showOption = false
-                            }
-                        )
+            if(selectedLocal){
+                LibraryContent(
+                    listSong = listSongLocal,
+                    onClickShowOption = {
+                        selectedSong = it
+                    },
+                    onClickOption1 = {
+                        showAddSongToPlaylistDialog = true
+                    },
+                    onClickOption2 = {
+                        AppUtils.shareSong(context, selectedSong!!)
                     }
-                }
-            } else {
-                ListSongEmpty(
-                    onCLick = { isLoadSong = true }
                 )
+            } else {
+                if(listSongRemote.isNotEmpty()){
+                    LibraryContent(
+                        listSong = listSongRemote,
+                        onClickShowOption = {
+                            selectedSong = it
+                        },
+                        onClickOption1 = {
+                            showAddSongToPlaylistDialog = true
+                        },
+                        onClickOption2 = {
+                            AppUtils.shareSong(context, selectedSong!!)
+                        }
+                    )
+                } else {
+                    ListSongEmpty(
+                        onCLick = { isLoadSong = true }
+                    )
+                }
             }
 
         }
@@ -147,13 +145,46 @@ fun LibraryScreen(
                 onClickNewPlaylist()
             },
             onAddSongToPlaylist = {
-                selectedSong?.let { selectedSong ->
-                    viewModel.processIntent(MviIntent.AddSongToPlaylist(selectedSong, it))
-                }
+                viewModel.processIntent(MviIntent.AddSongToPlaylist(selectedSong!!, it))
                 showAddSongToPlaylistDialog = false
                 selectedSong = null
             },
             onDismiss = { showAddSongToPlaylistDialog = false }
         )
+    }
+}
+
+@Composable
+fun LibraryContent(
+    modifier: Modifier = Modifier,
+    listSong: List<Song> = emptyList(),
+    onClickShowOption: (Song) -> Unit = {},
+    onClickOption1: () -> Unit = {},
+    onClickOption2: () -> Unit = {}
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(listSong) {
+            var showOption by remember { mutableStateOf(false) }
+            SongItemLinear(
+                song = it,
+                showOption = showOption,
+                option1 = "Add to playlist",
+                option2 = "Share",
+                icon1 = R.drawable.outline_add_24,
+                icon2 = R.drawable.outline_share_24,
+                onClickShowOption = {
+                    showOption = true
+                    onClickShowOption(it)
+                },
+                onClickOption1 = onClickOption1,
+                onClickOption2 = onClickOption2,
+                onDismissRequest = {
+                    showOption = false
+                }
+            )
+        }
     }
 }

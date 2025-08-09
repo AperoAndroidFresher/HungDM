@@ -8,10 +8,16 @@ import com.example.hungdm.domain.model.UserInfo
 data class MviState(
     val darkTheme: Boolean = true,
     val userInfo: UserInfo = UserInfo(),
-    val listSongLocal: List<Song> = mutableListOf<Song>(),
-    val listSongRemote: List<Song> = mutableListOf<Song>(),
+    val listSongLocal: List<Song> = mutableListOf(),
+    val listSongRemote: List<Song> = mutableListOf(),
     val playlists: List<Playlist> = mutableListOf(),
-    val songPlay: Song? = null,
+
+    val playerPlaylist: Playlist? = null,
+    val playerListSong: List<Song>? = null,
+    val playerSongIndex: Int? = null,
+    val playerSong: Song? = null,
+
+    val playerTime: Long = 0,
     val isPlay: Boolean = false
 )
 
@@ -31,7 +37,8 @@ sealed interface MviIntent{
     data class AddSongToPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class RemoveSongInPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class OnClickPlaylistDetail(val playlistId: Long) : MviIntent
-    data class OnClickSongPlay(val song: Song?, val context: Context) : MviIntent
+    data class OnClickPlayer(val song: Song, val playerListSong: List<Song>?, val playerPlaylist: Playlist?, val context: Context) : MviIntent
+    data class OnClickClosePlayer(val context: Context): MviIntent
     data class OnChangeSongPlayState(val context: Context): MviIntent
     data object ChangeTheme : MviIntent
 }

@@ -36,56 +36,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppNavigation()
-//            MusicScreen()
         }
     }
 }
-
-
-//@Composable
-//fun MusicScreen() {
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(32.dp),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        val context = LocalContext.current
-//
-//        Button(onClick = {
-//            val intent = Intent(context, AppService::class.java).apply {
-//                action = AppService.ACTION_PLAY
-//                putExtra(AppService.EXTRA_URI, "file:///data/user/0/com.example.hungdm/files/a/Tututu%20tititu.mp3")
-//            }
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                context.startForegroundService(intent)
-//            } else {
-//                context.startService(intent)
-//            }
-//        }) {
-//            Text("Start")
-//        }
-//
-//        Button(onClick = {
-//            val intent = Intent(context, AppService::class.java).apply {
-//                action = AppService.ACTION_PAUSE
-//            }
-//            context.startService(intent)
-//        }) {
-//            Text("Pause")
-//        }
-//
-//        Button(onClick = {
-//            val intent = Intent(context, AppService::class.java).apply {
-//                action = AppService.ACTION_CLOSE
-//            }
-//            context.startService(intent)
-//        }) {
-//            Text("Destroy")
-//        }
-//
-//    }
-//}
-
-

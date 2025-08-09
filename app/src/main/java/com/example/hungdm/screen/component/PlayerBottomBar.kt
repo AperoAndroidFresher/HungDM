@@ -23,17 +23,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
 import com.example.hungdm.domain.model.Song
+import com.example.hungdm.utils.AppUtils.formatTime
 
 @Composable
-fun MusicPlayer(
+fun PlayerBottomBar(
     song: Song,
+    playerTime: Long = 0,
     isPlay: Boolean = false,
-    progress: Float = 0.8f,
     onClick: () -> Unit = {},
-    onPlayPauseClick: () -> Unit = {},
+    onPauseClick: () -> Unit = {},
     onCloseClick: () -> Unit = {}
 ) {
     val icon = if(isPlay) R.drawable.outline_pause_24 else R.drawable.outline_play_arrow_24
+
+    val progress = playerTime.toFloat() / song.duration.toFloat()
 
     Column (
         modifier = Modifier
@@ -57,7 +60,7 @@ fun MusicPlayer(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onPlayPauseClick) {
+            IconButton(onClick = onPauseClick) {
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = null,
@@ -77,7 +80,7 @@ fun MusicPlayer(
             Spacer(Modifier.weight(1f))
 
             Text(
-                text = song.time,
+                text = formatTime(playerTime),
                 color = colorScheme.primary,
                 fontSize = 16.sp,
             )

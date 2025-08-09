@@ -1,7 +1,6 @@
 package com.example.hungdm.screen.navigation
 
 import android.app.Activity
-import android.content.Intent
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.compose.foundation.layout.Column
@@ -32,8 +31,7 @@ import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.hungdm.utils.UserPreferences
-import com.example.hungdm.data.mapper.toUserInfo
-import com.example.hungdm.screen.component.MusicPlayer
+import com.example.hungdm.screen.component.PlayerBottomBar
 import com.example.hungdm.screen.mvi.MviEvent
 import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen
@@ -45,7 +43,6 @@ import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen
 import com.example.hungdm.screen.profile.ProfileScreen
 import com.example.hungdm.screen.signup.SignupScreen
-import com.example.hungdm.service.AppService
 import com.example.hungdm.ui.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -54,14 +51,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     val viewModel: MviViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
+    val backStack = remember { mutableStateListOf<Destination>(Destination.Login) }
     val context = LocalContext.current
     val activity = context as? Activity
+
     val bottomItem = listOf(
         BottomItem("Home", Icons.Default.Home, Destination.Home),
         BottomItem("Library", Icons.Default.DateRange, Destination.Library),
         BottomItem("Playlist", Icons.Default.PlayArrow, Destination.Playlist)
     )
-    val backStack = remember { mutableStateListOf<Destination>(Destination.Login) }
     var selectedBottomBar by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
@@ -116,18 +114,19 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
                 if (showBottomNav) {
                     Column {
-                        if(state.songPlay!=null){
-                            MusicPlayer(
-                                song = state.songPlay!!,
+                        if(state.playerPlaylist!=null || state.playerListSong!=null){
+                            PlayerBottomBar(
+                                song = state.playerSong!!,
+                                playerTime = state.playerTime,
                                 isPlay = state.isPlay,
                                 onClick = {
                                     backStack.add(Destination.Player)
                                 },
-                                onPlayPauseClick = {
+                                onPauseClick = {
                                     viewModel.processIntent(MviIntent.OnChangeSongPlayState(context))
                                 },
                                 onCloseClick = {
-                                    viewModel.processIntent(MviIntent.OnClickSongPlay(null,context))
+                                    viewModel.processIntent(MviIntent.OnClickClosePlayer(context))
                                 }
                             )
                         }
@@ -206,7 +205,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     }
                     entry<Destination.Player> {
                         PlayerScreen(
-
+                            viewModel = viewModel,
+                            onBack = { backStack.removeLastOrNull() }
                         )
                     }
                 }

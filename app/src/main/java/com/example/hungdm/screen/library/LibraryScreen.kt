@@ -1,7 +1,6 @@
 package com.example.hungdm.screen.library
 
-import android.content.Intent
-import android.os.Build
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -103,7 +102,7 @@ fun LibraryScreen(
                 )
             }
         } else {
-            if(selectedLocal){
+            if (selectedLocal) {
                 LibraryContent(
                     listSong = listSongLocal,
                     onClickShowOption = {
@@ -116,11 +115,18 @@ fun LibraryScreen(
                         AppUtils.shareSong(context, selectedSong!!)
                     },
                     onCLickSongPlay = {
-                        viewModel.processIntent(MviIntent.OnClickSongPlay(it,context))
+                        viewModel.processIntent(
+                            MviIntent.OnClickPlayer(
+                                song = it,
+                                playerListSong = listSongLocal,
+                                playerPlaylist = null,
+                                context = context
+                            )
+                        )
                     }
                 )
             } else {
-                if(listSongRemote.isNotEmpty()){
+                if (listSongRemote.isNotEmpty()) {
                     LibraryContent(
                         listSong = listSongRemote,
                         onClickShowOption = {
@@ -133,16 +139,14 @@ fun LibraryScreen(
                             AppUtils.shareSong(context, selectedSong!!)
                         },
                         onCLickSongPlay = {
-                            viewModel.processIntent(MviIntent.OnClickSongPlay(it,context))
-//                            val intent = Intent(context, AppService::class.java).apply {
-//                                action = AppService.ACTION_PLAY
-//                                putExtra(AppService.EXTRA_URI, it.uri)
-//                            }
-//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                                context.startForegroundService(intent)
-//                            } else {
-//                                context.startService(intent)
-//                            }
+                            viewModel.processIntent(
+                                MviIntent.OnClickPlayer(
+                                    song = it,
+                                    playerListSong = listSongRemote,
+                                    playerPlaylist = null,
+                                    context = context
+                                )
+                            )
                         }
                     )
                 } else {

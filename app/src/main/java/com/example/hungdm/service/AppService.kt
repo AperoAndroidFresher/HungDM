@@ -1,31 +1,36 @@
 package com.example.hungdm.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.example.hungdm.NotificationHelper
-import com.example.hungdm.R
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class AppService : LifecycleService() {
 
     companion object {
-        const val ACTION_PLAY = "action_play"
-        const val ACTION_PAUSE = "action_pause"
-        const val ACTION_RESUME = "action_resume"
-        const val ACTION_CLOSE = "action_close"
-        const val EXTRA_URI = "extra_uri"
+        const val ACTION_PLAY = "ACTION_PLAY"
+        const val ACTION_PAUSE = "ACTION_PAUSE"
+        const val ACTION_RESUME = "ACTION_RESUME"
+        const val ACTION_CLOSE = "ACTION_CLOSE"
+        const val EXTRA_URI = "EXTRA_URI"
+
+        val playerTime = MutableStateFlow(0L)
+        val playerDuration = MutableStateFlow(0L)
+        val isPlaying = MutableStateFlow(false)
     }
 
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var notificationHelper: NotificationHelper
-    private var currentUri: Uri? = null
+    private var songUri: Uri? = null
+    private var timeJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -37,27 +42,31 @@ class AppService : LifecycleService() {
         when (intent?.action) {
             ACTION_PLAY -> {
                 val uri = intent.getParcelableExtra<Uri>(EXTRA_URI)
-                Log.d("tag","onStartCommand play")
                 uri?.let {
-                    playMusic(it)
+                    playSong(it)
                 }
             }
             ACTION_PAUSE -> {
-                pauseMusic()
+                pauseSong()
             }
             ACTION_CLOSE -> {
-                stopMusic()
+                closeSong()
             }
             ACTION_RESUME -> {
-                resumeMusic()
+                resumeSong()
             }
         }
         return START_STICKY
     }
 
-    private fun playMusic(uri: Uri) {
+    override fun onDestroy() {
+        mediaPlayer?.release()
+        mediaPlayer = null
+        super.onDestroy()
+    }
+
+    private fun playSong(uri: Uri) {
         try {
-            Log.d("tag","uri")
             mediaPlayer?.release()
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(applicationContext, uri)
@@ -65,7 +74,10 @@ class AppService : LifecycleService() {
                 start()
                 isLooping = false
             }
-            currentUri = uri
+            songUri = uri
+            playerDuration.value = mediaPlayer?.duration?.toLong() ?: 0L
+            isPlaying.value = true
+            startUpdatingTime()
             startForeground(
                 1,
                 notificationHelper.createNotification("Playing", uri, true)
@@ -75,36 +87,45 @@ class AppService : LifecycleService() {
         }
     }
 
-    private fun pauseMusic() {
+    private fun pauseSong() {
         mediaPlayer?.pause()
         startForeground(
             1,
-            notificationHelper.createNotification("Paused", currentUri, false)
+            notificationHelper.createNotification("Paused", songUri, false)
         )
+        Log.d("tag", "pauseSong: ${playerTime.value}")
     }
 
-    private fun stopMusic() {
+    private fun closeSong() {
         mediaPlayer?.stop()
         mediaPlayer?.release()
+        mediaPlayer = null
         stopSelf()
     }
 
-    private fun resumeMusic() {
+    private fun resumeSong() {
+        timeJob?.cancel()
         mediaPlayer?.let {
             if (!it.isPlaying) {
                 it.start()
+                startUpdatingTime()
                 startForeground(
                     1,
-                    notificationHelper.createNotification("Playing", currentUri, true)
+                    notificationHelper.createNotification("Playing", songUri, true)
                 )
+                Log.d("tag", "resumeSong: ${playerTime.value}")
             }
         }
     }
 
-
-    override fun onDestroy() {
-        mediaPlayer?.release()
-        mediaPlayer = null
-        super.onDestroy()
+    private fun startUpdatingTime() {
+        timeJob?.cancel()
+        timeJob = lifecycleScope.launch {
+            while (isActive) {
+                val time = mediaPlayer?.currentPosition?.toLong() ?: 0L
+                playerTime.value = time
+                delay(100)
+            }
+        }
     }
 }

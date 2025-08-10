@@ -111,7 +111,9 @@ fun PlayerScreen(
         Spacer(Modifier.size(10.dp))
         PlayerControl(
             isPlay = isPlay,
-            onPauseClick = { viewModel.processIntent(MviIntent.OnChangeSongPlayState(context)) }
+            onPauseClick = { viewModel.processIntent(MviIntent.OnChangeSongPlayState(context)) },
+            onNextClick = { viewModel.processIntent(MviIntent.OnClickNextSong(context)) },
+            onPreviousClick = { viewModel.processIntent(MviIntent.OnClickPreviousSong(context)) }
         )
     }
 }

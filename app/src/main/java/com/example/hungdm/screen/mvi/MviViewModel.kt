@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -15,7 +14,6 @@ import com.example.hungdm.data.db.entity.PlaylistSongReference
 import com.example.hungdm.data.mapper.toSong
 import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.domain.model.Song
-import com.example.hungdm.domain.model.getAlbumArt
 import com.example.hungdm.domain.repo.PlaylistRepository
 import com.example.hungdm.domain.repo.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +31,7 @@ import com.example.hungdm.data.mapper.toUserEntity
 import com.example.hungdm.data.mapper.toUserInfo
 import com.example.hungdm.data.remote.ApiClient
 import com.example.hungdm.service.AppService
+import com.example.hungdm.utils.AppUtils
 import kotlinx.coroutines.flow.update
 import java.io.BufferedInputStream
 import java.io.File
@@ -53,26 +52,34 @@ class MviViewModel(
     val event: SharedFlow<MviEvent> = _event.asSharedFlow()
 
     init {
-        observePlayerUpdates()
-    }
-
-    private fun observePlayerUpdates() {
         viewModelScope.launch {
-            AppService.playerTime.collect { time ->
-                _state.update { it.copy(playerTime = time) }
+            AppService.playerPlaylist.collect{ playerPlaylist ->
+                _state.update { it.copy(playerPlaylist = playerPlaylist) }
             }
         }
         viewModelScope.launch {
-            AppService.playerDuration.collect { duration ->
-                _state.update { state ->
-                    val currentSong = state.playerSong?.copy(duration = duration)
-                    state.copy(playerSong = currentSong)
-                }
+            AppService.playerListSong.collect{ playerListSong ->
+                _state.update { it.copy(playerListSong = playerListSong) }
             }
         }
         viewModelScope.launch {
-            AppService.isPlaying.collect { playing ->
-                _state.update { it.copy(isPlay = playing) }
+            AppService.playerSong.collect { playerSong ->
+                _state.update { it.copy(playerSong = playerSong) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.playerSongIndex.collect { playerSongIndex ->
+                _state.update { it.copy(playerSongIndex = playerSongIndex) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.playerTime.collect { playerTime ->
+                _state.update { it.copy(playerTime = playerTime) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.isPlay.collect { isPlay ->
+                _state.update { it.copy(isPlay = isPlay) }
             }
         }
     }
@@ -220,50 +227,49 @@ class MviViewModel(
                         intent.playerListSong.indexOf(intent.song)
                     } else intent.playerPlaylist!!.listSong.indexOf(intent.song)
 
-                    val tmp = Intent(intent.context, AppService::class.java).apply {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
                         action = AppService.ACTION_PLAY
-                        putExtra(AppService.EXTRA_URI, intent.song.uri)
+                        putExtra(AppService.EXTRA_PLAYLIST,intent.playerPlaylist)
+                        putExtra(AppService.EXTRA_LIST_SONG, ArrayList(intent.playerListSong?: emptyList()))
+                        putExtra(AppService.EXTRA_SONG, intent.song)
+                        putExtra(AppService.EXTRA_INDEX, playerSongIndex)
                     }
-                    intent.context.startForegroundService(tmp)
-                    Log.d("tag", "OnClickPlayer ${intent.song.title} ${intent.playerPlaylist==null} ${intent.playerListSong==null}")
-                    _state.value = _state.value.copy(
-                        playerPlaylist = intent.playerPlaylist,
-                        playerListSong = intent.playerListSong,
-                        playerSongIndex = playerSongIndex,
-                        playerSong = intent.song,
-                        playerTime = 0,
-                        isPlay = true
-                    )
+                    intent.context.startForegroundService(tmpIntent)
                 }
 
                 is MviIntent.OnClickClosePlayer -> {
-                    val tmp = Intent(intent.context, AppService::class.java).apply {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
                         action = AppService.ACTION_CLOSE
                     }
-                    intent.context.startService(tmp)
-                    _state.value = _state.value.copy(
-                        playerPlaylist = null,
-                        playerListSong = null,
-                        playerSongIndex = null,
-                        playerSong = null,
-                        playerTime = 0,
-                        isPlay = false
-                    )
+                    intent.context.startForegroundService(tmpIntent)
                 }
 
                 is MviIntent.OnChangeSongPlayState -> {
                     if(_state.value.isPlay){
-                        val tmp = Intent(intent.context, AppService::class.java).apply {
+                        val tmpIntent = Intent(intent.context, AppService::class.java).apply {
                             action = AppService.ACTION_PAUSE
                         }
-                        intent.context.startForegroundService(tmp)
+                        intent.context.startForegroundService(tmpIntent)
                     } else {
-                        val tmp = Intent(intent.context, AppService::class.java).apply {
+                        val tmpIntent = Intent(intent.context, AppService::class.java).apply {
                             action = AppService.ACTION_RESUME
                         }
-                        intent.context.startForegroundService(tmp)
+                        intent.context.startForegroundService(tmpIntent)
                     }
-                    _state.value = _state.value.copy(isPlay = !_state.value.isPlay)
+                }
+
+                is MviIntent.OnClickNextSong -> {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_NEXT
+                    }
+                    intent.context.startForegroundService(tmpIntent)
+                }
+
+                is MviIntent.OnClickPreviousSong -> {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_PREVIOUS
+                    }
+                    intent.context.startForegroundService(tmpIntent)
                 }
             }
         }
@@ -335,7 +341,7 @@ class MviViewModel(
                     val albumId = it.getLong(albumIdColumn)
                     val songUri =
                         ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-                    val img = getAlbumArt(context, albumId)
+                    val img = AppUtils.getAlbumArt(context, albumId)
                     songs.add(Song(id, title, artist, duration, songUri, img))
                 }
             }

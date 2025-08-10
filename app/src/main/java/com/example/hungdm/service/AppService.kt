@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.example.hungdm.NotificationHelper
+import com.example.hungdm.domain.model.Playlist
+import com.example.hungdm.domain.model.Song
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,16 +22,23 @@ class AppService : LifecycleService() {
         const val ACTION_PAUSE = "ACTION_PAUSE"
         const val ACTION_RESUME = "ACTION_RESUME"
         const val ACTION_CLOSE = "ACTION_CLOSE"
-        const val EXTRA_URI = "EXTRA_URI"
+        const val ACTION_NEXT = "ACTION_NEXT"
+        const val ACTION_PREVIOUS = "ACTION_PREVIOUS"
+        const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
+        const val EXTRA_LIST_SONG = "EXTRA_LIST_SONG"
+        const val EXTRA_INDEX = "EXTRA_INDEX"
+        const val EXTRA_SONG = "EXTRA_SONG"
 
-        val playerTime = MutableStateFlow(0L)
-        val playerDuration = MutableStateFlow(0L)
-        val isPlaying = MutableStateFlow(false)
+        val playerPlaylist: MutableStateFlow<Playlist?> = MutableStateFlow(null)
+        val playerListSong: MutableStateFlow<List<Song>?> = MutableStateFlow(null)
+        val playerSongIndex: MutableStateFlow<Int?> = MutableStateFlow(null)
+        val playerSong: MutableStateFlow<Song?> = MutableStateFlow(null)
+        val playerTime: MutableStateFlow<Long> = MutableStateFlow(0L)
+        val isPlay: MutableStateFlow<Boolean> = MutableStateFlow(false)
     }
 
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var notificationHelper: NotificationHelper
-    private var songUri: Uri? = null
     private var timeJob: Job? = null
 
     override fun onCreate() {
@@ -41,19 +50,36 @@ class AppService : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
             ACTION_PLAY -> {
-                val uri = intent.getParcelableExtra<Uri>(EXTRA_URI)
-                uri?.let {
-                    playSong(it)
-                }
+                playerPlaylist.value = intent.getParcelableExtra<Playlist>(EXTRA_PLAYLIST)
+                playerListSong.value = intent.getParcelableArrayListExtra<Song>(EXTRA_LIST_SONG)
+                playerSongIndex.value = intent.getIntExtra(EXTRA_INDEX,0)
+                playerSong.value = intent.getParcelableExtra<Song>(EXTRA_SONG)
+                playerTime.value = 0L
+                isPlay.value = true
+                playSong()
             }
             ACTION_PAUSE -> {
+                isPlay.value = false
                 pauseSong()
             }
             ACTION_CLOSE -> {
+                playerPlaylist.value = null
+                playerListSong.value = null
+                playerSongIndex.value = null
+                playerSong.value = null
+                playerTime.value = 0L
+                isPlay.value = false
                 closeSong()
             }
             ACTION_RESUME -> {
+                isPlay.value = true
                 resumeSong()
+            }
+            ACTION_NEXT -> {
+                nextSong()
+            }
+            ACTION_PREVIOUS -> {
+                previousSong()
             }
         }
         return START_STICKY
@@ -65,22 +91,23 @@ class AppService : LifecycleService() {
         super.onDestroy()
     }
 
-    private fun playSong(uri: Uri) {
+    private fun playSong() {
         try {
             mediaPlayer?.release()
             mediaPlayer = MediaPlayer().apply {
-                setDataSource(applicationContext, uri)
+                setDataSource(applicationContext, playerSong.value!!.uri!!)
                 prepare()
                 start()
                 isLooping = false
+                setOnCompletionListener {
+                    nextSong()
+                }
             }
-            songUri = uri
-            playerDuration.value = mediaPlayer?.duration?.toLong() ?: 0L
-            isPlaying.value = true
+            isPlay.value = true
             startUpdatingTime()
             startForeground(
                 1,
-                notificationHelper.createNotification("Playing", uri, true)
+                notificationHelper.createNotification("Playing", playerSong.value!!.uri!!, true)
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -91,9 +118,8 @@ class AppService : LifecycleService() {
         mediaPlayer?.pause()
         startForeground(
             1,
-            notificationHelper.createNotification("Paused", songUri, false)
+            notificationHelper.createNotification("Paused", playerSong.value!!.uri, false)
         )
-        Log.d("tag", "pauseSong: ${playerTime.value}")
     }
 
     private fun closeSong() {
@@ -111,12 +137,48 @@ class AppService : LifecycleService() {
                 startUpdatingTime()
                 startForeground(
                     1,
-                    notificationHelper.createNotification("Playing", songUri, true)
+                    notificationHelper.createNotification("Playing", playerSong.value!!.uri, true)
                 )
-                Log.d("tag", "resumeSong: ${playerTime.value}")
             }
         }
     }
+
+    private fun nextSong() {
+        if(playerPlaylist.value==null){
+            val nextIndex = if (playerSongIndex.value!! >= playerListSong.value!!.size - 1) 0 else playerSongIndex.value!! + 1
+
+            playerSongIndex.value = nextIndex
+            playerSong.value = playerListSong.value!![nextIndex]
+            playerTime.value = 0L
+        } else {
+            val nextIndex = if (playerSongIndex.value!! >= playerPlaylist.value!!.listSong.size - 1) 0 else playerSongIndex.value!! + 1
+
+            playerSongIndex.value = nextIndex
+            playerSong.value = playerPlaylist.value!!.listSong[nextIndex]
+            playerTime.value = 0L
+        }
+
+        playSong()
+    }
+
+    private fun previousSong(){
+        if(playerPlaylist.value==null){
+            val preIndex = if (playerSongIndex.value!! <= 0) playerListSong.value!!.size - 1 else playerSongIndex.value!! - 1
+
+            playerSongIndex.value = preIndex
+            playerSong.value = playerListSong.value!![preIndex]
+            playerTime.value = 0L
+        } else {
+            val preIndex = if (playerSongIndex.value!! <= 0) playerPlaylist.value!!.listSong.size - 1 else playerSongIndex.value!! - 1
+
+            playerSongIndex.value = preIndex
+            playerSong.value = playerPlaylist.value!!.listSong[preIndex]
+            playerTime.value = 0L
+        }
+
+        playSong()
+    }
+
 
     private fun startUpdatingTime() {
         timeJob?.cancel()

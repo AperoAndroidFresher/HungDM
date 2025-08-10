@@ -16,7 +16,6 @@ data class MviState(
     val playerListSong: List<Song>? = null,
     val playerSongIndex: Int? = null,
     val playerSong: Song? = null,
-
     val playerTime: Long = 0,
     val isPlay: Boolean = false
 )
@@ -40,6 +39,8 @@ sealed interface MviIntent{
     data class OnClickPlayer(val song: Song, val playerListSong: List<Song>?, val playerPlaylist: Playlist?, val context: Context) : MviIntent
     data class OnClickClosePlayer(val context: Context): MviIntent
     data class OnChangeSongPlayState(val context: Context): MviIntent
+    data class OnClickNextSong(val context: Context): MviIntent
+    data class OnClickPreviousSong(val context: Context): MviIntent
     data object ChangeTheme : MviIntent
 }
 

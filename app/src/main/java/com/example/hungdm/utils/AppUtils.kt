@@ -1,7 +1,9 @@
 package com.example.hungdm.utils
 
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.example.hungdm.domain.model.Song
 
 object AppUtils {
@@ -11,6 +13,20 @@ object AppUtils {
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
         return String.format("%02d:%02d", minutes, seconds)
+    }
+
+    fun getAlbumArt(context: Context, albumId: Long): ByteArray? {
+        val albumArtUri = ContentUris.withAppendedId(
+            Uri.parse("content://media/external/audio/albumart"), albumId
+        )
+
+        return try {
+            context.contentResolver.openInputStream(albumArtUri)?.use { inputStream ->
+                inputStream.readBytes()
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 
     fun isValid(s: String): Boolean {

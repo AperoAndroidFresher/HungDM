@@ -18,6 +18,8 @@ fun PlayerControl(
     modifier: Modifier = Modifier,
     isPlay: Boolean = false,
     onPauseClick: () -> Unit ={},
+    onNextClick: () -> Unit ={},
+    onPreviousClick: () -> Unit ={},
 ) {
     val icon = if (isPlay) R.drawable.outline_pause_24 else R.drawable.outline_play_arrow_24
 
@@ -39,7 +41,7 @@ fun PlayerControl(
         Spacer(Modifier.weight(1f))
 
         IconButton(
-            onClick = {},
+            onClick = onPreviousClick,
         ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_skip_previous_24),
@@ -59,7 +61,7 @@ fun PlayerControl(
             )
         }
         IconButton(
-            onClick = {},
+            onClick = onNextClick,
         ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_skip_next_24),

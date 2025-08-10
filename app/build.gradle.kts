@@ -82,4 +82,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation(libs.lottie.compose)
 
+    implementation("androidx.media:media:1.7.0")
+
 }

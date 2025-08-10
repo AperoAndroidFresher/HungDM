@@ -34,7 +34,7 @@ fun PlayerBottomBar(
     onPauseClick: () -> Unit = {},
     onCloseClick: () -> Unit = {}
 ) {
-    val icon = if(isPlay) R.drawable.outline_pause_24 else R.drawable.outline_play_arrow_24
+    val icon = if(isPlay) R.drawable.baseline_pause_24 else R.drawable.baseline_play_arrow_24
 
     val progress = playerTime.toFloat() / song.duration.toFloat()
 

@@ -107,7 +107,7 @@ class AppService : LifecycleService() {
             startUpdatingTime()
             startForeground(
                 1,
-                notificationHelper.createNotification("Playing", playerSong.value!!.uri!!, true)
+                notificationHelper.createNotification(playerSong.value!!.title, isPlay.value)
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -118,7 +118,7 @@ class AppService : LifecycleService() {
         mediaPlayer?.pause()
         startForeground(
             1,
-            notificationHelper.createNotification("Paused", playerSong.value!!.uri, false)
+            notificationHelper.createNotification(playerSong.value!!.title, isPlay.value)
         )
     }
 
@@ -137,7 +137,7 @@ class AppService : LifecycleService() {
                 startUpdatingTime()
                 startForeground(
                     1,
-                    notificationHelper.createNotification("Playing", playerSong.value!!.uri, true)
+                    notificationHelper.createNotification(playerSong.value!!.title, isPlay.value)
                 )
             }
         }

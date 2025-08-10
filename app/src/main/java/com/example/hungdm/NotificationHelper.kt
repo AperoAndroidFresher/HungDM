@@ -26,30 +26,82 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-    fun createNotification(title: String, uri: Uri?, isPlaying: Boolean): Notification {
-        val pauseIntent = Intent(context, AppService::class.java).apply {
-            action = AppService.ACTION_PAUSE
+//    fun createNotification(title: String, uri: Uri?, isPlaying: Boolean): Notification {
+//        val pauseIntent = Intent(context, AppService::class.java).apply {
+//            action = AppService.ACTION_PAUSE
+//        }
+//        val pausePendingIntent = PendingIntent.getService(
+//            context, 0, pauseIntent,
+//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//        )
+//
+//        val closeIntent = Intent(context, AppService::class.java).apply {
+//            action = AppService.ACTION_CLOSE
+//        }
+//        val closePendingIntent = PendingIntent.getService(
+//            context, 1, closeIntent,
+//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//        )
+//
+//        return NotificationCompat.Builder(context, channelId)
+//            .setContentTitle(title)
+//            .setContentText(uri?.lastPathSegment ?: "Unknown")
+//            .setSmallIcon(android.R.drawable.ic_media_play)
+//            .setOngoing(isPlaying)
+//            .addAction(android.R.drawable.ic_media_pause, "Pause", pausePendingIntent)
+//            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Close", closePendingIntent)
+//            .build()
+//    }
+
+    fun createNotification(songTitle: String, isPlaying: Boolean): Notification {
+        val prevIntent = Intent(context, AppService::class.java).apply {
+            action = AppService.ACTION_PREVIOUS
         }
-        val pausePendingIntent = PendingIntent.getService(
-            context, 0, pauseIntent,
+        val prevPending = PendingIntent.getService(
+            context, 0, prevIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val pauseResumeIntent = Intent(context, AppService::class.java).apply {
+            action = if (isPlaying) AppService.ACTION_PAUSE else AppService.ACTION_RESUME
+        }
+        val pauseResumePending = PendingIntent.getService(
+            context, 1, pauseResumeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val nextIntent = Intent(context, AppService::class.java).apply {
+            action = AppService.ACTION_NEXT
+        }
+        val nextPending = PendingIntent.getService(
+            context, 2, nextIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val closeIntent = Intent(context, AppService::class.java).apply {
             action = AppService.ACTION_CLOSE
         }
-        val closePendingIntent = PendingIntent.getService(
-            context, 1, closeIntent,
+        val closePending = PendingIntent.getService(
+            context, 3, closeIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         return NotificationCompat.Builder(context, channelId)
-            .setContentTitle(title)
-            .setContentText(uri?.lastPathSegment ?: "Unknown")
-            .setSmallIcon(android.R.drawable.ic_media_play)
+            .setContentTitle(songTitle)
+            .setSmallIcon(R.drawable.logoapp)
             .setOngoing(isPlaying)
-            .addAction(android.R.drawable.ic_media_pause, "Pause", pausePendingIntent)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Close", closePendingIntent)
+            .addAction(R.drawable.baseline_skip_previous_24, "", prevPending)
+            .addAction(
+                if (isPlaying) R.drawable.baseline_pause_24 else R.drawable.baseline_play_arrow_24,
+                "",
+                pauseResumePending
+            )
+            .addAction(R.drawable.baseline_skip_next_24, "", nextPending)
+            .addAction(R.drawable.outline_close_24, "", closePending)
+            .setOnlyAlertOnce(true)
+            .setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle().setShowActionsInCompactView(0, 1, 2, 3)
+            )
             .build()
     }
 }

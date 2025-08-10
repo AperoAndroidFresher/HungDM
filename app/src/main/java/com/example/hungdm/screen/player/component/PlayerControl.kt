@@ -21,7 +21,7 @@ fun PlayerControl(
     onNextClick: () -> Unit ={},
     onPreviousClick: () -> Unit ={},
 ) {
-    val icon = if (isPlay) R.drawable.outline_pause_24 else R.drawable.outline_play_arrow_24
+    val icon = if (isPlay) R.drawable.baseline_pause_24 else R.drawable.baseline_play_arrow_24
 
     Row(
         modifier = Modifier.fillMaxWidth()

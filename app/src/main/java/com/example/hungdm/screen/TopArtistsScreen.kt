@@ -1,4 +1,4 @@
-package com.example.hungdm.screen.toptracks
+package com.example.hungdm.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -22,32 +23,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
-import com.example.hungdm.data.remote.musicApi.dto.TopTracks
-import com.example.hungdm.screen.home.component.TopTracksItem
-import com.example.hungdm.utils.AppUtils
+import com.example.hungdm.data.remote.musicApi.dto.TopArtists
+import com.example.hungdm.screen.home.component.TopArtistsItem
 
 @Composable
-fun TopTracksScreen(
+fun TopArtistsScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = {},
-    topTracks: TopTracks,
+    topArtists: TopArtists,
 ) {
     BackHandler { onBack() }
 
     Column(
-        modifier = modifier.padding(16.dp)
+        modifier = Modifier.padding(16.dp)
     ) {
-        TopTracksHeader(onBack = onBack)
+        TopArtistsHeader(onBack = onBack)
         Spacer(Modifier.size(10.dp))
         LazyVerticalGrid (
             columns = GridCells.Fixed(2),
-            verticalArrangement = Arrangement.spacedBy(30.dp),
-            horizontalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(topTracks.track.size){
-                TopTracksItem(
-                    track = topTracks.track[it],
-                    color = AppUtils.color[it%8]
+            items(topArtists.artist){
+                TopArtistsItem(
+                    artist = it
                 )
             }
         }
@@ -55,7 +53,7 @@ fun TopTracksScreen(
 }
 
 @Composable
-fun TopTracksHeader(
+fun TopArtistsHeader(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = {},
 ) {
@@ -75,7 +73,7 @@ fun TopTracksHeader(
         }
         Spacer(Modifier.size(10.dp))
         Text(
-            text = "Top Tracks",
+            text = "Top Artists",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,

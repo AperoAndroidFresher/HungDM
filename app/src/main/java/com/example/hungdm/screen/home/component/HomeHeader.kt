@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,7 +35,8 @@ fun HomeHeader(
     modifier: Modifier = Modifier,
     userName: String = "HungDM",
     image: Any? = R.drawable.img,
-    onClick: () -> Unit = {}
+    onClickProfile: () -> Unit = {},
+    onClickSetting: () -> Unit = {}
 ) {
     Column {
         Box(
@@ -48,7 +47,7 @@ fun HomeHeader(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .clickable {
-                        onClick()
+                        onClickProfile()
                     }
             ) {
                 UserImage(image = image)
@@ -57,7 +56,7 @@ fun HomeHeader(
             }
 
             IconButton(
-                onClick = {},
+                onClick = onClickSetting,
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
                 Icon(

@@ -5,28 +5,20 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.BackHandler
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.hungdm.screen.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -46,7 +37,6 @@ import com.example.hungdm.R
 import com.example.hungdm.screen.component.NoInternet
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.home.component.HomeHeader
-import com.example.hungdm.screen.home.component.Ranking
 import com.example.hungdm.screen.home.component.TopAlbums
 import com.example.hungdm.screen.home.component.TopArtists
 import com.example.hungdm.screen.home.component.TopTracks
@@ -114,8 +104,11 @@ fun HomeScreen(
         HomeHeader(
             userName = state.userInfo.username,
             image = state.userInfo.img,
-            onClick = {
+            onClickProfile = {
                 viewModel.processIntent(MviIntent.OnClickProfile)
+            },
+            onClickSetting = {
+                viewModel.processIntent(MviIntent.OnClickSetting)
             }
         )
         Spacer(modifier = Modifier.size(20.dp))

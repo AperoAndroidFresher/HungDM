@@ -156,6 +156,10 @@ class MviViewModel(
                     sendEvent(MviEvent.GotoLogin)
                 }
 
+                is MviIntent.OnClickSetting -> {
+                    sendEvent(MviEvent.GotoSettings)
+                }
+
                 is MviIntent.ChangeTheme -> {
                     _state.value = _state.value.copy(darkTheme = !_state.value.darkTheme)
                 }

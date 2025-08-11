@@ -19,4 +19,5 @@ sealed interface Destination: NavKey {
     data object TopAlbums: Destination
     data object TopTracks: Destination
     data object TopArtists: Destination
+    data object Settings: Destination
 }

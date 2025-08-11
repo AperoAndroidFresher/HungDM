@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.example.hungdm.screen.SettingScreen
 import com.example.hungdm.screen.component.PlayerBottomBar
 import com.example.hungdm.screen.mvi.MviEvent
 import com.example.hungdm.screen.mvi.MviViewModel
@@ -42,9 +43,9 @@ import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen
 import com.example.hungdm.screen.profile.ProfileScreen
 import com.example.hungdm.screen.signup.SignupScreen
-import com.example.hungdm.screen.topalbums.TopAlbumsScreen
-import com.example.hungdm.screen.topartists.TopArtistsScreen
-import com.example.hungdm.screen.toptracks.TopTracksScreen
+import com.example.hungdm.screen.TopAlbumsScreen
+import com.example.hungdm.screen.TopArtistsScreen
+import com.example.hungdm.screen.TopTracksScreen
 import com.example.hungdm.ui.theme.AppTheme
 import com.example.hungdm.utils.AppUtils
 import org.koin.androidx.compose.koinViewModel
@@ -109,6 +110,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
                 is MviEvent.GotoTopArtists -> {
                     backStack.add(Destination.TopArtists)
+                }
+
+                is MviEvent.GotoSettings -> {
+                    backStack.add(Destination.Settings)
                 }
 
                 is MviEvent.ShowToast -> {
@@ -243,6 +248,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         TopArtistsScreen(
                             onBack = { backStack.removeLastOrNull() },
                             topArtists = state.topArtists!!
+                        )
+                    }
+                    entry<Destination.Settings> {
+                        SettingScreen(
+                            onBack = { backStack.removeLastOrNull() },
                         )
                     }
                 }

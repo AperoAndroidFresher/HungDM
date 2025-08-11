@@ -35,6 +35,7 @@ sealed interface MviIntent{
     data object OnClickProfile: MviIntent
     data class EditProfile(val userInfo: UserInfo) : MviIntent
     data class OnLogout(val context: Context): MviIntent
+    data object OnClickSetting: MviIntent
 
     data class LoadMusicData(val context: Context): MviIntent
     data object OnClickSeeAllTopAlbums: MviIntent
@@ -69,5 +70,6 @@ sealed interface MviEvent{
     data object GotoTopAlbums: MviEvent
     data object GotoTopTracks: MviEvent
     data object GotoTopArtists: MviEvent
+    data object GotoSettings: MviEvent
     data class ShowToast(val mess: String): MviEvent
 }

@@ -1,6 +1,9 @@
 package com.example.hungdm.screen.mvi
 
 import android.content.Context
+import com.example.hungdm.data.remote.musicApi.dto.TopAlbums
+import com.example.hungdm.data.remote.musicApi.dto.TopArtists
+import com.example.hungdm.data.remote.musicApi.dto.TopTracks
 import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.domain.model.Song
 import com.example.hungdm.domain.model.UserInfo
@@ -11,6 +14,10 @@ data class MviState(
     val listSongLocal: List<Song> = mutableListOf(),
     val listSongRemote: List<Song> = mutableListOf(),
     val playlists: List<Playlist> = mutableListOf(),
+
+    val topAlbums: TopAlbums? = null,
+    val topTracks: TopTracks? = null,
+    val topArtists: TopArtists? = null,
 
     val playerPlaylist: Playlist? = null,
     val playerListSong: List<Song>? = null,
@@ -27,6 +34,12 @@ sealed interface MviIntent{
     data class CheckSignup(val userInfo: UserInfo) : MviIntent
     data object OnClickProfile: MviIntent
     data class EditProfile(val userInfo: UserInfo) : MviIntent
+
+    data class LoadMusicData(val context: Context): MviIntent
+    data object OnClickSeeAllTopAlbums: MviIntent
+    data object OnClickSeeAllTopTracks: MviIntent
+    data object OnClickSeeAllTopArtists: MviIntent
+
     data class LoadSongLocal(val context: Context) : MviIntent
     data class LoadSongRemote(val context: Context) : MviIntent
     data object LoadPlaylistsOfUser: MviIntent
@@ -36,11 +49,13 @@ sealed interface MviIntent{
     data class AddSongToPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class RemoveSongInPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class OnClickPlaylistDetail(val playlistId: Long) : MviIntent
+
     data class OnClickPlayer(val song: Song, val playerListSong: List<Song>?, val playerPlaylist: Playlist?, val context: Context) : MviIntent
     data class OnClickClosePlayer(val context: Context): MviIntent
     data class OnChangeSongPlayState(val context: Context): MviIntent
     data class OnClickNextSong(val context: Context): MviIntent
     data class OnClickPreviousSong(val context: Context): MviIntent
+
     data object ChangeTheme : MviIntent
 }
 
@@ -50,9 +65,8 @@ sealed interface MviEvent{
     data object GotoSignup: MviEvent
     data object GotoProfile: MviEvent
     data class GotoPlaylistDetail(val playlistId: Long): MviEvent
+    data object GotoTopAlbums: MviEvent
+    data object GotoTopTracks: MviEvent
+    data object GotoTopArtists: MviEvent
     data class ShowToast(val mess: String): MviEvent
 }
-
-
-
-

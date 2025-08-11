@@ -2,7 +2,7 @@ package com.example.hungdm.data.mapper
 
 import com.example.hungdm.data.db.entity.SongEntity
 import com.example.hungdm.data.db.entity.UserEntity
-import com.example.hungdm.data.remote.dto.SongDTO
+import com.example.hungdm.data.remote.songApi.SongDTO
 import com.example.hungdm.domain.model.Song
 import com.example.hungdm.domain.model.UserInfo
 

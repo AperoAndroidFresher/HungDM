@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,34 +37,39 @@ fun HomeHeader(
     modifier: Modifier = Modifier,
     userName: String = "HungDM",
     image: Any? = R.drawable.img,
-    onClick: ()->Unit = {}
+    onClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = modifier.fillMaxWidth().padding(top = 8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)
-                .clickable {
-                    onClick()
-                }
+    Column {
+        Box(
+            modifier = modifier.fillMaxWidth()
         ) {
-            UserImage(image = image)
-            Spacer(Modifier.size(10.dp))
-            UserInfo(userName = userName)
-        }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .clickable {
+                        onClick()
+                    }
+            ) {
+                UserImage(image = image)
+                Spacer(Modifier.size(10.dp))
+                UserInfo(userName = userName)
+            }
 
-        IconButton(
-            onClick = {},
-            modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_settings_24),
-                contentDescription = null,
-                tint = colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
+            IconButton(
+                onClick = {},
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_settings_24),
+                    contentDescription = null,
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
+        Spacer(Modifier.size(10.dp))
+        Ranking()
     }
 }
 
@@ -106,6 +113,27 @@ fun UserInfo(
             text = userName,
             fontSize = 14.sp,
             color = colorScheme.primary,
+        )
+    }
+}
+
+@Composable
+fun Ranking(modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ranking),
+            contentDescription = null,
+            tint = Color.Yellow,
+            modifier = Modifier.size(30.dp)
+        )
+        Spacer(Modifier.size(10.dp))
+        Text(
+            text = "Rankings",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.primary
         )
     }
 }

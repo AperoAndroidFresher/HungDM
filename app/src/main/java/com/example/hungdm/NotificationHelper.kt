@@ -26,32 +26,6 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-//    fun createNotification(title: String, uri: Uri?, isPlaying: Boolean): Notification {
-//        val pauseIntent = Intent(context, AppService::class.java).apply {
-//            action = AppService.ACTION_PAUSE
-//        }
-//        val pausePendingIntent = PendingIntent.getService(
-//            context, 0, pauseIntent,
-//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-//
-//        val closeIntent = Intent(context, AppService::class.java).apply {
-//            action = AppService.ACTION_CLOSE
-//        }
-//        val closePendingIntent = PendingIntent.getService(
-//            context, 1, closeIntent,
-//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-//
-//        return NotificationCompat.Builder(context, channelId)
-//            .setContentTitle(title)
-//            .setContentText(uri?.lastPathSegment ?: "Unknown")
-//            .setSmallIcon(android.R.drawable.ic_media_play)
-//            .setOngoing(isPlaying)
-//            .addAction(android.R.drawable.ic_media_pause, "Pause", pausePendingIntent)
-//            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Close", closePendingIntent)
-//            .build()
-//    }
 
     fun createNotification(songTitle: String, isPlaying: Boolean): Notification {
         val prevIntent = Intent(context, AppService::class.java).apply {

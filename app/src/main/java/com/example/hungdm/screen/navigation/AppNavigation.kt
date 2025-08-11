@@ -43,6 +43,9 @@ import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen
 import com.example.hungdm.screen.profile.ProfileScreen
 import com.example.hungdm.screen.signup.SignupScreen
+import com.example.hungdm.screen.topalbums.TopAlbumsScreen
+import com.example.hungdm.screen.topartists.TopArtistsScreen
+import com.example.hungdm.screen.toptracks.TopTracksScreen
 import com.example.hungdm.ui.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -93,6 +96,18 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
                 is MviEvent.GotoPlaylistDetail -> {
                     backStack.add(Destination.PlaylistDetail(e.playlistId))
+                }
+
+                is MviEvent.GotoTopAlbums -> {
+                    backStack.add(Destination.TopAlbums)
+                }
+
+                is MviEvent.GotoTopTracks -> {
+                    backStack.add(Destination.TopTracks)
+                }
+
+                is MviEvent.GotoTopArtists -> {
+                    backStack.add(Destination.TopArtists)
                 }
 
                 is MviEvent.ShowToast -> {
@@ -207,6 +222,24 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         PlayerScreen(
                             viewModel = viewModel,
                             onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+                    entry<Destination.TopAlbums> {
+                        TopAlbumsScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            topAlbums = state.topAlbums!!
+                        )
+                    }
+                    entry<Destination.TopTracks> {
+                        TopTracksScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            topTracks = state.topTracks!!
+                        )
+                    }
+                    entry<Destination.TopArtists> {
+                        TopArtistsScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            topArtists = state.topArtists!!
                         )
                     }
                 }

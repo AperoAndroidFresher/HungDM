@@ -29,7 +29,11 @@ import com.example.hungdm.utils.UserPreferences
 import com.example.hungdm.data.mapper.toSongEntity
 import com.example.hungdm.data.mapper.toUserEntity
 import com.example.hungdm.data.mapper.toUserInfo
-import com.example.hungdm.data.remote.ApiClient
+import com.example.hungdm.data.remote.musicApi.ApiMusicClient
+import com.example.hungdm.data.remote.musicApi.dto.TopAlbums
+import com.example.hungdm.data.remote.musicApi.dto.TopArtists
+import com.example.hungdm.data.remote.musicApi.dto.TopTracks
+import com.example.hungdm.data.remote.songApi.ApiSongClient
 import com.example.hungdm.service.AppService
 import com.example.hungdm.utils.AppUtils
 import kotlinx.coroutines.flow.update
@@ -145,6 +149,26 @@ class MviViewModel(
 
                 is MviIntent.ChangeTheme -> {
                     _state.value = _state.value.copy(darkTheme = !_state.value.darkTheme)
+                }
+
+                is MviIntent.LoadMusicData -> {
+                    _state.value = _state.value.copy(
+                        topAlbums = getTopAlbums(),
+                        topTracks = getTopTracks(),
+                        topArtists = getTopArtists()
+                    )
+                }
+
+                is MviIntent.OnClickSeeAllTopAlbums -> {
+                    sendEvent(MviEvent.GotoTopAlbums)
+                }
+
+                is MviIntent.OnClickSeeAllTopTracks -> {
+                    sendEvent(MviEvent.GotoTopTracks)
+                }
+
+                is MviIntent.OnClickSeeAllTopArtists -> {
+                    sendEvent(MviEvent.GotoTopArtists)
                 }
 
                 is MviIntent.LoadPlaylistsOfUser -> {
@@ -387,7 +411,7 @@ class MviViewModel(
 
     private suspend fun getSongRemote(): MutableList<Song> = withContext(Dispatchers.IO) {
         return@withContext try {
-            ApiClient.build().getSongRemote().map { it.toSong() }.toMutableList()
+            ApiSongClient.build().getSongRemote().map { it.toSong() }.toMutableList()
         } catch (e: UnknownHostException) {
             Log.d("API_ERROR", "Khong co mang: ${e.message}")
             mutableListOf()
@@ -397,6 +421,51 @@ class MviViewModel(
         } catch (e: Exception) {
             Log.d("API_ERROR", "Loi khac: ${e.message}")
             mutableListOf()
+        }
+    }
+
+    private suspend fun getTopAlbums(): TopAlbums? = withContext(Dispatchers.IO) {
+        return@withContext try {
+            ApiMusicClient.build().getTopAlbums().topalbums
+        } catch (e: UnknownHostException) {
+            Log.d("API_ERROR", "Khong co mang: ${e.message}")
+            null
+        } catch (e: IOException) {
+            Log.d("API_ERROR", "Loi IO: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Log.d("API_ERROR", "Loi khac: ${e.message}")
+            null
+        }
+    }
+
+    private suspend fun getTopTracks(): TopTracks? = withContext(Dispatchers.IO) {
+        return@withContext try {
+            ApiMusicClient.build().getTopTracks().toptracks
+        } catch (e: UnknownHostException) {
+            Log.d("API_ERROR", "Khong co mang: ${e.message}")
+            null
+        } catch (e: IOException) {
+            Log.d("API_ERROR", "Loi IO: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Log.d("API_ERROR", "Loi khac: ${e.message}")
+            null
+        }
+    }
+
+    private suspend fun getTopArtists(): TopArtists? = withContext(Dispatchers.IO) {
+        return@withContext try {
+            ApiMusicClient.build().getTopArtists().topArtists
+        } catch (e: UnknownHostException) {
+            Log.d("API_ERROR", "Khong co mang: ${e.message}")
+            null
+        } catch (e: IOException) {
+            Log.d("API_ERROR", "Loi IO: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Log.d("API_ERROR", "Loi khac: ${e.message}")
+            null
         }
     }
 

@@ -51,21 +51,21 @@ fun LibraryScreen(
     val state = viewModel.state.collectAsState()
     val listSongLocal = state.value.listSongLocal
     val listSongRemote = state.value.listSongRemote
+    val context = LocalContext.current
     var selectedSong by remember { mutableStateOf<Song?>(null) }
+    var isLoadSong by remember { mutableStateOf(true) }
     var showAddSongToPlaylistDialog by remember { mutableStateOf(false) }
     var selectedLocal by remember { mutableStateOf(true) }
-    val context = LocalContext.current
-    var isLoadSong by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        viewModel.processIntent(MviIntent.LoadSongLocal(context))
+        if(listSongLocal.isEmpty()) { viewModel.processIntent(MviIntent.LoadSongLocal(context)) }
         viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
     }
 
     LaunchedEffect(key1 = isLoadSong) {
         if (isLoadSong) {
             viewModel.processIntent(MviIntent.LoadSongRemote(context))
-            delay(2000)
+            delay(1000)
             isLoadSong = false
         }
     }

@@ -5,39 +5,18 @@ import com.example.hungdm.domain.model.UserInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
+
 sealed interface Destination: NavKey {
 
-    @Serializable
-    @SerialName("Login")
     data object Login: Destination
-
-    @Serializable
-    @SerialName("Signup")
     data object Signup : Destination
-
-    @Serializable
-    @SerialName("Home")
     data object Home: Destination
-
-    @Serializable
-    @SerialName("Profile")
     data object Profile: Destination
-
-
-    @Serializable
-    @SerialName("Playlist")
     data object Playlist : Destination
-
-    @Serializable
-    @SerialName("Library")
     data object Library : Destination
-
-    @Serializable
-    @SerialName("PlaylistDetail")
     data class PlaylistDetail(val playlistID: Long) : Destination
-
-    @Serializable
-    @SerialName("Player")
     data object Player : Destination
+    data object TopAlbums: Destination
+    data object TopTracks: Destination
+    data object TopArtists: Destination
 }

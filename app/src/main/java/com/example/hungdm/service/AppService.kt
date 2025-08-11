@@ -2,11 +2,8 @@ package com.example.hungdm.service
 
 import android.content.Intent
 import android.media.MediaPlayer
-import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.example.hungdm.NotificationHelper
 import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.domain.model.Song
 import kotlinx.coroutines.Job
@@ -38,7 +35,7 @@ class AppService : LifecycleService() {
     }
 
     private var mediaPlayer: MediaPlayer? = null
-    private lateinit var notificationHelper: NotificationHelper
+    private var notificationHelper: NotificationHelper? = null
     private var timeJob: Job? = null
 
     override fun onCreate() {
@@ -107,7 +104,7 @@ class AppService : LifecycleService() {
             startUpdatingTime()
             startForeground(
                 1,
-                notificationHelper.createNotification(playerSong.value!!.title, isPlay.value)
+                notificationHelper!!.createNotification(playerSong.value!!.title, isPlay.value)
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -118,7 +115,7 @@ class AppService : LifecycleService() {
         mediaPlayer?.pause()
         startForeground(
             1,
-            notificationHelper.createNotification(playerSong.value!!.title, isPlay.value)
+            notificationHelper!!.createNotification(playerSong.value!!.title, isPlay.value)
         )
     }
 
@@ -137,7 +134,7 @@ class AppService : LifecycleService() {
                 startUpdatingTime()
                 startForeground(
                     1,
-                    notificationHelper.createNotification(playerSong.value!!.title, isPlay.value)
+                    notificationHelper!!.createNotification(playerSong.value!!.title, isPlay.value)
                 )
             }
         }

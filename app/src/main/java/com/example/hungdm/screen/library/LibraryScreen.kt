@@ -33,12 +33,11 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hungdm.R
+import com.example.hungdm.screen.component.NoInternet
 import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
 import com.example.hungdm.screen.component.SongItemLinear
 import com.example.hungdm.screen.library.component.LibraryHeader
-import com.example.hungdm.screen.library.component.ListSongEmpty
-import com.example.hungdm.service.AppService
 import kotlinx.coroutines.delay
 
 @Composable
@@ -150,7 +149,7 @@ fun LibraryScreen(
                         }
                     )
                 } else {
-                    ListSongEmpty(
+                    NoInternet(
                         onCLick = { isLoadSong = true }
                     )
                 }

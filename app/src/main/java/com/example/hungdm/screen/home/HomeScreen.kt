@@ -43,12 +43,14 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hungdm.R
+import com.example.hungdm.screen.component.NoInternet
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.home.component.HomeHeader
 import com.example.hungdm.screen.home.component.Ranking
 import com.example.hungdm.screen.home.component.TopAlbums
 import com.example.hungdm.screen.home.component.TopArtists
 import com.example.hungdm.screen.home.component.TopTracks
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -62,9 +64,14 @@ fun HomeScreen(
     val topTracks = state.topTracks
     val topArtists = state.topArtists
     val context = LocalContext.current
+    var isLoading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        viewModel.processIntent(MviIntent.LoadMusicData(context))
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            viewModel.processIntent(MviIntent.LoadMusicData(context))
+            delay(2000)
+            isLoading = false
+        }
     }
 
     if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_AUDIO)
@@ -81,25 +88,25 @@ fun HomeScreen(
 
     BackHandler { onBack() }
 
-    LazyColumn (
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .background(colorScheme.background)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        item {
-            HomeHeader(
-                userName = state.userInfo.username,
-                image = state.userInfo.img,
-                onClick = {
-                    viewModel.processIntent(MviIntent.OnClickProfile)
-                }
-            )
-            Spacer(modifier = Modifier.size(20.dp))
-        }
+        HomeHeader(
+            userName = state.userInfo.username,
+            image = state.userInfo.img,
+            onClick = {
+                viewModel.processIntent(MviIntent.OnClickProfile)
+            }
+        )
+        Spacer(modifier = Modifier.size(20.dp))
 
         if (topAlbums == null || topTracks == null || topArtists == null) {
-            item {
+            if (isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -111,11 +118,22 @@ fun HomeScreen(
                         progress = { progress },
                     )
                 }
+            } else {
+                NoInternet(onCLick = { isLoading = true })
             }
         } else {
-            item { TopAlbums(topAlbums = topAlbums, onClickSeeAll = { viewModel.processIntent(MviIntent.OnClickSeeAllTopAlbums) }) }
-            item { TopTracks(topTracks = topTracks, onClickSeeAll = { viewModel.processIntent(MviIntent.OnClickSeeAllTopTracks) }) }
-            item { TopArtists(topArtists = topArtists, onClickSeeAll = { viewModel.processIntent(MviIntent.OnClickSeeAllTopArtists) }) }
+            TopAlbums(
+                topAlbums = topAlbums,
+                onClickSeeAll = { viewModel.processIntent(MviIntent.OnClickSeeAllTopAlbums) })
+
+            TopTracks(
+                topTracks = topTracks,
+                onClickSeeAll = { viewModel.processIntent(MviIntent.OnClickSeeAllTopTracks) })
+
+            TopArtists(
+                topArtists = topArtists,
+                onClickSeeAll = { viewModel.processIntent(MviIntent.OnClickSeeAllTopArtists) })
         }
+
     }
 }

@@ -34,6 +34,7 @@ sealed interface MviIntent{
     data class CheckSignup(val userInfo: UserInfo) : MviIntent
     data object OnClickProfile: MviIntent
     data class EditProfile(val userInfo: UserInfo) : MviIntent
+    data class OnLogout(val context: Context): MviIntent
 
     data class LoadMusicData(val context: Context): MviIntent
     data object OnClickSeeAllTopAlbums: MviIntent

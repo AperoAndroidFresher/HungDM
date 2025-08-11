@@ -1,5 +1,6 @@
 package com.example.hungdm.screen.home.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +36,7 @@ import coil.request.ImageRequest
 import com.example.hungdm.R
 import com.example.hungdm.data.remote.musicApi.dto.TopTracks
 import com.example.hungdm.data.remote.musicApi.dto.Track
+import com.example.hungdm.utils.AppUtils
 
 @Composable
 fun TopTracks(
@@ -86,13 +89,15 @@ fun TopTracksContent(
     modifier: Modifier = Modifier,
     topTracks: TopTracks
 ) {
+    val tracks = topTracks.track.take(5)
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.height(160.dp)
     ) {
-        items(topTracks.track.take(5)) {
+        items(tracks.size) {
             TopTracksItem(
-                track = it
+                track = tracks[it],
+                color = AppUtils.color[it%8]
             )
         }
 
@@ -102,7 +107,8 @@ fun TopTracksContent(
 @Composable
 fun TopTracksItem(
     modifier: Modifier = Modifier,
-    track: Track
+    track: Track,
+    color: Color
 ) {
     Box(
         modifier = modifier.size(150.dp).wrapContentSize()
@@ -134,6 +140,7 @@ fun TopTracksItem(
         TopTracksInfo(
             listeners = track.listeners,
             name = track.artist.name,
+            color = color,
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(10.dp)
@@ -145,7 +152,8 @@ fun TopTracksItem(
 fun TopTracksInfo(
     modifier: Modifier = Modifier,
     listeners: String,
-    name: String
+    name: String,
+    color: Color
 ) {
     Column(modifier = modifier) {
         Row {
@@ -172,5 +180,6 @@ fun TopTracksInfo(
                 maxLines = 1,
             )
         }
+        Spacer(Modifier.height(4.dp).width(130.dp).background(color))
     }
 }

@@ -141,6 +141,9 @@ fun ProfileScreen(
                     }
                     isEdit = false
                 }
+            },
+            onLogout = {
+                viewModel.processIntent(MviIntent.OnLogout(context))
             }
         )
         PopUp(

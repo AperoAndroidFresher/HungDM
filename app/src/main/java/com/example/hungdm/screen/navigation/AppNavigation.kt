@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.example.hungdm.utils.UserPreferences
 import com.example.hungdm.screen.component.PlayerBottomBar
 import com.example.hungdm.screen.mvi.MviEvent
 import com.example.hungdm.screen.mvi.MviViewModel
@@ -47,6 +46,7 @@ import com.example.hungdm.screen.topalbums.TopAlbumsScreen
 import com.example.hungdm.screen.topartists.TopArtistsScreen
 import com.example.hungdm.screen.toptracks.TopTracksScreen
 import com.example.hungdm.ui.theme.AppTheme
+import com.example.hungdm.utils.AppUtils
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -66,7 +66,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     var selectedBottomBar by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        val userId = UserPreferences.getUser(context)
+        val userId = AppUtils.getUser(context)
 
         if (userId != null) {
             backStack.clear()
@@ -79,6 +79,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         viewModel.event.collect { e ->
             when (e) {
                 is MviEvent.GotoLogin -> {
+                    backStack.clear()
                     backStack.add(Destination.Login)
                 }
 
@@ -124,7 +125,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         Scaffold(
             bottomBar = {
                 val showBottomNav = backStack.lastOrNull()?.let {
-                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile && it !is Destination.Player
+                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile &&
+                            it !is Destination.Player && it !is Destination.TopTracks &&
+                            it !is Destination.TopAlbums && it !is Destination.TopArtists
                 } ?: false
 
                 if (showBottomNav) {

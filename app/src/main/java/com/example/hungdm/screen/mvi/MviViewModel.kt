@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.example.hungdm.utils.UserPreferences
 import com.example.hungdm.data.mapper.toSongEntity
 import com.example.hungdm.data.mapper.toUserEntity
 import com.example.hungdm.data.mapper.toUserInfo
@@ -109,7 +108,7 @@ class MviViewModel(
 
                     if (user != null) {
                         _state.value = _state.value.copy(userInfo = user.toUserInfo())
-                        UserPreferences.saveUser(intent.context, user.userId)
+                        AppUtils.saveUser(intent.context, user.userId)
                         sendEvent(MviEvent.GotoHome)
                     } else {
                         sendEvent(MviEvent.ShowToast("Đăng nhập thất bại"))
@@ -145,6 +144,16 @@ class MviViewModel(
                         userRepository.updateUser(intent.userInfo.toUserEntity())
                     }
                     _state.value = _state.value.copy(userInfo = intent.userInfo)
+                }
+
+                is MviIntent.OnLogout -> {
+                    AppUtils.clear(intent.context)
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_CLOSE
+                    }
+                    intent.context.startForegroundService(tmpIntent)
+                    _state.value = MviState()
+                    sendEvent(MviEvent.GotoLogin)
                 }
 
                 is MviIntent.ChangeTheme -> {

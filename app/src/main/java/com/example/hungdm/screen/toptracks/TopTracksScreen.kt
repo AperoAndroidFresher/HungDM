@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -23,11 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
-import com.example.hungdm.data.remote.musicApi.dto.TopArtists
 import com.example.hungdm.data.remote.musicApi.dto.TopTracks
-import com.example.hungdm.screen.home.component.TopArtistsItem
 import com.example.hungdm.screen.home.component.TopTracksItem
-import com.example.hungdm.screen.topartists.TopArtistsHeader
+import com.example.hungdm.utils.AppUtils
 
 @Composable
 fun TopTracksScreen(
@@ -38,7 +35,7 @@ fun TopTracksScreen(
     BackHandler { onBack() }
 
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = modifier.padding(16.dp)
     ) {
         TopTracksHeader(onBack = onBack)
         Spacer(Modifier.size(10.dp))
@@ -47,9 +44,10 @@ fun TopTracksScreen(
             verticalArrangement = Arrangement.spacedBy(30.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            items(topTracks.track){
+            items(topTracks.track.size){
                 TopTracksItem(
-                    track = it
+                    track = topTracks.track[it],
+                    color = AppUtils.color[it%8]
                 )
             }
         }

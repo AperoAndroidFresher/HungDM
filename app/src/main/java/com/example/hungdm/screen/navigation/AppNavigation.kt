@@ -3,6 +3,7 @@ package com.example.hungdm.screen.navigation
 import android.app.Activity
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -29,19 +30,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.example.hungdm.utils.UserPreferences
-import com.example.hungdm.data.mapper.toUserInfo
+import com.example.hungdm.screen.SettingScreen
+import com.example.hungdm.screen.component.PlayerBottomBar
 import com.example.hungdm.screen.mvi.MviEvent
 import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen
 import com.example.hungdm.screen.library.LibraryScreen
 import com.example.hungdm.screen.login.LoginScreen
 import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.screen.player.PlayerScreen
 import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen
 import com.example.hungdm.screen.profile.ProfileScreen
 import com.example.hungdm.screen.signup.SignupScreen
+import com.example.hungdm.screen.TopAlbumsScreen
+import com.example.hungdm.screen.TopArtistsScreen
+import com.example.hungdm.screen.TopTracksScreen
 import com.example.hungdm.ui.theme.AppTheme
+import com.example.hungdm.utils.AppUtils
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -49,23 +55,24 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     val viewModel: MviViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
+    val backStack = remember { mutableStateListOf<Destination>(Destination.Login) }
     val context = LocalContext.current
     val activity = context as? Activity
+
     val bottomItem = listOf(
         BottomItem("Home", Icons.Default.Home, Destination.Home),
         BottomItem("Library", Icons.Default.DateRange, Destination.Library),
         BottomItem("Playlist", Icons.Default.PlayArrow, Destination.Playlist)
     )
-    val backStack = remember { mutableStateListOf<Destination>(Destination.Login) }
     var selectedBottomBar by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        val user = UserPreferences.getUser(context)
+        val userId = AppUtils.getUser(context)
 
-        if (user != null) {
+        if (userId != null) {
             backStack.clear()
             backStack.add(Destination.Home)
-            viewModel.processIntent(MviIntent.EditProfile(user.toUserInfo()))
+            viewModel.processIntent(MviIntent.GetUser(userId))
         }
     }
 
@@ -73,6 +80,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         viewModel.event.collect { e ->
             when (e) {
                 is MviEvent.GotoLogin -> {
+                    backStack.clear()
                     backStack.add(Destination.Login)
                 }
 
@@ -92,6 +100,22 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     backStack.add(Destination.PlaylistDetail(e.playlistId))
                 }
 
+                is MviEvent.GotoTopAlbums -> {
+                    backStack.add(Destination.TopAlbums)
+                }
+
+                is MviEvent.GotoTopTracks -> {
+                    backStack.add(Destination.TopTracks)
+                }
+
+                is MviEvent.GotoTopArtists -> {
+                    backStack.add(Destination.TopArtists)
+                }
+
+                is MviEvent.GotoSettings -> {
+                    backStack.add(Destination.Settings)
+                }
+
                 is MviEvent.ShowToast -> {
                     Toast.makeText(context, e.mess, LENGTH_SHORT).show()
                 }
@@ -106,25 +130,45 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         Scaffold(
             bottomBar = {
                 val showBottomNav = backStack.lastOrNull()?.let {
-                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile
+                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile &&
+                            it !is Destination.Player && it !is Destination.TopTracks &&
+                            it !is Destination.TopAlbums && it !is Destination.TopArtists
                 } ?: false
 
                 if (showBottomNav) {
-                    NavigationBar(
-                        windowInsets = NavigationBarDefaults.windowInsets,
-                        containerColor = colorScheme.background
-                    ) {
-                        bottomItem.forEachIndexed { index, item ->
-                            NavigationBarItem(
-                                selected = selectedBottomBar == index,
+                    Column {
+                        if(state.playerPlaylist!=null || state.playerListSong!=null){
+                            PlayerBottomBar(
+                                song = state.playerSong!!,
+                                playerTime = state.playerTime,
+                                isPlay = state.isPlay,
                                 onClick = {
-                                    selectedBottomBar = index
-                                    backStack.clear()
-                                    backStack.add(item.destination)
+                                    backStack.add(Destination.Player)
                                 },
-                                icon = { Icon(item.icon, null) },
-                                label = { Text(item.label, color = colorScheme.primary) }
+                                onPauseClick = {
+                                    viewModel.processIntent(MviIntent.OnChangeSongPlayState(context))
+                                },
+                                onCloseClick = {
+                                    viewModel.processIntent(MviIntent.OnClickClosePlayer(context))
+                                }
                             )
+                        }
+                        NavigationBar(
+                            windowInsets = NavigationBarDefaults.windowInsets,
+                            containerColor = colorScheme.background
+                        ) {
+                            bottomItem.forEachIndexed { index, item ->
+                                NavigationBarItem(
+                                    selected = selectedBottomBar == index,
+                                    onClick = {
+                                        selectedBottomBar = index
+                                        backStack.clear()
+                                        backStack.add(item.destination)
+                                    },
+                                    icon = { Icon(item.icon, null) },
+                                    label = { Text(item.label, color = colorScheme.primary) }
+                                )
+                            }
                         }
                     }
                 }
@@ -180,6 +224,35 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             viewModel = viewModel,
                             destination = destination,
                             onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+                    entry<Destination.Player> {
+                        PlayerScreen(
+                            viewModel = viewModel,
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+                    entry<Destination.TopAlbums> {
+                        TopAlbumsScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            topAlbums = state.topAlbums!!
+                        )
+                    }
+                    entry<Destination.TopTracks> {
+                        TopTracksScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            topTracks = state.topTracks!!
+                        )
+                    }
+                    entry<Destination.TopArtists> {
+                        TopArtistsScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            topArtists = state.topArtists!!
+                        )
+                    }
+                    entry<Destination.Settings> {
+                        SettingScreen(
+                            onBack = { backStack.removeLastOrNull() },
                         )
                     }
                 }

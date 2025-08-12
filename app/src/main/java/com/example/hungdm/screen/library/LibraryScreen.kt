@@ -1,5 +1,6 @@
 package com.example.hungdm.screen.library
 
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,11 +33,11 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hungdm.R
+import com.example.hungdm.screen.component.NoInternet
 import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
 import com.example.hungdm.screen.component.SongItemLinear
 import com.example.hungdm.screen.library.component.LibraryHeader
-import com.example.hungdm.screen.library.component.ListSongEmpty
 import kotlinx.coroutines.delay
 
 @Composable
@@ -49,21 +50,21 @@ fun LibraryScreen(
     val state = viewModel.state.collectAsState()
     val listSongLocal = state.value.listSongLocal
     val listSongRemote = state.value.listSongRemote
+    val context = LocalContext.current
     var selectedSong by remember { mutableStateOf<Song?>(null) }
+    var isLoadSong by remember { mutableStateOf(true) }
     var showAddSongToPlaylistDialog by remember { mutableStateOf(false) }
     var selectedLocal by remember { mutableStateOf(true) }
-    val context = LocalContext.current
-    var isLoadSong by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        viewModel.processIntent(MviIntent.LoadSongLocal(context))
+        if(listSongLocal.isEmpty()) { viewModel.processIntent(MviIntent.LoadSongLocal(context)) }
         viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
     }
 
     LaunchedEffect(key1 = isLoadSong) {
         if (isLoadSong) {
             viewModel.processIntent(MviIntent.LoadSongRemote(context))
-            delay(2000)
+            delay(1000)
             isLoadSong = false
         }
     }
@@ -100,7 +101,7 @@ fun LibraryScreen(
                 )
             }
         } else {
-            if(selectedLocal){
+            if (selectedLocal) {
                 LibraryContent(
                     listSong = listSongLocal,
                     onClickShowOption = {
@@ -111,10 +112,20 @@ fun LibraryScreen(
                     },
                     onClickOption2 = {
                         AppUtils.shareSong(context, selectedSong!!)
+                    },
+                    onCLickSongPlay = {
+                        viewModel.processIntent(
+                            MviIntent.OnClickPlayer(
+                                song = it,
+                                playerListSong = listSongLocal,
+                                playerPlaylist = null,
+                                context = context
+                            )
+                        )
                     }
                 )
             } else {
-                if(listSongRemote.isNotEmpty()){
+                if (listSongRemote.isNotEmpty()) {
                     LibraryContent(
                         listSong = listSongRemote,
                         onClickShowOption = {
@@ -125,10 +136,20 @@ fun LibraryScreen(
                         },
                         onClickOption2 = {
                             AppUtils.shareSong(context, selectedSong!!)
+                        },
+                        onCLickSongPlay = {
+                            viewModel.processIntent(
+                                MviIntent.OnClickPlayer(
+                                    song = it,
+                                    playerListSong = listSongRemote,
+                                    playerPlaylist = null,
+                                    context = context
+                                )
+                            )
                         }
                     )
                 } else {
-                    ListSongEmpty(
+                    NoInternet(
                         onCLick = { isLoadSong = true }
                     )
                 }
@@ -160,7 +181,8 @@ fun LibraryContent(
     listSong: List<Song> = emptyList(),
     onClickShowOption: (Song) -> Unit = {},
     onClickOption1: () -> Unit = {},
-    onClickOption2: () -> Unit = {}
+    onClickOption2: () -> Unit = {},
+    onCLickSongPlay: (Song) -> Unit = {}
 ) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
@@ -183,7 +205,8 @@ fun LibraryContent(
                 onClickOption2 = onClickOption2,
                 onDismissRequest = {
                     showOption = false
-                }
+                },
+                onCLickSongPlay = { onCLickSongPlay(it) }
             )
         }
     }

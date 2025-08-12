@@ -2,9 +2,9 @@ package com.example.hungdm.screen.mvi
 
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.net.http.HttpException
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -14,11 +14,9 @@ import com.example.hungdm.data.db.entity.PlaylistSongReference
 import com.example.hungdm.data.mapper.toSong
 import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.domain.model.Song
-import com.example.hungdm.domain.model.getAlbumArt
 import com.example.hungdm.domain.repo.PlaylistRepository
 import com.example.hungdm.domain.repo.UserRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -27,21 +25,22 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.example.hungdm.utils.UserPreferences
 import com.example.hungdm.data.mapper.toSongEntity
 import com.example.hungdm.data.mapper.toUserEntity
 import com.example.hungdm.data.mapper.toUserInfo
-import com.example.hungdm.data.remote.ApiClient
-import com.example.hungdm.data.remote.SongRemote
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.hungdm.data.remote.musicApi.ApiMusicClient
+import com.example.hungdm.data.remote.musicApi.dto.TopAlbums
+import com.example.hungdm.data.remote.musicApi.dto.TopArtists
+import com.example.hungdm.data.remote.musicApi.dto.TopTracks
+import com.example.hungdm.data.remote.songApi.ApiSongClient
+import com.example.hungdm.service.AppService
+import com.example.hungdm.utils.AppUtils
+import kotlinx.coroutines.flow.update
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
-import java.net.SocketTimeoutException
 import java.net.URL
 import java.net.UnknownHostException
 
@@ -55,9 +54,49 @@ class MviViewModel(
     private val _event = MutableSharedFlow<MviEvent>()
     val event: SharedFlow<MviEvent> = _event.asSharedFlow()
 
+    init {
+        viewModelScope.launch {
+            AppService.playerPlaylist.collect{ playerPlaylist ->
+                _state.update { it.copy(playerPlaylist = playerPlaylist) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.playerListSong.collect{ playerListSong ->
+                _state.update { it.copy(playerListSong = playerListSong) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.playerSong.collect { playerSong ->
+                _state.update { it.copy(playerSong = playerSong) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.playerSongIndex.collect { playerSongIndex ->
+                _state.update { it.copy(playerSongIndex = playerSongIndex) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.playerTime.collect { playerTime ->
+                _state.update { it.copy(playerTime = playerTime) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.isPlay.collect { isPlay ->
+                _state.update { it.copy(isPlay = isPlay) }
+            }
+        }
+    }
+
     fun processIntent(intent: MviIntent) {
         viewModelScope.launch  {
             when (intent) {
+                is MviIntent.GetUser -> {
+                    val user =  withContext(Dispatchers.IO) {
+                        userRepository.getUserById(intent.userId)
+                    }
+                    _state.value = _state.value.copy(userInfo = user!!.toUserInfo())
+                }
+
                 is MviIntent.OnClickSignup -> {
                     sendEvent(MviEvent.GotoSignup)
                 }
@@ -68,10 +107,8 @@ class MviViewModel(
                     }
 
                     if (user != null) {
-                        _state.value = _state.value.copy(
-                            userInfo = user.toUserInfo()
-                        )
-                        UserPreferences.saveUser(intent.context, user)
+                        _state.value = _state.value.copy(userInfo = user.toUserInfo())
+                        AppUtils.saveUser(intent.context, user.userId)
                         sendEvent(MviEvent.GotoHome)
                     } else {
                         sendEvent(MviEvent.ShowToast("Đăng nhập thất bại"))
@@ -106,13 +143,45 @@ class MviViewModel(
                     withContext(Dispatchers.IO) {
                         userRepository.updateUser(intent.userInfo.toUserEntity())
                     }
-                    _state.value = _state.value.copy(
-                        userInfo = intent.userInfo
-                    )
+                    _state.value = _state.value.copy(userInfo = intent.userInfo)
+                }
+
+                is MviIntent.OnLogout -> {
+                    AppUtils.clear(intent.context)
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_CLOSE
+                    }
+                    intent.context.startForegroundService(tmpIntent)
+                    _state.value = MviState()
+                    sendEvent(MviEvent.GotoLogin)
+                }
+
+                is MviIntent.OnClickSetting -> {
+                    sendEvent(MviEvent.GotoSettings)
                 }
 
                 is MviIntent.ChangeTheme -> {
                     _state.value = _state.value.copy(darkTheme = !_state.value.darkTheme)
+                }
+
+                is MviIntent.LoadMusicData -> {
+                    _state.value = _state.value.copy(
+                        topAlbums = getTopAlbums(),
+                        topTracks = getTopTracks(),
+                        topArtists = getTopArtists()
+                    )
+                }
+
+                is MviIntent.OnClickSeeAllTopAlbums -> {
+                    sendEvent(MviEvent.GotoTopAlbums)
+                }
+
+                is MviIntent.OnClickSeeAllTopTracks -> {
+                    sendEvent(MviEvent.GotoTopTracks)
+                }
+
+                is MviIntent.OnClickSeeAllTopArtists -> {
+                    sendEvent(MviEvent.GotoTopArtists)
                 }
 
                 is MviIntent.LoadPlaylistsOfUser -> {
@@ -123,9 +192,7 @@ class MviViewModel(
                     val songs = withContext(Dispatchers.IO) {
                         getSongExternal(intent.context)
                     }
-                    _state.value = _state.value.copy(
-                        listSongLocal = songs,
-                    )
+                    _state.value = _state.value.copy(listSongLocal = songs,)
                 }
 
                 is MviIntent.LoadSongRemote -> {
@@ -190,6 +257,56 @@ class MviViewModel(
 
                 is MviIntent.OnClickPlaylistDetail -> {
                     sendEvent(MviEvent.GotoPlaylistDetail(intent.playlistId))
+                }
+
+                is MviIntent.OnClickPlayer -> {
+                    val playerSongIndex = if(intent.playerListSong!=null) {
+                        intent.playerListSong.indexOf(intent.song)
+                    } else intent.playerPlaylist!!.listSong.indexOf(intent.song)
+
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_PLAY
+                        putExtra(AppService.EXTRA_PLAYLIST,intent.playerPlaylist)
+                        putExtra(AppService.EXTRA_LIST_SONG, ArrayList(intent.playerListSong?: emptyList()))
+                        putExtra(AppService.EXTRA_SONG, intent.song)
+                        putExtra(AppService.EXTRA_INDEX, playerSongIndex)
+                    }
+                    intent.context.startForegroundService(tmpIntent)
+                }
+
+                is MviIntent.OnClickClosePlayer -> {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_CLOSE
+                    }
+                    intent.context.startForegroundService(tmpIntent)
+                }
+
+                is MviIntent.OnChangeSongPlayState -> {
+                    if(_state.value.isPlay){
+                        val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                            action = AppService.ACTION_PAUSE
+                        }
+                        intent.context.startForegroundService(tmpIntent)
+                    } else {
+                        val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                            action = AppService.ACTION_RESUME
+                        }
+                        intent.context.startForegroundService(tmpIntent)
+                    }
+                }
+
+                is MviIntent.OnClickNextSong -> {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_NEXT
+                    }
+                    intent.context.startForegroundService(tmpIntent)
+                }
+
+                is MviIntent.OnClickPreviousSong -> {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_PREVIOUS
+                    }
+                    intent.context.startForegroundService(tmpIntent)
                 }
             }
         }
@@ -261,7 +378,7 @@ class MviViewModel(
                     val albumId = it.getLong(albumIdColumn)
                     val songUri =
                         ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-                    val img = getAlbumArt(context, albumId)
+                    val img = AppUtils.getAlbumArt(context, albumId)
                     songs.add(Song(id, title, artist, duration, songUri, img))
                 }
             }
@@ -307,7 +424,7 @@ class MviViewModel(
 
     private suspend fun getSongRemote(): MutableList<Song> = withContext(Dispatchers.IO) {
         return@withContext try {
-            ApiClient.build().getSongRemote().map { it.toSong() }.toMutableList()
+            ApiSongClient.build().getSongRemote().map { it.toSong() }.toMutableList()
         } catch (e: UnknownHostException) {
             Log.d("API_ERROR", "Khong co mang: ${e.message}")
             mutableListOf()
@@ -317,6 +434,51 @@ class MviViewModel(
         } catch (e: Exception) {
             Log.d("API_ERROR", "Loi khac: ${e.message}")
             mutableListOf()
+        }
+    }
+
+    private suspend fun getTopAlbums(): TopAlbums? = withContext(Dispatchers.IO) {
+        return@withContext try {
+            ApiMusicClient.build().getTopAlbums().topalbums
+        } catch (e: UnknownHostException) {
+            Log.d("API_ERROR", "Khong co mang: ${e.message}")
+            null
+        } catch (e: IOException) {
+            Log.d("API_ERROR", "Loi IO: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Log.d("API_ERROR", "Loi khac: ${e.message}")
+            null
+        }
+    }
+
+    private suspend fun getTopTracks(): TopTracks? = withContext(Dispatchers.IO) {
+        return@withContext try {
+            ApiMusicClient.build().getTopTracks().toptracks
+        } catch (e: UnknownHostException) {
+            Log.d("API_ERROR", "Khong co mang: ${e.message}")
+            null
+        } catch (e: IOException) {
+            Log.d("API_ERROR", "Loi IO: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Log.d("API_ERROR", "Loi khac: ${e.message}")
+            null
+        }
+    }
+
+    private suspend fun getTopArtists(): TopArtists? = withContext(Dispatchers.IO) {
+        return@withContext try {
+            ApiMusicClient.build().getTopArtists().topArtists
+        } catch (e: UnknownHostException) {
+            Log.d("API_ERROR", "Khong co mang: ${e.message}")
+            null
+        } catch (e: IOException) {
+            Log.d("API_ERROR", "Loi IO: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Log.d("API_ERROR", "Loi khac: ${e.message}")
+            null
         }
     }
 

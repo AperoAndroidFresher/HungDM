@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -34,7 +36,8 @@ fun ProfileInput(
     onValueChangePhone: (String) -> Unit ={},
     onValueChangeUni: (String) -> Unit ={},
     onValueChangeDesc: (String) -> Unit ={},
-    onSubmit: () -> Unit = {}
+    onSubmit: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -93,6 +96,17 @@ fun ProfileInput(
                     .height(60.dp),
             ) {
                 Text(text = "Submit", fontSize = 16.sp, color = Color.White)
+            }
+        } else {
+            Button(
+                onClick = onLogout,
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(colorScheme.onSecondary),
+                modifier = Modifier
+                    .width(170.dp)
+                    .height(60.dp),
+            ) {
+                Text(text = "Log out", fontSize = 16.sp, color = Color.Red)
             }
         }
     }

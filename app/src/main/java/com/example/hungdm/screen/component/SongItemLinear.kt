@@ -42,14 +42,14 @@ fun SongItemLinear(
     onClickOption1: () -> Unit = {},
     onClickOption2: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
-    onCLickShowPlaylistDetail: () -> Unit = {}
+    onCLickSongPlay: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable {
-                onCLickShowPlaylistDetail()
+                onCLickSongPlay()
             }
     ) {
         SongImage(

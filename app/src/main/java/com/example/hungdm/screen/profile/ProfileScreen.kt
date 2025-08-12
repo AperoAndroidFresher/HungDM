@@ -100,7 +100,7 @@ fun ProfileScreen(
             onChangeAvatar = {
                 launcher.launch(arrayOf("image/*"))
             },
-            imageUri = userInfo.img ?: R.drawable.img
+            image = userInfo.img ?: R.drawable.img
         )
         Spacer(Modifier.size(20.dp))
         ProfileInput(
@@ -141,6 +141,9 @@ fun ProfileScreen(
                     }
                     isEdit = false
                 }
+            },
+            onLogout = {
+                viewModel.processIntent(MviIntent.OnLogout(context))
             }
         )
         PopUp(

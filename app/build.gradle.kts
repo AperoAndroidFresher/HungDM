@@ -5,7 +5,7 @@ plugins {
 
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
     id("kotlin-kapt")
-
+    id("kotlin-parcelize")
 }
 
 android {
@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.hungdm"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.lifecycle.service)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,5 +81,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation(libs.lottie.compose)
+
+    implementation("androidx.media:media:1.7.0")
 
 }

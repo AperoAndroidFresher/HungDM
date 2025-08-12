@@ -90,6 +90,16 @@ fun PlaylistDetailScreen(
                     },
                     onDismissRequest = {
                         showOption = false
+                    },
+                    onCLickSongPlay = {
+                        viewModel.processIntent(
+                            MviIntent.OnClickPlayer(
+                                song = playlist.listSong[it],
+                                playerListSong = null,
+                                playerPlaylist = playlist,
+                                context = context
+                            )
+                        )
                     }
                 )
             }

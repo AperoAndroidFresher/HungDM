@@ -1,6 +1,6 @@
-package com.example.hungdm.data.remote
+package com.example.hungdm.data.remote.songApi
 
-data class SongRemote(
+data class SongDTO(
     val title: String,
     val artist: String,
     val kind: String,

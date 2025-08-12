@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -81,7 +82,7 @@ fun SettingHeader(
             )
         }
         Text(
-            text = "Settings",
+            text = stringResource(R.string.setting),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
@@ -124,7 +125,7 @@ fun SettingContent(
             )
         }
         Text(
-            text = "Language",
+            text = stringResource(R.string.language),
             fontSize = 20.sp,
             color = colorScheme.primary,
         )
@@ -133,7 +134,7 @@ fun SettingContent(
             onClick = onCLickShowMenu
         ) {
             Text(
-                text = "English",
+                text = stringResource(R.string.english),
                 fontSize = 14.sp,
                 color = colorScheme.primary,
             )
@@ -161,30 +162,23 @@ fun MenuLanguage(
         modifier = modifier.background(Color.DarkGray),
     ) {
         DropdownMenuItem(
-            text = { Text("English", color = Color.White) },
+            text = { Text(stringResource(R.string.english), color = Color.White) },
             onClick = {
                 onClickOption1()
                 onDismissRequest()
             }
         )
         DropdownMenuItem(
-            text = { Text("Korean", color = Color.White) },
+            text = { Text(stringResource(R.string.vietnamese), color = Color.White) },
             onClick = {
                 onClickOption2()
                 onDismissRequest()
             }
         )
         DropdownMenuItem(
-            text = { Text("Vietnamese", color = Color.White) },
+            text = { Text(stringResource(R.string.japanese), color = Color.White) },
             onClick = {
                 onClickOption3()
-                onDismissRequest()
-            }
-        )
-        DropdownMenuItem(
-            text = { Text("Japanese", color = Color.White) },
-            onClick = {
-                onClickOption4()
                 onDismissRequest()
             }
         )

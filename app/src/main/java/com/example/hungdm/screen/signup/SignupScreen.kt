@@ -15,7 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.hungdm.R
 import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.component.Logo
 import com.example.hungdm.domain.model.UserInfo
@@ -47,7 +49,7 @@ fun SignupScreen(
     ) {
         Logo(
             isSignup = true,
-            title = "Sign up",
+            title = stringResource(R.string.signup),
             onBack = onBack
         )
         Spacer(Modifier.size(40.dp))

@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,7 +58,7 @@ fun PlaylistDetailScreen(
     ) {
 
         Text(
-            text = "Playlist detail",
+            text = stringResource(R.string.playlist_detail),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary
@@ -74,8 +75,8 @@ fun PlaylistDetailScreen(
                 SongItemLinear(
                     song = playlist.listSong[it],
                     showOption = showOption,
-                    option1 = "Remove from playlist",
-                    option2 = "Share",
+                    option1 = stringResource(R.string.remove_playlist),
+                    option2 = stringResource(R.string.share),
                     icon1 = R.drawable.outline_delete_24,
                     icon2 = R.drawable.outline_share_24,
                     onClickShowOption = {

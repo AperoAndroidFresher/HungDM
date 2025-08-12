@@ -22,11 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.hungdm.R
 
 @Composable
 fun PlaylistDialog(
@@ -57,7 +59,7 @@ fun PlaylistDialog(
             OutlinedTextField(
                 value = playlistTitle,
                 onValueChange = { playlistTitle = it },
-                placeholder = { Text("Give your playlist a title", color = Color.Gray) },
+                placeholder = { Text(stringResource(R.string.enter_name_playlist), color = Color.Gray) },
                 singleLine = true,
                 textStyle = TextStyle(
                     color = Color.White,
@@ -94,7 +96,7 @@ fun DialogActionButtons(
             onClick = onCancel,
             modifier = Modifier.width(145.dp)
         ) {
-            Text("Cancel", color = Color.White)
+            Text(stringResource(R.string.cancel), color = Color.White)
         }
         TextButton(
             onClick = onConfirm,

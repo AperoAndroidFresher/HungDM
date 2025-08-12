@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,7 +58,7 @@ fun TopArtistsTitle(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Top Artists",
+            text = stringResource(R.string.top_artist),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
@@ -67,7 +68,7 @@ fun TopArtistsTitle(
             onClick = onClickSeeAll
         ) {
             Text(
-                text = "See all",
+                text = stringResource(R.string.see_all),
                 fontSize = 14.sp,
                 color = colorScheme.primary,
                 textDecoration = TextDecoration.Underline

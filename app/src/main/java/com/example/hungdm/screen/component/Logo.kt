@@ -25,7 +25,7 @@ fun Logo(
     modifier: Modifier = Modifier,
     isSignup: Boolean = false,
     onBack: ()->Unit = {},
-    title: String = "Login to your account",
+    title: String = "",
 ) {
     Box(
         modifier = modifier.fillMaxWidth()

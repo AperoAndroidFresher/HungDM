@@ -94,16 +94,16 @@ fun ItemGrid(
             }
         }
         Text(
-            modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth(),
             text = playlist?.title ?: song.title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(4.dp)
+                .fillMaxWidth()
         )
         Text(
             text = playlist?.songNumberStr ?: song.artist,

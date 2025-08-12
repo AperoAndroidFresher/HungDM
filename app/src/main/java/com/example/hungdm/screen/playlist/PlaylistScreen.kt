@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
 import com.example.hungdm.domain.model.Playlist
@@ -81,8 +82,8 @@ fun PlaylistScreen(
                         modifier = Modifier.fillMaxWidth(),
                         playlist = playlists[it],
                         showOption = showOption,
-                        option1 = "Remove playlist",
-                        option2 = "Rename",
+                        option1 = stringResource(R.string.remove_playlist),
+                        option2 = stringResource(R.string.rename),
                         icon1 = R.drawable.outline_delete_24,
                         icon2 = R.drawable.outline_edit_24,
                         onClickShowOption = {
@@ -113,8 +114,8 @@ fun PlaylistScreen(
 
     if (showCreatePlaylistDialog) {
         PlaylistDialog(
-            title = "New playlist",
-            confirmText = "Create",
+            title = stringResource(R.string.new_playlist),
+            confirmText = stringResource(R.string.create),
             onAction = {
                 viewModel.processIntent(MviIntent.CreatePlaylist(it))
                 viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
@@ -126,8 +127,8 @@ fun PlaylistScreen(
     }
     if (showRenamePlaylistDialog) {
         PlaylistDialog(
-            title = "Rename playlist",
-            confirmText = "Rename",
+            title = stringResource(R.string.rename),
+            confirmText = stringResource(R.string.rename),
             onAction = {
                 viewModel.processIntent(MviIntent.RenamePlaylist(it,selectedPlaylist!!))
             },
@@ -149,7 +150,7 @@ fun EmptyPlaylist(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "You don’t have any playlists.\n Click the '+' button to add",
+            text = stringResource(R.string.empty_playlist),
             color = colorScheme.primary
         )
         IconButton(
@@ -159,7 +160,7 @@ fun EmptyPlaylist(
                 .size(48.dp)
                 .border(1.dp, colorScheme.primary, shape = CircleShape)
         ) {
-            Icon(painterResource(R.drawable.outline_add_24), contentDescription = "Add", tint = colorScheme.primary)
+            Icon(painterResource(R.drawable.outline_add_24), contentDescription = null, tint = colorScheme.primary)
         }
     }
 }

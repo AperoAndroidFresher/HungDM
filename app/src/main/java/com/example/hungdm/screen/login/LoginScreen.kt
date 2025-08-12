@@ -15,7 +15,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.hungdm.R
 import com.example.hungdm.component.Logo
 import com.example.hungdm.domain.model.UserInfo
 import com.example.hungdm.screen.mvi.MviIntent
@@ -42,7 +44,9 @@ fun LoginScreen(
             .fillMaxSize()
             .padding(30.dp)
     ) {
-        Logo()
+        Logo(
+            title = stringResource(R.string.login_title)
+        )
         Spacer(Modifier.size(40.dp))
         LoginInput(
             userInfo = userInfo,

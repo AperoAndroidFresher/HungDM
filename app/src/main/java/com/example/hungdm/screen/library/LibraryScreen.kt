@@ -28,6 +28,7 @@ import com.example.hungdm.domain.model.Song
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -193,8 +194,8 @@ fun LibraryContent(
             SongItemLinear(
                 song = it,
                 showOption = showOption,
-                option1 = "Add to playlist",
-                option2 = "Share",
+                option1 = stringResource(R.string.add_playlist),
+                option2 = stringResource(R.string.share),
                 icon1 = R.drawable.outline_add_24,
                 icon2 = R.drawable.outline_share_24,
                 onClickShowOption = {

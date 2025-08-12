@@ -20,10 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.R
 
 @Preview
 @Composable
@@ -39,7 +41,7 @@ fun LibraryHeader(
         modifier = modifier.fillMaxWidth().padding(top = 8.dp)
     ) {
         Text(
-            text = "Library",
+            text = stringResource(R.string.library),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
@@ -56,7 +58,7 @@ fun LibraryHeader(
                     .width(140.dp)
                     .height(50.dp)
             ) {
-                Text(text = "Local", fontSize = 16.sp, color = Color.White)
+                Text(text = stringResource(R.string.local), fontSize = 16.sp, color = Color.White)
             }
             Spacer(Modifier.size(30.dp))
             Button(
@@ -69,7 +71,7 @@ fun LibraryHeader(
                     .width(140.dp)
                     .height(50.dp)
             ) {
-                Text(text = "Remote", fontSize = 16.sp, color = Color.White)
+                Text(text = stringResource(R.string.remote), fontSize = 16.sp, color = Color.White)
             }
         }
 

@@ -7,12 +7,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.R
 
 @Composable
 fun LoginFooter(
@@ -20,22 +22,10 @@ fun LoginFooter(
     onClick: () -> Unit ={}
 ) {
     Text(
-        text = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = colorScheme.inversePrimary)) {
-                append("Don’t have an account? ")
-            }
-            withStyle(
-                style = SpanStyle(
-                    color = colorScheme.surfaceTint,
-                    fontWeight = FontWeight.Bold
-                )
-            ) {
-                append("Sign Up")
-            }
-        },
+        text = stringResource(R.string.login_footer),
         fontSize = 16.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White,
+        color = colorScheme.primary,
         modifier = modifier
             .padding(10.dp)
             .padding(bottom = 20.dp)

@@ -7,16 +7,18 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.R
 
 @Composable
 fun PlaylistInfo(
     modifier: Modifier = Modifier,
     title: String = "playlist",
-    songNumberStr: String = "0 songs"
+    songNumberStr: Int = 0
 ) {
     Column(
         modifier = modifier
@@ -32,7 +34,7 @@ fun PlaylistInfo(
             overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = songNumberStr,
+            text = "$songNumberStr"+ stringResource(R.string.song_number),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,

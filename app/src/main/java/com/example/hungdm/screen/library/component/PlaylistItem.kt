@@ -44,7 +44,7 @@ fun PlaylistItem(
 
         PlaylistInfo(
             title = playlist.title,
-            songNumberStr = playlist.songNumberStr
+            songNumberStr = playlist.songNumber
         )
     }
 }

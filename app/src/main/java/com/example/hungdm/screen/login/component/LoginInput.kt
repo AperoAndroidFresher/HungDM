@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.hungdm.R
 import com.example.hungdm.component.InputPassword
 import com.example.hungdm.component.InputText
 import com.example.hungdm.domain.model.UserInfo
@@ -25,13 +27,13 @@ fun LoginInput(
         modifier = modifier.wrapContentSize()
     ) {
         InputText(
-            title = "Username",
+            title = stringResource(R.string.username),
             value = userInfo.username,
             onValueChange = onValueChangeUsername
         )
         Spacer(Modifier.size(10.dp))
         InputPassword(
-            title = "Password",
+            title = stringResource(R.string.password),
             value = userInfo.password,
             showPass = showPass,
             onValueChange = onValueChangePassword,

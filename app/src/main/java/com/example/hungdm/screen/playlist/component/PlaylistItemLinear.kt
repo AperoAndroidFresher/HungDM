@@ -55,7 +55,7 @@ fun PlaylistItemLinear(
 
         PlaylistInfo(
             title = playlist.title,
-            songNumberStr = playlist.songNumberStr
+            songNumberStr = playlist.songNumber
         )
 
         Spacer(Modifier.weight(1f))

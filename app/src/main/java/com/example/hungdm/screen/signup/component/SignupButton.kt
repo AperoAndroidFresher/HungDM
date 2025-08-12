@@ -10,9 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.R
 
 @Composable
 fun SignupButton(
@@ -27,7 +29,7 @@ fun SignupButton(
         onClick = onClick
     ) {
         Text(
-            "Sign up",
+            text = stringResource(R.string.signup),
             color = Color.White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold

@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,7 +49,7 @@ fun AddSongToPlaylistDialog(
                 .padding(20.dp)
         ) {
             Text(
-                text = "Choose playlist",
+                text = stringResource(R.string.choose_playlist),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -57,7 +58,7 @@ fun AddSongToPlaylistDialog(
             if (playlists.isEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "You don’t have any playlists.\n Click the '+' button to add",
+                    text = stringResource(R.string.empty_playlist),
                     color = Color.White
                 )
 

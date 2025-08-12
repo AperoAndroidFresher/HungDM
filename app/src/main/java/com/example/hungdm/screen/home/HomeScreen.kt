@@ -59,11 +59,10 @@ fun HomeScreen(
     LaunchedEffect(isLoading) {
         if (isLoading) {
             viewModel.processIntent(MviIntent.LoadMusicData(context))
-            delay(2000)
+            delay(3000)
             isLoading = false
         }
     }
-
     if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_AUDIO)
         != PackageManager.PERMISSION_GRANTED
     ) {
@@ -74,7 +73,6 @@ fun HomeScreen(
             100
         )
     }
-
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -88,8 +86,6 @@ fun HomeScreen(
             )
         }
     }
-
-
 
     BackHandler { onBack() }
 

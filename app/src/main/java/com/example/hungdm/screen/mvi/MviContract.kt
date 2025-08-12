@@ -24,7 +24,9 @@ data class MviState(
     val playerSongIndex: Int? = null,
     val playerSong: Song? = null,
     val playerTime: Long = 0,
-    val isPlay: Boolean = false
+    val isPlay: Boolean = false,
+    val isShuffle: Boolean = false,
+    val isRepeat: Boolean = false
 )
 
 sealed interface MviIntent{
@@ -47,9 +49,9 @@ sealed interface MviIntent{
     data object LoadPlaylistsOfUser: MviIntent
     data class CreatePlaylist(val title: String): MviIntent
     data class RenamePlaylist(val title: String, val playlist: Playlist): MviIntent
-    data class RemovePlaylist(val playlist: Playlist): MviIntent
-    data class AddSongToPlaylist(val song: Song, val playlist: Playlist): MviIntent
-    data class RemoveSongInPlaylist(val song: Song, val playlist: Playlist): MviIntent
+    data class RemovePlaylist(val context: Context, val playlist: Playlist): MviIntent
+    data class AddSongToPlaylist(val context: Context, val song: Song, val playlist: Playlist): MviIntent
+    data class RemoveSongInPlaylist(val context: Context, val song: Song, val playlist: Playlist): MviIntent
     data class OnClickPlaylistDetail(val playlistId: Long) : MviIntent
 
     data class OnClickPlayer(val song: Song, val playerListSong: List<Song>?, val playerPlaylist: Playlist?, val context: Context) : MviIntent
@@ -57,6 +59,8 @@ sealed interface MviIntent{
     data class OnChangeSongPlayState(val context: Context): MviIntent
     data class OnClickNextSong(val context: Context): MviIntent
     data class OnClickPreviousSong(val context: Context): MviIntent
+    data class OnClickShuffle(val context: Context): MviIntent
+    data class OnClickRepeat(val context: Context): MviIntent
 
     data object ChangeTheme : MviIntent
 }

@@ -9,6 +9,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
@@ -17,9 +18,13 @@ import com.example.hungdm.R
 fun PlayerControl(
     modifier: Modifier = Modifier,
     isPlay: Boolean = false,
-    onPauseClick: () -> Unit ={},
-    onNextClick: () -> Unit ={},
-    onPreviousClick: () -> Unit ={},
+    isShuffle: Boolean = false,
+    isRepeat: Boolean = false,
+    onClickPause: () -> Unit ={},
+    onClickNext: () -> Unit ={},
+    onClickPrevious: () -> Unit ={},
+    onClickShuffle: () -> Unit = {},
+    onClickRepeat: () -> Unit = {}
 ) {
     val icon = if (isPlay) R.drawable.baseline_pause_24 else R.drawable.baseline_play_arrow_24
 
@@ -28,12 +33,12 @@ fun PlayerControl(
     ) {
         Spacer(Modifier.size(30.dp))
         IconButton(
-            onClick = {},
+            onClick = onClickShuffle,
         ) {
             Icon(
                 painter = painterResource(R.drawable.outline_shuffle_24),
                 contentDescription = null,
-                tint = colorScheme.primary,
+                tint = if(isShuffle) colorScheme.primary else Color.LightGray,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -41,7 +46,7 @@ fun PlayerControl(
         Spacer(Modifier.weight(1f))
 
         IconButton(
-            onClick = onPreviousClick,
+            onClick = onClickPrevious,
         ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_skip_previous_24),
@@ -51,7 +56,7 @@ fun PlayerControl(
             )
         }
         IconButton(
-            onClick = onPauseClick,
+            onClick = onClickPause,
         ) {
             Icon(
                 painter = painterResource(icon),
@@ -61,7 +66,7 @@ fun PlayerControl(
             )
         }
         IconButton(
-            onClick = onNextClick,
+            onClick = onClickNext,
         ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_skip_next_24),
@@ -74,12 +79,12 @@ fun PlayerControl(
         Spacer(Modifier.weight(1f))
 
         IconButton(
-            onClick = {},
+            onClick = onClickRepeat,
         ) {
             Icon(
                 painter = painterResource(R.drawable.outline_repeat_24),
                 contentDescription = null,
-                tint = colorScheme.primary,
+                tint = if(isRepeat) colorScheme.primary else Color.LightGray,
                 modifier = Modifier.size(20.dp)
             )
         }

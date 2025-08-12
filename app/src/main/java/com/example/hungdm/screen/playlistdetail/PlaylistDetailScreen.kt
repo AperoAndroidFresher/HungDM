@@ -80,10 +80,9 @@ fun PlaylistDetailScreen(
                     icon2 = R.drawable.outline_share_24,
                     onClickShowOption = {
                         showOption = true
-                        Log.d("tag,", "PlaylistDetailScreen: $it")
                     },
                     onClickOption1 = {
-                        viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
+                        viewModel.processIntent(MviIntent.RemoveSongInPlaylist(context, playlist.listSong[it], playlist))
                     },
                     onClickOption2 = {
                         AppUtils.shareSong(context, playlist.listSong[it])

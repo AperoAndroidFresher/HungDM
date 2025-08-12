@@ -31,8 +31,8 @@ fun PlayerBottomBar(
     playerTime: Long = 0,
     isPlay: Boolean = false,
     onClick: () -> Unit = {},
-    onPauseClick: () -> Unit = {},
-    onCloseClick: () -> Unit = {}
+    onCLickPause: () -> Unit = {},
+    onClickClose: () -> Unit = {}
 ) {
     val icon = if(isPlay) R.drawable.baseline_pause_24 else R.drawable.baseline_play_arrow_24
 
@@ -60,7 +60,7 @@ fun PlayerBottomBar(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onPauseClick) {
+            IconButton(onClick = onCLickPause) {
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = null,
@@ -85,7 +85,7 @@ fun PlayerBottomBar(
                 fontSize = 16.sp,
             )
 
-            IconButton(onClick = onCloseClick) {
+            IconButton(onClick = onClickClose) {
                 Icon(
                     painter = painterResource(R.drawable.outline_close_24),
                     contentDescription = "Close",

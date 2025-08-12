@@ -169,7 +169,7 @@ fun TopTracksInfo(
             )
         }
         Row {
-            Icon(painterResource(R.drawable.outline_person_edit_24),null, tint = colorScheme.primary)
+            Icon(painterResource(R.drawable.outline_artist_24),null, tint = colorScheme.primary)
             Spacer(Modifier.size(4.dp))
             Text(
                 text = name,

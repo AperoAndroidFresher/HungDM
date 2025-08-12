@@ -2,6 +2,7 @@ package com.example.hungdm.service
 
 import android.content.Intent
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.example.hungdm.domain.model.Playlist
@@ -11,6 +12,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 class AppService : LifecycleService() {
 
@@ -21,6 +24,9 @@ class AppService : LifecycleService() {
         const val ACTION_CLOSE = "ACTION_CLOSE"
         const val ACTION_NEXT = "ACTION_NEXT"
         const val ACTION_PREVIOUS = "ACTION_PREVIOUS"
+        const val ACTION_UPDATE = "ACTION_UPDATE"
+        const val ACTION_SHUFFLE = "ACTION_SHUFFLE"
+        const val ACTION_REPEAT = "ACTION_REPEAT"
         const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
         const val EXTRA_LIST_SONG = "EXTRA_LIST_SONG"
         const val EXTRA_INDEX = "EXTRA_INDEX"
@@ -32,6 +38,8 @@ class AppService : LifecycleService() {
         val playerSong: MutableStateFlow<Song?> = MutableStateFlow(null)
         val playerTime: MutableStateFlow<Long> = MutableStateFlow(0L)
         val isPlay: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        val isShuffle: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        val isRepeat: MutableStateFlow<Boolean> = MutableStateFlow(false)
     }
 
     private var mediaPlayer: MediaPlayer? = null
@@ -73,10 +81,30 @@ class AppService : LifecycleService() {
                 resumeSong()
             }
             ACTION_NEXT -> {
-                nextSong()
+                if(isShuffle.value){
+                    shuffleSong()
+                } else if(isRepeat.value){
+                    repeatSong()
+                } else nextSong()
+
             }
             ACTION_PREVIOUS -> {
-                previousSong()
+                if(isShuffle.value){
+                    shuffleSong()
+                } else if(isRepeat.value){
+                    repeatSong()
+                } else previousSong()
+            }
+            ACTION_SHUFFLE -> {
+                isShuffle.value = !isShuffle.value
+                isRepeat.value = false
+            }
+            ACTION_REPEAT -> {
+                isRepeat.value = !isRepeat.value
+                isShuffle.value = false
+            }
+            ACTION_UPDATE -> {
+                playerPlaylist.value = intent.getParcelableExtra<Playlist>(EXTRA_PLAYLIST)
             }
         }
         return START_STICKY
@@ -97,7 +125,11 @@ class AppService : LifecycleService() {
                 start()
                 isLooping = false
                 setOnCompletionListener {
-                    nextSong()
+                    if(isShuffle.value){
+                        shuffleSong()
+                    } else if(isRepeat.value){
+                        repeatSong()
+                    } else nextSong()
                 }
             }
             isPlay.value = true
@@ -112,6 +144,7 @@ class AppService : LifecycleService() {
     }
 
     private fun pauseSong() {
+        timeJob?.cancel()
         mediaPlayer?.pause()
         startForeground(
             1,
@@ -123,11 +156,12 @@ class AppService : LifecycleService() {
         mediaPlayer?.stop()
         mediaPlayer?.release()
         mediaPlayer = null
+        notificationHelper = null
         stopSelf()
     }
 
     private fun resumeSong() {
-        timeJob?.cancel()
+//        timeJob?.cancel()
         mediaPlayer?.let {
             if (!it.isPlaying) {
                 it.start()
@@ -176,6 +210,42 @@ class AppService : LifecycleService() {
         playSong()
     }
 
+    private fun shuffleSong() {
+        if(playerPlaylist.value==null){
+            val nextIndex = Random.nextInt(0, playerListSong.value!!.size)
+
+            playerSongIndex.value = nextIndex
+            playerSong.value = playerListSong.value!![nextIndex]
+            playerTime.value = 0L
+        } else {
+            val nextIndex = Random.nextInt(0, playerPlaylist.value!!.listSong.size)
+
+            playerSongIndex.value = nextIndex
+            playerSong.value = playerPlaylist.value!!.listSong[nextIndex]
+            playerTime.value = 0L
+        }
+
+        playSong()
+    }
+
+    private fun repeatSong() {
+        if(playerPlaylist.value==null){
+            val nextIndex = playerSongIndex.value!!
+
+            playerSongIndex.value = nextIndex
+            playerSong.value = playerListSong.value!![nextIndex]
+            playerTime.value = 0L
+        } else {
+            val nextIndex = playerSongIndex.value!!
+
+            playerSongIndex.value = nextIndex
+            playerSong.value = playerPlaylist.value!!.listSong[nextIndex]
+            playerTime.value = 0L
+        }
+
+        playSong()
+    }
+
 
     private fun startUpdatingTime() {
         timeJob?.cancel()
@@ -184,6 +254,7 @@ class AppService : LifecycleService() {
                 val time = mediaPlayer?.currentPosition?.toLong() ?: 0L
                 playerTime.value = time
                 delay(100)
+                Log.d("tag","timejob $time")
             }
         }
     }

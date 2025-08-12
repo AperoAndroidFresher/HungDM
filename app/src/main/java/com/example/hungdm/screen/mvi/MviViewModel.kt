@@ -34,6 +34,8 @@ import com.example.hungdm.data.remote.musicApi.dto.TopArtists
 import com.example.hungdm.data.remote.musicApi.dto.TopTracks
 import com.example.hungdm.data.remote.songApi.ApiSongClient
 import com.example.hungdm.service.AppService
+import com.example.hungdm.service.AppService.Companion.isPlay
+import com.example.hungdm.service.AppService.Companion.playerSongIndex
 import com.example.hungdm.utils.AppUtils
 import kotlinx.coroutines.flow.update
 import java.io.BufferedInputStream
@@ -83,6 +85,16 @@ class MviViewModel(
         viewModelScope.launch {
             AppService.isPlay.collect { isPlay ->
                 _state.update { it.copy(isPlay = isPlay) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.isShuffle.collect { isShuffle ->
+                _state.update { it.copy(isShuffle = isShuffle) }
+            }
+        }
+        viewModelScope.launch {
+            AppService.isRepeat.collect { isRepeat ->
+                _state.update { it.copy(isRepeat = isRepeat) }
             }
         }
     }
@@ -236,23 +248,16 @@ class MviViewModel(
                     )
                 }
 
-                is MviIntent.RemovePlaylist -> {
-                    playlistRepository.removePlaylist(intent.playlist.id)
-                    playlistRepository.removeAllSongInPlaylist(intent.playlist.id)
-                    _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
+                is MviIntent.RemovePlaylist -> {//fix
+                    removePlaylist(intent.context, intent.playlist)
                 }
 
                 is MviIntent.AddSongToPlaylist -> {
-                    val id = playlistRepository.addSong(intent.song.toSongEntity())
-                    playlistRepository.addSongToPlaylist(
-                        PlaylistSongReference(intent.playlist.id, id)
-                    )
-                    _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
+                    addSongToPlaylist(intent.context, intent.song, intent.playlist)
                 }
 
                 is MviIntent.RemoveSongInPlaylist -> {
-                    playlistRepository.removeSongInPlaylist(intent.song.id, intent.playlist.id)
-                    _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
+                    removeSongInPlaylist(intent.context,intent.song,intent.playlist)
                 }
 
                 is MviIntent.OnClickPlaylistDetail -> {
@@ -305,6 +310,20 @@ class MviViewModel(
                 is MviIntent.OnClickPreviousSong -> {
                     val tmpIntent = Intent(intent.context, AppService::class.java).apply {
                         action = AppService.ACTION_PREVIOUS
+                    }
+                    intent.context.startForegroundService(tmpIntent)
+                }
+
+                is MviIntent.OnClickShuffle -> {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_SHUFFLE
+                    }
+                    intent.context.startForegroundService(tmpIntent)
+                }
+
+                is MviIntent.OnClickRepeat -> {
+                    val tmpIntent = Intent(intent.context, AppService::class.java).apply {
+                        action = AppService.ACTION_REPEAT
                     }
                     intent.context.startForegroundService(tmpIntent)
                 }
@@ -479,6 +498,60 @@ class MviViewModel(
         } catch (e: Exception) {
             Log.d("API_ERROR", "Loi khac: ${e.message}")
             null
+        }
+    }
+
+    private suspend fun removeSongInPlaylist(context: Context, song: Song, playlist: Playlist){
+        withContext(Dispatchers.IO){
+            playlistRepository.removeSongInPlaylist(song.id, playlist.id)
+            _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
+            if(_state.value.playerPlaylist?.id==playlist.id){
+                val newPlaylist = _state.value.playlists.find {
+                    it.id == playlist.id
+                }
+                if(song.id==_state.value.playerSong?.id){
+                    //chay not bai hat day di
+                }
+                val tmpIntent = Intent(context, AppService::class.java).apply {
+                    action = AppService.ACTION_UPDATE
+                    putExtra(AppService.EXTRA_PLAYLIST,newPlaylist)
+                }
+                context.startForegroundService(tmpIntent)
+            }
+        }
+    }
+
+    private suspend fun addSongToPlaylist(context: Context, song: Song, playlist: Playlist){
+        withContext(Dispatchers.IO){
+            val id = playlistRepository.addSong(song.toSongEntity())
+            playlistRepository.addSongToPlaylist(
+                PlaylistSongReference(playlist.id, id)
+            )
+            _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
+            if(_state.value.playerPlaylist?.id==playlist.id){
+                val newPlaylist = _state.value.playlists.find {
+                    it.id == playlist.id
+                }
+                val tmpIntent = Intent(context, AppService::class.java).apply {
+                    action = AppService.ACTION_UPDATE
+                    putExtra(AppService.EXTRA_PLAYLIST,newPlaylist)
+                }
+                context.startForegroundService(tmpIntent)
+            }
+        }
+    }
+
+    private suspend fun removePlaylist(context: Context, playlist: Playlist){
+        withContext(Dispatchers.IO) {
+            playlistRepository.removePlaylist(playlist.id)
+            playlistRepository.removeAllSongInPlaylist(playlist.id)
+            _state.value = _state.value.copy(playlists = loadPlaylistOfUser())
+            if (_state.value.playerPlaylist?.id == playlist.id) {
+                val tmpIntent = Intent(context, AppService::class.java).apply {
+                    action = AppService.ACTION_CLOSE
+                }
+                context.startForegroundService(tmpIntent)
+            }
         }
     }
 

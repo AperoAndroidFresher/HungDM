@@ -166,7 +166,7 @@ fun LibraryScreen(
                 onClickNewPlaylist()
             },
             onAddSongToPlaylist = {
-                viewModel.processIntent(MviIntent.AddSongToPlaylist(selectedSong!!, it))
+                viewModel.processIntent(MviIntent.AddSongToPlaylist(context, selectedSong!!, it))
                 showAddSongToPlaylistDialog = false
                 selectedSong = null
             },

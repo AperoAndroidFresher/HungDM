@@ -1,7 +1,6 @@
 package com.example.hungdm.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -16,8 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
@@ -29,10 +26,7 @@ fun InputText(
     value: String = "",
     leadingIcon: Int = R.drawable.outline_account_circle_24,
     isValid: Boolean = true,
-    isPass: Boolean = false,
-    showPass: Boolean = false,
     onValueChange: (String) -> Unit = {},
-    onClickShowPass: () -> Unit = {},
 ) {
     Column {
         OutlinedTextField(
@@ -43,23 +37,6 @@ fun InputText(
             value = value,
             leadingIcon = { Icon(painterResource(leadingIcon), null, tint = colorScheme.primary) },
             onValueChange = onValueChange,
-            trailingIcon = {
-                if (isPass) {
-                    Icon(
-                        painter = painterResource(if (showPass) R.drawable.outline_password_24 else R.drawable.outline_password_2_off_24),
-                        null,
-                        tint = colorScheme.primary,
-                        modifier = Modifier.clickable {
-                            onClickShowPass()
-                        }
-                    )
-                }
-            },
-            visualTransformation = if (isPass) {
-                if (showPass) VisualTransformation.None else PasswordVisualTransformation()
-            } else {
-                VisualTransformation.None
-            },
             label = {
                 Text(
                     title,

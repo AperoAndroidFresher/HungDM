@@ -83,5 +83,6 @@ dependencies {
     implementation(libs.lottie.compose)
 
     implementation("androidx.media:media:1.7.0")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
 }

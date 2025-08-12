@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 
 sealed interface Destination: NavKey {
-
+    data object Splash: Destination
     data object Login: Destination
     data object Signup : Destination
     data object Home: Destination

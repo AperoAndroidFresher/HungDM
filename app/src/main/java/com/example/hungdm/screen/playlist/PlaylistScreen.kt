@@ -1,5 +1,6 @@
 package com.example.hungdm.screen.playlist
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
@@ -44,12 +46,13 @@ fun PlaylistScreen(
 
     val state = viewModel.state.collectAsState()
     val playlists = state.value.playlists
+    val context = LocalContext.current
     var selectedPlaylist by remember { mutableStateOf<Playlist?>(null) }
     var showCreatePlaylistDialog by remember { mutableStateOf(false) }
     var showRenamePlaylistDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
+        if(playlists.isEmpty()){ viewModel.processIntent(MviIntent.LoadPlaylistsOfUser) }
     }
 
     BackHandler { onBack() }
@@ -87,7 +90,7 @@ fun PlaylistScreen(
                             selectedPlaylist = playlists[it]
                         },
                         onClickOption1 = {
-                            viewModel.processIntent(MviIntent.RemovePlaylist(selectedPlaylist!!))
+                            viewModel.processIntent(MviIntent.RemovePlaylist(context, selectedPlaylist!!))
                         },
                         onClickOption2 = {
                             showRenamePlaylistDialog = true

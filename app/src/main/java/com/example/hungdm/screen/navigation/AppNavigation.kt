@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.example.hungdm.component.Splash
 import com.example.hungdm.screen.SettingScreen
 import com.example.hungdm.screen.component.PlayerBottomBar
 import com.example.hungdm.screen.mvi.MviEvent
@@ -48,6 +49,7 @@ import com.example.hungdm.screen.TopArtistsScreen
 import com.example.hungdm.screen.TopTracksScreen
 import com.example.hungdm.ui.theme.AppTheme
 import com.example.hungdm.utils.AppUtils
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -55,7 +57,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     val viewModel: MviViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
-    val backStack = remember { mutableStateListOf<Destination>(Destination.Login) }
+    val backStack = remember { mutableStateListOf<Destination>(Destination.Splash) }
     val context = LocalContext.current
     val activity = context as? Activity
 
@@ -70,9 +72,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         val userId = AppUtils.getUser(context)
 
         if (userId != null) {
+            viewModel.processIntent(MviIntent.GetUser(userId))
+            delay(2000)
             backStack.clear()
             backStack.add(Destination.Home)
-            viewModel.processIntent(MviIntent.GetUser(userId))
+        } else{
+            delay(2000)
+            backStack.clear()
+            backStack.add(Destination.Login)
         }
     }
 
@@ -131,7 +138,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             bottomBar = {
                 val showBottomNav = backStack.lastOrNull()?.let {
                     it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile &&
-                            it !is Destination.Player && it !is Destination.TopTracks &&
+                            it !is Destination.Player && it !is Destination.Splash && it !is Destination.TopTracks &&
                             it !is Destination.TopAlbums && it !is Destination.TopArtists
                 } ?: false
 
@@ -145,10 +152,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 onClick = {
                                     backStack.add(Destination.Player)
                                 },
-                                onPauseClick = {
+                                onCLickPause = {
                                     viewModel.processIntent(MviIntent.OnChangeSongPlayState(context))
                                 },
-                                onCloseClick = {
+                                onClickClose = {
                                     viewModel.processIntent(MviIntent.OnClickClosePlayer(context))
                                 }
                             )
@@ -179,6 +186,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 backStack = backStack,
                 onBack = { backStack.removeLastOrNull() },
                 entryProvider = entryProvider {
+                    entry<Destination.Splash> {
+                        Splash()
+                    }
                     entry<Destination.Login> {
                         LoginScreen(
                             viewModel = viewModel

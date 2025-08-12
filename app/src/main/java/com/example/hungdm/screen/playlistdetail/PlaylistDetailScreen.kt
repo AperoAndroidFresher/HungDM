@@ -85,7 +85,7 @@ fun PlaylistDetailScreen(
                         viewModel.processIntent(MviIntent.RemoveSongInPlaylist(context, playlist.listSong[it], playlist))
                     },
                     onClickOption2 = {
-                        AppUtils.shareSong(context, playlist.listSong[it])
+//                        AppUtils.shareSong(context, playlist.listSong[it]
                     },
                     onDismissRequest = {
                         showOption = false

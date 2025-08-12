@@ -75,7 +75,7 @@ fun PlaylistDetailScreen(
                 SongItemLinear(
                     song = playlist.listSong[it],
                     showOption = showOption,
-                    option1 = stringResource(R.string.remove_playlist),
+                    option1 = stringResource(R.string.remove_song),
                     option2 = stringResource(R.string.share),
                     icon1 = R.drawable.outline_delete_24,
                     icon2 = R.drawable.outline_share_24,

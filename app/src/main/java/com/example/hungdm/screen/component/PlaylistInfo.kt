@@ -34,7 +34,7 @@ fun PlaylistInfo(
             overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = "$songNumberStr"+ stringResource(R.string.song_number),
+            text = "$songNumberStr "+ stringResource(R.string.song_number),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,

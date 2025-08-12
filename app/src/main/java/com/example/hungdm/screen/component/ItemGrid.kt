@@ -33,16 +33,15 @@ import com.example.hungdm.domain.model.Song
 @Composable
 fun ItemGrid(
     modifier: Modifier = Modifier,
-    option1:String="",
-    option2:String="",
+    option1: String = "",
+    option2: String = "",
     icon1: Int = R.drawable.outline_delete_24,
     icon2: Int = R.drawable.outline_share_24,
-    song: Song = Song(100,"Noi nay co anh","MTP", duration = 100000L ,null),
-    playlist: Playlist? = null,
+    song: Song = Song(100, "Noi nay co anh", "MTP", duration = 100000L, null),
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
     onClickOption1: () -> Unit = {},
-    onClickOption2: ()->Unit = {},
+    onClickOption2: () -> Unit = {},
     onDismissRequest: () -> Unit = {}
 ) {
 
@@ -53,7 +52,7 @@ fun ItemGrid(
         Box() {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data( if(playlist!=null) R.drawable.img1 else song.img)
+                    .data(song.img)
                     .crossfade(true)
                     .error(R.drawable.img1)
                     .size(300, 300)
@@ -94,7 +93,7 @@ fun ItemGrid(
             }
         }
         Text(
-            text = playlist?.title ?: song.title,
+            text = song.title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
@@ -106,22 +105,21 @@ fun ItemGrid(
                 .fillMaxWidth()
         )
         Text(
-            text = playlist?.songNumberStr ?: song.artist,
+            text = song.artist,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
         )
-        if(playlist==null){
-            Text(
-                text = song.time,
-                fontSize = 16.sp,
-                fontWeight = FontWeight(400),
-                color = colorScheme.primary,
-                modifier = Modifier.padding(8.dp)
-            )
-        }
+        Text(
+            text = song.time,
+            fontSize = 16.sp,
+            fontWeight = FontWeight(400),
+            color = colorScheme.primary,
+            modifier = Modifier.padding(8.dp)
+        )
+
 
     }
 

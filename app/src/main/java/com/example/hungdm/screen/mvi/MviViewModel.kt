@@ -510,7 +510,7 @@ class MviViewModel(
                     it.id == playlist.id
                 }
                 if(song.id==_state.value.playerSong?.id){
-                    //chay not bai hat day di
+                    Log.d("HungDM","chay not bai day di")
                 }
                 val tmpIntent = Intent(context, AppService::class.java).apply {
                     action = AppService.ACTION_UPDATE

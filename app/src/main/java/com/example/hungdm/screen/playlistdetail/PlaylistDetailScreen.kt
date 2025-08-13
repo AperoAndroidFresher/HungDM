@@ -73,7 +73,7 @@ fun PlaylistDetailScreen(
             verticalArrangement = Arrangement.spacedBy(if(isLinear) 8.dp else 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(playlist!!.listSong.size){
+            items(playlist.listSong.size){
                 val isPlay = it==songPlayIndex
                 if(isLinear){
                     var showOption by remember { mutableStateOf(false) }

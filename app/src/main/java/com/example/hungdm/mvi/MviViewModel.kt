@@ -1,4 +1,4 @@
-package com.example.hungdm.screen.mvi
+package com.example.hungdm.mvi
 
 import android.content.ContentUris
 import android.content.Context

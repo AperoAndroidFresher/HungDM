@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
-import com.example.hungdm.screen.mvi.MviIntent
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.player.component.PlayerControl
 import com.example.hungdm.screen.player.component.PlayerHeader
 import com.example.hungdm.screen.player.component.SongProgress

@@ -113,6 +113,7 @@ class AppService : LifecycleService() {
     override fun onDestroy() {
         mediaPlayer?.release()
         mediaPlayer = null
+        stopForeground(true)
         super.onDestroy()
     }
 
@@ -120,7 +121,7 @@ class AppService : LifecycleService() {
         try {
             mediaPlayer?.release()
             mediaPlayer = MediaPlayer().apply {
-                setDataSource(applicationContext, playerSong.value!!.uri!!)
+                setDataSource(applicationContext, playerSong.value?.uri!!)
                 prepare()
                 start()
                 isLooping = false
@@ -136,7 +137,7 @@ class AppService : LifecycleService() {
             startUpdatingTime()
             startForeground(
                 1,
-                notificationHelper!!.createNotification(playerSong.value!!.title, isPlay.value)
+                notificationHelper?.createNotification(playerSong.value?.title!!, isPlay.value)
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -148,7 +149,7 @@ class AppService : LifecycleService() {
         mediaPlayer?.pause()
         startForeground(
             1,
-            notificationHelper!!.createNotification(playerSong.value!!.title, isPlay.value)
+            notificationHelper?.createNotification(playerSong.value?.title!!, isPlay.value)
         )
     }
 
@@ -161,14 +162,13 @@ class AppService : LifecycleService() {
     }
 
     private fun resumeSong() {
-//        timeJob?.cancel()
         mediaPlayer?.let {
             if (!it.isPlaying) {
                 it.start()
                 startUpdatingTime()
                 startForeground(
                     1,
-                    notificationHelper!!.createNotification(playerSong.value!!.title, isPlay.value)
+                    notificationHelper?.createNotification(playerSong.value?.title!!, isPlay.value)
                 )
             }
         }

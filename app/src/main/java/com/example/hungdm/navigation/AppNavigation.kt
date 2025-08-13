@@ -36,12 +36,12 @@ import com.example.hungdm.R
 import com.example.hungdm.component.Splash
 import com.example.hungdm.screen.SettingScreen
 import com.example.hungdm.screen.component.PlayerBottomBar
-import com.example.hungdm.screen.mvi.MviEvent
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviEvent
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen
 import com.example.hungdm.screen.library.LibraryScreen
 import com.example.hungdm.screen.login.LoginScreen
-import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.screen.player.PlayerScreen
 import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen

@@ -21,8 +21,8 @@ import com.example.hungdm.R
 import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.component.Logo
 import com.example.hungdm.domain.model.UserInfo
-import com.example.hungdm.screen.mvi.MviIntent
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.signup.component.SignupButton
 import com.example.hungdm.screen.signup.component.SignupInput
 

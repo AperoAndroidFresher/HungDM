@@ -25,8 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.domain.model.Song
-import com.example.hungdm.screen.mvi.MviIntent
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.playlistdetail.component.PlaylistDetailHeader
 import com.example.hungdm.screen.playlistdetail.component.SongItemGrid
 import com.example.hungdm.screen.playlistdetail.component.SongItemLinear

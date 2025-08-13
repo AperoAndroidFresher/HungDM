@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +35,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hungdm.R
 import com.example.hungdm.screen.component.NoInternet
-import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.screen.home.component.HomeHeader
 import com.example.hungdm.screen.home.component.TopAlbums
 import com.example.hungdm.screen.home.component.TopArtists

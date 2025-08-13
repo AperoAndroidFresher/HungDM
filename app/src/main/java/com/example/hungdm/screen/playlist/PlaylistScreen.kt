@@ -24,8 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
 import com.example.hungdm.domain.model.Playlist
-import com.example.hungdm.screen.mvi.MviIntent
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.playlist.component.EmptyPlaylist
 import com.example.hungdm.screen.playlist.component.PlaylistDialog
 import com.example.hungdm.screen.playlist.component.PlaylistHeader

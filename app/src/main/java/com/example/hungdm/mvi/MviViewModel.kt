@@ -301,7 +301,7 @@ class MviViewModel(
         val tmpIntent = Intent(context, AppService::class.java).apply {
             action = AppService.ACTION_CLOSE
         }
-        context.startForegroundService(tmpIntent)
+        context.startService(tmpIntent)
         _state.value = MviState()
         sendEvent(MviEvent.GotoLogin)
     }

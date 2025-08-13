@@ -27,6 +27,8 @@ import com.example.hungdm.screen.mvi.MviViewModel
 import com.example.hungdm.screen.player.component.PlayerControl
 import com.example.hungdm.screen.player.component.PlayerHeader
 import com.example.hungdm.screen.player.component.SongProgress
+import com.example.hungdm.service.AppService.Companion.isPlay
+import com.example.hungdm.service.AppService.Companion.playerTime
 
 @Composable
 fun PlayerScreen(
@@ -35,9 +37,6 @@ fun PlayerScreen(
     onBack: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
-    val songPLay = state.playerSong
-    val playerTime = state.playerTime
-    val isPlay = state.isPlay
     val context = LocalContext.current
 
     BackHandler { onBack() }
@@ -67,7 +66,7 @@ fun PlayerScreen(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.size(10.dp))
-        songPLay?.title?.let {
+        state.playerSong?.title?.let {
             Text(
                 text = it,
                 fontSize = 20.sp,
@@ -78,7 +77,7 @@ fun PlayerScreen(
             )
         }
         Spacer(Modifier.size(4.dp))
-        songPLay?.artist?.let {
+        state.playerSong?.artist?.let {
             Text(
                 text = it,
                 fontSize = 16.sp,
@@ -88,15 +87,15 @@ fun PlayerScreen(
             )
         }
         Spacer(Modifier.size(20.dp))
-        songPLay?.let {
+        state.playerSong?.let {
             SongProgress(
-                playerTime = playerTime,
+                playerTime = state.playerTime,
                 duration = it.duration
             )
         }
         Spacer(Modifier.size(10.dp))
         PlayerControl(
-            isPlay = isPlay,
+            isPlay = state.isPlay,
             isRepeat = state.isRepeat,
             isShuffle = state.isShuffle,
             onClickPause = { viewModel.processIntent(MviIntent.OnChangeSongPlayState(context)) },

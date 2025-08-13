@@ -2,9 +2,11 @@ package com.example.hungdm.screen.library.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hungdm.R
 import com.example.hungdm.domain.model.Playlist
+import com.example.hungdm.screen.component.PlaylistImage
+import com.example.hungdm.screen.component.PlaylistInfo
 
 @Composable
 fun AddSongToPlaylistDialog(
@@ -77,7 +81,7 @@ fun AddSongToPlaylistDialog(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(playlists.size) {
-                        PlaylistItem(
+                        PlaylistItemLibrary(
                             playlist = playlists[it],
                             onAddSongToPlaylist = {
                                 onAddSongToPlaylist(playlists[it])
@@ -87,5 +91,29 @@ fun AddSongToPlaylistDialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PlaylistItemLibrary(
+    modifier: Modifier = Modifier,
+    playlist: Playlist = Playlist(),
+    onAddSongToPlaylist: () -> Unit = {}
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable {
+                onAddSongToPlaylist()
+            }
+    ) {
+        PlaylistImage()
+        Spacer(Modifier.size(8.dp))
+
+        PlaylistInfo(
+            title = playlist.title,
+            songNumberStr = playlist.songNumber
+        )
     }
 }

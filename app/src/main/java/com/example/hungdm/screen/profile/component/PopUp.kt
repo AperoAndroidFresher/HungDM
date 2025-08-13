@@ -6,11 +6,15 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,8 +42,11 @@ fun PopUp(
     ) {
         Dialog(onDismissRequest = { }) {
             Box(
-                modifier = modifier,
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
+                modifier = modifier
+                    .background(Color(0xFFFEFEFE), RoundedCornerShape(20.dp))
+                    .height(350.dp)
+                    .width(330.dp)
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,

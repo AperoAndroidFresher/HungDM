@@ -232,7 +232,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     entry<Destination.PlaylistDetail> { destination ->
                         PlaylistDetailScreen(
                             viewModel = viewModel,
-                            destination = destination,
+                            playlistId = destination.playlistID,
                             onBack = { backStack.removeLastOrNull() }
                         )
                     }

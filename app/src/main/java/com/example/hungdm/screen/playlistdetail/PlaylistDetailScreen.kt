@@ -1,6 +1,5 @@
 package com.example.hungdm.screen.playlistdetail
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,23 +26,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
-import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
-import com.example.hungdm.screen.navigation.Destination
-import com.example.hungdm.screen.component.SongItemLinear
+import com.example.hungdm.screen.playlistdetail.component.SongItemLinear
 
 @Composable
 fun PlaylistDetailScreen(
     viewModel: MviViewModel,
     modifier: Modifier = Modifier,
-    destination: Destination.PlaylistDetail = Destination.PlaylistDetail(0),
+    playlistId: Long,
     onBack: () -> Unit = {}
 ) {
 
     val context = LocalContext.current
-    val state = viewModel.state.collectAsState()
-    val playlist = state.value.playlists.find { it.id == destination.playlistID }
+    val state by viewModel.state.collectAsState()
+    val playlist = state.playlists.find { it.id == playlistId }
 
     BackHandler {
         onBack()
@@ -75,22 +72,12 @@ fun PlaylistDetailScreen(
                 SongItemLinear(
                     song = playlist.listSong[it],
                     showOption = showOption,
-                    option1 = stringResource(R.string.remove_song),
-                    option2 = stringResource(R.string.share),
-                    icon1 = R.drawable.outline_delete_24,
-                    icon2 = R.drawable.outline_share_24,
-                    onClickShowOption = {
-                        showOption = true
-                    },
+                    onClickShowOption = { showOption = true },
                     onClickOption1 = {
                         viewModel.processIntent(MviIntent.RemoveSongInPlaylist(context, playlist.listSong[it], playlist))
                     },
-                    onClickOption2 = {
-//                        AppUtils.shareSong(context, playlist.listSong[it]
-                    },
-                    onDismissRequest = {
-                        showOption = false
-                    },
+                    onClickOption2 = {},
+                    onDismissRequest = { showOption = false },
                     onCLickSongPlay = {
                         viewModel.processIntent(
                             MviIntent.OnClickPlayer(

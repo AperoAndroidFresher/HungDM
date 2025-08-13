@@ -65,5 +65,6 @@
     <string name="setting">Cài đặt</string>
 
     <string name="login_failed">Đăng nhập thất bại</string>
+    <string name="success">Thành công!</string>
 
 </resources>

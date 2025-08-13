@@ -1,5 +1,6 @@
 package com.example.hungdm.screen.player.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -23,6 +24,8 @@ fun PlayerHeader(
     onBack: () -> Unit = {},
     onClose: ()->Unit = {},
 ) {
+    BackHandler { onBack() }
+
     Box(
         modifier = modifier.fillMaxWidth(),
     ) {

@@ -1,22 +1,15 @@
 package com.example.hungdm.screen.playlist
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,16 +20,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
 import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.screen.playlist.component.EmptyPlaylist
 import com.example.hungdm.screen.playlist.component.PlaylistDialog
 import com.example.hungdm.screen.playlist.component.PlaylistHeader
-import com.example.hungdm.screen.playlist.component.PlaylistItemLinear
+import com.example.hungdm.screen.playlist.component.PlaylistItem
 
 @Composable
 fun PlaylistScreen(
@@ -78,15 +71,11 @@ fun PlaylistScreen(
             ) {
                 items(playlists.size) {
                     var showOption by remember { mutableStateOf(false) }
-                    PlaylistItemLinear(
+                    PlaylistItem(
                         modifier = Modifier.fillMaxWidth(),
                         playlist = playlists[it],
-                        showOption = showOption,
-                        option1 = stringResource(R.string.remove_playlist),
-                        option2 = stringResource(R.string.rename),
-                        icon1 = R.drawable.outline_delete_24,
-                        icon2 = R.drawable.outline_edit_24,
-                        onClickShowOption = {
+                        showDropDown = showOption,
+                        onClickShowDropDown = {
                             showOption = true
                             selectedPlaylist = playlists[it]
                         },
@@ -136,31 +125,5 @@ fun PlaylistScreen(
                 showRenamePlaylistDialog = false
             }
         )
-    }
-}
-
-@Composable
-fun EmptyPlaylist(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.empty_playlist),
-            color = colorScheme.primary
-        )
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .size(48.dp)
-                .border(1.dp, colorScheme.primary, shape = CircleShape)
-        ) {
-            Icon(painterResource(R.drawable.outline_add_24), contentDescription = null, tint = colorScheme.primary)
-        }
     }
 }

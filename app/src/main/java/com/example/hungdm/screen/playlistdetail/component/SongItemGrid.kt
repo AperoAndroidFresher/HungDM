@@ -1,4 +1,4 @@
-package com.example.hungdm.screen.component
+package com.example.hungdm.screen.playlistdetail.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,17 +26,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hungdm.R
-import com.example.hungdm.component.Dropdown
-import com.example.hungdm.domain.model.Playlist
 import com.example.hungdm.domain.model.Song
 
 @Composable
-fun ItemGrid(
+fun SongItemGrid(
     modifier: Modifier = Modifier,
-    option1: String = "",
-    option2: String = "",
-    icon1: Int = R.drawable.outline_delete_24,
-    icon2: Int = R.drawable.outline_share_24,
     song: Song = Song(100, "Noi nay co anh", "MTP", duration = 100000L, null),
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
@@ -49,7 +43,7 @@ fun ItemGrid(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.wrapContentSize()
     ) {
-        Box() {
+        Box {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(song.img)
@@ -80,18 +74,24 @@ fun ItemGrid(
                         tint = Color.White
                     )
                 }
-                Dropdown(
+                PlaylistDetailDropdown(
                     expanded = showOption,
-                    option1 = option1,
-                    option2 = option2,
-                    icon1 = icon1,
-                    icon2 = icon2,
                     onClickOption1 = onClickOption1,
                     onClickOption2 = onClickOption2,
                     onDismissRequest = onDismissRequest
                 )
             }
         }
+        SongInfoGrid(song = song)
+    }
+}
+
+@Composable
+fun SongInfoGrid(
+    modifier: Modifier = Modifier,
+    song: Song
+) {
+    Column {
         Text(
             text = song.title,
             fontSize = 20.sp,
@@ -119,9 +119,5 @@ fun ItemGrid(
             color = colorScheme.primary,
             modifier = Modifier.padding(8.dp)
         )
-
-
     }
-
-
 }

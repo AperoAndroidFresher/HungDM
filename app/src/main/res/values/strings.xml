@@ -67,4 +67,6 @@
 
     <string name="login_failed">Login failed</string>
 
+    <string name="success">Success!</string>
+
 </resources>

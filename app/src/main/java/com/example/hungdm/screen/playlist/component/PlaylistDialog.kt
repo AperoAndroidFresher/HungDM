@@ -90,7 +90,7 @@ fun DialogActionButtons(
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         TextButton(
             onClick = onCancel,

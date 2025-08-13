@@ -3,16 +3,12 @@ package com.example.hungdm.screen.library
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,7 +24,6 @@ import com.example.hungdm.domain.model.Song
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.res.stringResource
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -37,7 +32,7 @@ import com.example.hungdm.R
 import com.example.hungdm.screen.component.NoInternet
 import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.screen.library.component.AddSongToPlaylistDialog
-import com.example.hungdm.screen.component.SongItemLinear
+import com.example.hungdm.screen.library.component.LibraryContent
 import com.example.hungdm.screen.library.component.LibraryHeader
 import kotlinx.coroutines.delay
 
@@ -48,9 +43,7 @@ fun LibraryScreen(
     onClickNewPlaylist: () -> Unit = {},
     onBack: () -> Unit = {},
 ) {
-    val state = viewModel.state.collectAsState()
-    val listSongLocal = state.value.listSongLocal
-    val listSongRemote = state.value.listSongRemote
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     var selectedSong by remember { mutableStateOf<Song?>(null) }
     var isLoadSong by remember { mutableStateOf(true) }
@@ -58,7 +51,7 @@ fun LibraryScreen(
     var selectedLocal by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        if(listSongLocal.isEmpty()) { viewModel.processIntent(MviIntent.LoadSongLocal(context)) }
+        if(state.listSongLocal.isEmpty()) { viewModel.processIntent(MviIntent.LoadSongLocal(context)) }
         viewModel.processIntent(MviIntent.LoadPlaylistsOfUser)
     }
 
@@ -104,7 +97,7 @@ fun LibraryScreen(
         } else {
             if (selectedLocal) {
                 LibraryContent(
-                    listSong = listSongLocal,
+                    listSong = state.listSongLocal,
                     onClickShowOption = {
                         selectedSong = it
                     },
@@ -118,7 +111,7 @@ fun LibraryScreen(
                         viewModel.processIntent(
                             MviIntent.OnClickPlayer(
                                 song = it,
-                                playerListSong = listSongLocal,
+                                playerListSong = state.listSongLocal,
                                 playerPlaylist = null,
                                 context = context
                             )
@@ -126,9 +119,9 @@ fun LibraryScreen(
                     }
                 )
             } else {
-                if (listSongRemote.isNotEmpty()) {
+                if (state.listSongRemote.isNotEmpty()) {
                     LibraryContent(
-                        listSong = listSongRemote,
+                        listSong = state.listSongRemote,
                         onClickShowOption = {
                             selectedSong = it
                         },
@@ -142,7 +135,7 @@ fun LibraryScreen(
                             viewModel.processIntent(
                                 MviIntent.OnClickPlayer(
                                     song = it,
-                                    playerListSong = listSongRemote,
+                                    playerListSong = state.listSongRemote,
                                     playerPlaylist = null,
                                     context = context
                                 )
@@ -161,7 +154,7 @@ fun LibraryScreen(
 
     if (showAddSongToPlaylistDialog) {
         AddSongToPlaylistDialog(
-            playlists = state.value.playlists,
+            playlists = state.playlists,
             onClickNewPlaylist = {
                 showAddSongToPlaylistDialog = false
                 onClickNewPlaylist()
@@ -173,42 +166,5 @@ fun LibraryScreen(
             },
             onDismiss = { showAddSongToPlaylistDialog = false }
         )
-    }
-}
-
-@Composable
-fun LibraryContent(
-    modifier: Modifier = Modifier,
-    listSong: List<Song> = emptyList(),
-    onClickShowOption: (Song) -> Unit = {},
-    onClickOption1: () -> Unit = {},
-    onClickOption2: () -> Unit = {},
-    onCLickSongPlay: (Song) -> Unit = {}
-) {
-    LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(listSong) {
-            var showOption by remember { mutableStateOf(false) }
-            SongItemLinear(
-                song = it,
-                showOption = showOption,
-                option1 = stringResource(R.string.add_playlist),
-                option2 = stringResource(R.string.share),
-                icon1 = R.drawable.outline_add_24,
-                icon2 = R.drawable.outline_share_24,
-                onClickShowOption = {
-                    showOption = true
-                    onClickShowOption(it)
-                },
-                onClickOption1 = onClickOption1,
-                onClickOption2 = onClickOption2,
-                onDismissRequest = {
-                    showOption = false
-                },
-                onCLickSongPlay = { onCLickSongPlay(it) }
-            )
-        }
     }
 }

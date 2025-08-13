@@ -133,7 +133,6 @@ fun ProfileInputItem(
             color = colorScheme.primary
         )
 
-
         OutlinedTextField(
             modifier = modifier.background(colorScheme.onSecondary),
             textStyle = TextStyle(

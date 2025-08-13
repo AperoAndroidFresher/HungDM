@@ -6,10 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import com.example.hungdm.screen.navigation.AppNavigation
+import com.example.hungdm.navigation.AppNavigation
 import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.utils.AppUtils.getSavedLangCode
-import com.example.hungdm.utils.AppUtils.setLocale
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

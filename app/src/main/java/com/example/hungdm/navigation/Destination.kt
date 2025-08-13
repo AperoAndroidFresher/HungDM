@@ -1,4 +1,4 @@
-package com.example.hungdm.screen.navigation
+package com.example.hungdm.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.example.hungdm.domain.model.UserInfo

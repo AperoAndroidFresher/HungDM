@@ -1,4 +1,4 @@
-package com.example.hungdm.screen.navigation
+package com.example.hungdm.navigation
 
 import android.app.Activity
 import android.widget.Toast

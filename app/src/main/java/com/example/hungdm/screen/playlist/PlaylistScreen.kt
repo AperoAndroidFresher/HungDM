@@ -80,7 +80,7 @@ fun PlaylistScreen(
                             selectedPlaylist = playlists[it]
                         },
                         onClickOption1 = {
-                            viewModel.processIntent(MviIntent.RemovePlaylist(context, selectedPlaylist!!))
+                            viewModel.processIntent(MviIntent.RemovePlaylist(selectedPlaylist!!))
                         },
                         onClickOption2 = {
                             showRenamePlaylistDialog = true

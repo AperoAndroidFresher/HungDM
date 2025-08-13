@@ -51,7 +51,7 @@ fun PlayerScreen(
             onBack = onBack,
             onClose = {
                 onBack()
-                viewModel.processIntent(MviIntent.OnClickClosePlayer(context))
+                viewModel.processIntent(MviIntent.OnClickClosePlayer)
             }
         )
         Spacer(Modifier.size(10.dp))
@@ -98,11 +98,11 @@ fun PlayerScreen(
             isPlay = state.isPlay,
             isRepeat = state.isRepeat,
             isShuffle = state.isShuffle,
-            onClickPause = { viewModel.processIntent(MviIntent.OnChangeSongPlayState(context)) },
-            onClickNext = { viewModel.processIntent(MviIntent.OnClickNextSong(context)) },
-            onClickPrevious = { viewModel.processIntent(MviIntent.OnClickPreviousSong(context)) },
-            onClickShuffle = { viewModel.processIntent(MviIntent.OnClickShuffle(context)) },
-            onClickRepeat = { viewModel.processIntent(MviIntent.OnClickRepeat(context)) }
+            onClickPause = { viewModel.processIntent(MviIntent.OnChangeSongPlayState) },
+            onClickNext = { viewModel.processIntent(MviIntent.OnClickNextSong) },
+            onClickPrevious = { viewModel.processIntent(MviIntent.OnClickPreviousSong) },
+            onClickShuffle = { viewModel.processIntent(MviIntent.OnClickShuffle) },
+            onClickRepeat = { viewModel.processIntent(MviIntent.OnClickRepeat) }
         )
     }
 }

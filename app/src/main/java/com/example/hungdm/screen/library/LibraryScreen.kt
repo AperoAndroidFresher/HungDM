@@ -112,8 +112,7 @@ fun LibraryScreen(
                             MviIntent.OnClickPlayer(
                                 song = it,
                                 playerListSong = state.listSongLocal,
-                                playerPlaylist = null,
-                                context = context
+                                playerPlaylist = null
                             )
                         )
                     }
@@ -136,8 +135,7 @@ fun LibraryScreen(
                                 MviIntent.OnClickPlayer(
                                     song = it,
                                     playerListSong = state.listSongRemote,
-                                    playerPlaylist = null,
-                                    context = context
+                                    playerPlaylist = null
                                 )
                             )
                         }
@@ -160,7 +158,7 @@ fun LibraryScreen(
                 onClickNewPlaylist()
             },
             onAddSongToPlaylist = {
-                viewModel.processIntent(MviIntent.AddSongToPlaylist(context, selectedSong!!, it))
+                viewModel.processIntent(MviIntent.AddSongToPlaylist(selectedSong!!, it))
                 showAddSongToPlaylistDialog = false
                 selectedSong = null
             },

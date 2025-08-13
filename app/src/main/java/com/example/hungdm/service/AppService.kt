@@ -2,6 +2,7 @@ package com.example.hungdm.service
 
 import android.content.Intent
 import android.media.MediaPlayer
+import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
@@ -68,13 +69,7 @@ class AppService : LifecycleService() {
                 pauseSong()
             }
             ACTION_CLOSE -> {
-                playerPlaylist.value = null
-                playerListSong.value = null
-                playerSongIndex.value = null
-                playerSong.value = null
-                playerTime.value = 0L
-                isPlay.value = false
-                closeSong()
+                close()
             }
             ACTION_RESUME -> {
                 isPlay.value = true
@@ -105,6 +100,10 @@ class AppService : LifecycleService() {
             }
             ACTION_UPDATE -> {
                 playerPlaylist.value = intent.getParcelableExtra<Playlist>(EXTRA_PLAYLIST)
+                if(!playerPlaylist.value!!.listSong.map { it.id }.contains(playerSong.value?.id)){
+                    if(playerPlaylist.value!!.listSong.isNotEmpty()) nextSong() else close()
+                    Log.d("Service", "remove")
+                }
             }
         }
         return START_STICKY
@@ -132,6 +131,7 @@ class AppService : LifecycleService() {
                         repeatSong()
                     } else nextSong()
                 }
+
             }
             isPlay.value = true
             startUpdatingTime()
@@ -153,11 +153,18 @@ class AppService : LifecycleService() {
         )
     }
 
-    private fun closeSong() {
+    private fun close() {
+        playerPlaylist.value = null
+        playerListSong.value = null
+        playerSongIndex.value = null
+        playerSong.value = null
+        playerTime.value = 0L
+        isPlay.value = false
         mediaPlayer?.stop()
         mediaPlayer?.release()
         mediaPlayer = null
         notificationHelper = null
+        timeJob?.cancel()
         stopSelf()
     }
 
@@ -246,6 +253,21 @@ class AppService : LifecycleService() {
         playSong()
     }
 
+    private fun ensureNotification() {
+        val title = playerSong.value?.title ?: "Playing"
+        val playing = isPlay.value
+        val notif = (notificationHelper ?: NotificationHelper(this))
+            .also { notificationHelper = it }
+            .createNotification(title, playing)
+        // Nếu đã ở foreground thì update, còn chưa thì startForeground
+        if (playing) {
+            startForeground(1, notif)
+        } else {
+            // update notification khi pause
+            startForeground(1, notif)
+        }
+    }
+
 
     private fun startUpdatingTime() {
         timeJob?.cancel()
@@ -258,3 +280,267 @@ class AppService : LifecycleService() {
         }
     }
 }
+
+
+
+
+//class AppService : LifecycleService() {
+//
+//    companion object {
+//        const val ACTION_PLAY = "ACTION_PLAY"
+//        const val ACTION_PAUSE = "ACTION_PAUSE"
+//        const val ACTION_RESUME = "ACTION_RESUME"
+//        const val ACTION_CLOSE = "ACTION_CLOSE"
+//        const val ACTION_NEXT = "ACTION_NEXT"
+//        const val ACTION_PREVIOUS = "ACTION_PREVIOUS"
+//        const val ACTION_UPDATE = "ACTION_UPDATE"
+//        const val ACTION_SHUFFLE = "ACTION_SHUFFLE"
+//        const val ACTION_REPEAT = "ACTION_REPEAT"
+//
+//        const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
+//        const val EXTRA_LIST_SONG = "EXTRA_LIST_SONG"
+//        const val EXTRA_INDEX = "EXTRA_INDEX"
+//        const val EXTRA_SONG = "EXTRA_SONG"
+//
+//        val playerPlaylist = MutableStateFlow<Playlist?>(null)
+//        val playerListSong = MutableStateFlow<List<Song>?>(null)
+//        val playerSongIndex = MutableStateFlow<Int?>(null)
+//        val playerSong = MutableStateFlow<Song?>(null)
+//        val playerTime = MutableStateFlow(0L)
+//        val isPlay = MutableStateFlow(false)
+//        val isShuffle = MutableStateFlow(false)
+//        val isRepeat = MutableStateFlow(false)
+//    }
+//
+//    private var mediaPlayer: MediaPlayer? = null
+//    private var notificationHelper: NotificationHelper? = null
+//    private var timeJob: Job? = null
+//
+//    override fun onCreate() {
+//        super.onCreate()
+//        notificationHelper = NotificationHelper(this)
+//    }
+//
+//    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+//        super.onStartCommand(intent, flags, startId)
+//
+//        val action = intent?.action ?: return START_STICKY
+//        when (action) {
+//            ACTION_PLAY -> {
+//                val pl = intent.getParcelableExtra<Playlist>(EXTRA_PLAYLIST)
+//                val list = intent.getParcelableArrayListExtra<Song>(EXTRA_LIST_SONG)
+//                val index = intent.getIntExtra(EXTRA_INDEX, -1)
+//                val song = intent.getParcelableExtra<Song>(EXTRA_SONG)
+//
+//                if ((pl == null && list.isNullOrEmpty()) || index < 0 || song == null) {
+//                    // Thiếu dữ liệu, bỏ qua để tránh crash
+//                    return START_STICKY
+//                }
+//
+//                playerPlaylist.value = pl
+//                playerListSong.value = list
+//                playerSongIndex.value = index
+//                playerSong.value = song
+//                playerTime.value = 0L
+//                isPlay.value = true
+//                playSong()
+//            }
+//
+//            ACTION_PAUSE -> {
+//                isPlay.value = false
+//                pauseSong()
+//            }
+//
+//            ACTION_CLOSE -> {
+//                resetState()
+//                closeSong()
+//            }
+//
+//            ACTION_RESUME -> {
+//                isPlay.value = true
+//                resumeSong()
+//            }
+//
+//            ACTION_NEXT -> when {
+//                isShuffle.value -> shuffleSong()
+//                isRepeat.value -> repeatSong()
+//                else -> nextSong()
+//            }
+//
+//            ACTION_PREVIOUS -> when {
+//                isShuffle.value -> shuffleSong()
+//                isRepeat.value -> repeatSong()
+//                else -> previousSong()
+//            }
+//
+//            ACTION_SHUFFLE -> {
+//                isShuffle.value = !isShuffle.value
+//                if (isShuffle.value) isRepeat.value = false
+//                // Không đổi bài ngay để giữ UX; nếu muốn đổi ngay có thể gọi shuffleSong()
+//            }
+//
+//            ACTION_REPEAT -> {
+//                isRepeat.value = !isRepeat.value
+//                if (isRepeat.value) isShuffle.value = false
+//            }
+//
+//            ACTION_UPDATE -> {
+//                playerPlaylist.value = intent.getParcelableExtra(EXTRA_PLAYLIST)
+//                // Không đổi bài nếu index/song không đổi
+//            }
+//        }
+//        return START_STICKY
+//    }
+//
+//    override fun onDestroy() {
+//        timeJob?.cancel()
+//        timeJob = null
+//        mediaPlayer?.release()
+//        mediaPlayer = null
+//        stopForeground(true)
+//        super.onDestroy()
+//    }
+//
+//    // ---------- Playback ----------
+//
+//    private fun playSong() {
+//        val uri = playerSong.value?.uri ?: return
+//        try {
+//            timeJob?.cancel()
+//            mediaPlayer?.release()
+//            mediaPlayer = MediaPlayer().apply {
+//                setDataSource(applicationContext, uri)
+//                setOnPreparedListener {
+//                    start()
+//                    isLooping = false
+//                    startUpdatingTime()
+//                    ensureNotification()
+//                }
+//                setOnCompletionListener {
+//                    when {
+//                        isShuffle.value -> shuffleSong()
+//                        isRepeat.value -> repeatSong()
+//                        else -> nextSong()
+//                    }
+//                }
+//                prepareAsync()
+//            }
+//            isPlay.value = true
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            // Thất bại -> thử dừng sạch để tránh treo
+//            pauseSong()
+//        }
+//    }
+//
+//    private fun pauseSong() {
+//        timeJob?.cancel()
+//        timeJob = null
+//        mediaPlayer?.pause()
+//        ensureNotification()
+//    }
+//
+//    private fun closeSong() {
+//        timeJob?.cancel()
+//        timeJob = null
+//        mediaPlayer?.stop()
+//        mediaPlayer?.release()
+//        mediaPlayer = null
+//        stopForeground(true)
+//        stopSelf()
+//    }
+//
+//    private fun resumeSong() {
+//        mediaPlayer?.let {
+//            if (!it.isPlaying) {
+//                it.start()
+//                startUpdatingTime()
+//                ensureNotification()
+//            }
+//        }
+//    }
+//
+//    private fun nextSong() {
+//        val (list, idx) = currentListAndIndex() ?: return
+//        if (list.isEmpty()) return
+//
+//        val nextIndex = if (idx >= list.lastIndex) 0 else idx + 1
+//        setCurrentByIndex(nextIndex, list)
+//        playSong()
+//    }
+//
+//    private fun previousSong() {
+//        val (list, idx) = currentListAndIndex() ?: return
+//        if (list.isEmpty()) return
+//
+//        val prevIndex = if (idx <= 0) list.lastIndex else idx - 1
+//        setCurrentByIndex(prevIndex, list)
+//        playSong()
+//    }
+//
+//    private fun shuffleSong() {
+//        val (list, _) = currentListAndIndex() ?: return
+//        if (list.isEmpty()) return
+//
+//        val nextIndex = Random.nextInt(0, list.size)
+//        setCurrentByIndex(nextIndex, list)
+//        playSong()
+//    }
+//
+//    private fun repeatSong() {
+//        val (list, idx) = currentListAndIndex() ?: return
+//        if (list.isEmpty() || idx !in list.indices) return
+//
+//        setCurrentByIndex(idx, list)
+//        playSong()
+//    }
+//
+//    // ---------- Helpers ----------
+//
+//    private fun currentListAndIndex(): Pair<List<Song>, Int>? {
+//        val list = playerPlaylist.value?.listSong ?: playerListSong.value ?: emptyList()
+//        val idx = playerSongIndex.value ?: -1
+//        return if (idx in list.indices) list to idx else null
+//    }
+//
+//    private fun setCurrentByIndex(index: Int, list: List<Song>) {
+//        playerSongIndex.value = index
+//        playerSong.value = list[index]
+//        playerTime.value = 0L
+//    }
+//
+//    private fun startUpdatingTime() {
+//        timeJob?.cancel()
+//        timeJob = lifecycleScope.launch {
+//            while (isActive) {
+//                val t = mediaPlayer?.currentPosition?.toLong() ?: 0L
+//                playerTime.value = t
+//                delay(100)
+//            }
+//        }
+//    }
+//
+//    private fun ensureNotification() {
+//        val title = playerSong.value?.title ?: "Playing"
+//        val playing = isPlay.value
+//        val notif = (notificationHelper ?: NotificationHelper(this))
+//            .also { notificationHelper = it }
+//            .createNotification(title, playing)
+//        // Nếu đã ở foreground thì update, còn chưa thì startForeground
+//        if (playing) {
+//            startForeground(1, notif)
+//        } else {
+//            // update notification khi pause
+//            startForeground(1, notif)
+//        }
+//    }
+//
+//    private fun resetState() {
+//        playerPlaylist.value = null
+//        playerListSong.value = null
+//        playerSongIndex.value = null
+//        playerSong.value = null
+//        playerTime.value = 0L
+//        isPlay.value = false
+//    }
+//}

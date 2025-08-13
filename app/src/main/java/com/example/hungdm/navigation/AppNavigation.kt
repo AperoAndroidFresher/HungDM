@@ -155,10 +155,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                     backStack.add(Destination.Player)
                                 },
                                 onCLickPause = {
-                                    viewModel.processIntent(MviIntent.OnChangeSongPlayState(context))
+                                    viewModel.processIntent(MviIntent.OnChangeSongPlayState)
                                 },
                                 onClickClose = {
-                                    viewModel.processIntent(MviIntent.OnClickClosePlayer(context))
+                                    viewModel.processIntent(MviIntent.OnClickClosePlayer)
                                 }
                             )
                         }

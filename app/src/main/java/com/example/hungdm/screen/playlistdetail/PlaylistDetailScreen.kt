@@ -83,7 +83,7 @@ fun PlaylistDetailScreen(
                         showOption = showOption,
                         onClickShowOption = { showOption = true },
                         onClickOption1 = {
-                            viewModel.processIntent(MviIntent.RemoveSongInPlaylist(context, playlist.listSong[it], playlist))
+                            viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
                         },
                         onClickOption2 = {},
                         onDismissRequest = { showOption = false },
@@ -92,8 +92,7 @@ fun PlaylistDetailScreen(
                                 MviIntent.OnClickPlayer(
                                     song = playlist.listSong[it],
                                     playerListSong = null,
-                                    playerPlaylist = playlist,
-                                    context = context
+                                    playerPlaylist = playlist
                                 )
                             )
                         }
@@ -106,7 +105,7 @@ fun PlaylistDetailScreen(
                         showOption = showOption,
                         onClickShowOption = { showOption = true },
                         onClickOption1 = {
-                            viewModel.processIntent(MviIntent.RemoveSongInPlaylist(context, playlist.listSong[it], playlist))
+                            viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
                         },
                         onClickOption2 = {},
                         onDismissRequest = { showOption = false },
@@ -115,8 +114,7 @@ fun PlaylistDetailScreen(
                                 MviIntent.OnClickPlayer(
                                     song = playlist.listSong[it],
                                     playerListSong = null,
-                                    playerPlaylist = playlist,
-                                    context = context
+                                    playerPlaylist = playlist
                                 )
                             )
                         }

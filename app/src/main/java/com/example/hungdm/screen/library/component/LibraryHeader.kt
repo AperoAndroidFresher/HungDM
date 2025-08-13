@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,15 +39,17 @@ fun LibraryHeader(
     Column (
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxWidth().padding(top = 8.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
-        Text(
-            text = stringResource(R.string.library),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.primary,
-        )
-        Spacer(Modifier.size(20.dp))
+        TextButton({}) {
+            Text(
+                text = stringResource(R.string.library),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.primary,
+            )
+        }
+        Spacer(Modifier.size(10.dp))
         Row {
             Button(
                 onClick = onClickLocal,

@@ -107,7 +107,7 @@ fun HomeScreen(
                 viewModel.processIntent(MviIntent.OnClickSetting)
             }
         )
-        Spacer(modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.size(10.dp))
 
         if (topAlbums == null || topTracks == null || topArtists == null) {
             if (isLoading) {

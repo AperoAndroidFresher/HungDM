@@ -80,7 +80,7 @@ fun ProfileInput(
         ProfileInputItem(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp),
+                .height(150.dp),
             text = stringResource(R.string.desc),
             hint = stringResource(R.string.enter_desc),
             value = userInfo.desc,
@@ -103,7 +103,7 @@ fun ProfileInput(
             Button(
                 onClick = onLogout,
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(colorScheme.onSecondary),
+                colors = ButtonDefaults.buttonColors(colorScheme.surfaceTint),
                 modifier = Modifier
                     .width(170.dp)
                     .height(60.dp),

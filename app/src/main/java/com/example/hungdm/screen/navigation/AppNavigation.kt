@@ -27,9 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.example.hungdm.R
 import com.example.hungdm.component.Splash
 import com.example.hungdm.screen.SettingScreen
 import com.example.hungdm.screen.component.PlayerBottomBar
@@ -61,11 +64,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    val bottomItem = listOf(
-        BottomItem("Home", Icons.Default.Home, Destination.Home),
-        BottomItem("Library", Icons.Default.DateRange, Destination.Library),
-        BottomItem("Playlist", Icons.Default.PlayArrow, Destination.Playlist)
-    )
     var selectedBottomBar by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
@@ -136,13 +134,17 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     ) {
         Scaffold(
             bottomBar = {
-                val showBottomNav = backStack.lastOrNull()?.let {
-                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile &&
-                            it !is Destination.Player && it !is Destination.Splash && it !is Destination.TopTracks &&
-                            it !is Destination.TopAlbums && it !is Destination.TopArtists
+                val showBottomBar = backStack.lastOrNull()?.let {
+                    it is Destination.Home || it is Destination.Playlist ||
+                            it is Destination.Library || it is Destination.PlaylistDetail
                 } ?: false
 
-                if (showBottomNav) {
+                if (showBottomBar) {
+                    val bottomItem = listOf(
+                        BottomItem(stringResource(R.string.home), R.drawable.outline_home_24, Destination.Home),
+                        BottomItem(stringResource(R.string.library), R.drawable.outline_library_music_24, Destination.Library),
+                        BottomItem(stringResource(R.string.playlist), R.drawable.outline_playlist_play_24, Destination.Playlist)
+                    )
                     Column {
                         if(state.playerPlaylist!=null || state.playerListSong!=null){
                             PlayerBottomBar(
@@ -172,7 +174,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                         backStack.clear()
                                         backStack.add(item.destination)
                                     },
-                                    icon = { Icon(item.icon, null) },
+                                    icon = { Icon(painterResource(item.icon), null) },
                                     label = { Text(item.label, color = colorScheme.primary) }
                                 )
                             }
@@ -273,6 +275,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
 data class BottomItem(
     var label: String,
-    var icon: ImageVector,
+    var icon: Int,
     val destination: Destination
 )

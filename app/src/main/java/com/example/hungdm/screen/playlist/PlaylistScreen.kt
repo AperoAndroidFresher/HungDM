@@ -55,7 +55,7 @@ fun PlaylistScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colorScheme.background)
-            .padding(start = 8.dp, end = 8.dp),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PlaylistHeader(

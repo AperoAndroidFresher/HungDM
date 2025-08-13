@@ -59,7 +59,7 @@ fun PopUp(
                         modifier = Modifier.size(97.dp)
                     )
                     Text(
-                        text = "Success!",
+                        text = stringResource(R.string.success),
                         fontSize = 36.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF25AE88)

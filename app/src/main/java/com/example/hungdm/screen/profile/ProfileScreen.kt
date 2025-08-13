@@ -79,7 +79,7 @@ fun ProfileScreen(
         modifier = modifier
             .background(colorScheme.background)
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp)
+            .padding(16.dp)
             .pointerInput(Unit) {
                 detectTapGestures {
                     focusManager.clearFocus()
@@ -92,7 +92,7 @@ fun ProfileScreen(
             onChangeTheme = { viewModel.processIntent(MviIntent.ChangeTheme) },
             onEdit = { isEdit = !isEdit }
         )
-        Spacer(Modifier.size(20.dp))
+        Spacer(Modifier.size(10.dp))
         Avatar(
             isEdit = isEdit,
             onChangeAvatar = { launcher.launch(arrayOf("image/*")) },

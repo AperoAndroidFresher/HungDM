@@ -1,7 +1,5 @@
 package com.example.hungdm.screen
 
-import android.content.Context
-import android.view.Menu
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,14 +29,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
 import com.example.hungdm.utils.AppUtils
-import com.example.hungdm.utils.AppUtils.setAppLanguage
 
-@Preview
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
@@ -133,7 +128,6 @@ fun SettingContent(
     showMenu: Boolean,
     onLanguageSelected: (String) -> Unit
 ) {
-    val context = LocalContext.current
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -164,17 +158,17 @@ fun SettingContent(
             )
             DropdownMenu(
                 expanded = showMenu,
-                onDismissRequest = onDismissRequest
+                onDismissRequest = onDismissRequest,
+                modifier = Modifier.background(Color.DarkGray)
             ) {
                 languages.forEach { (code, label) ->
                     DropdownMenuItem(
-                        text = { Text(label) },
+                        text = { Text(label, color = Color.White) },
                         onClick = {
                             onLanguageSelected(code)
                             onDismissRequest()
                         }
                     )
-
                 }
             }
         }

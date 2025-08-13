@@ -254,7 +254,6 @@ class AppService : LifecycleService() {
                 val time = mediaPlayer?.currentPosition?.toLong() ?: 0L
                 playerTime.value = time
                 delay(100)
-                Log.d("tag","timejob $time")
             }
         }
     }

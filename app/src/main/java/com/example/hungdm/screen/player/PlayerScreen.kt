@@ -45,7 +45,7 @@ fun PlayerScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colorScheme.background)
-            .padding(start = 20.dp, end = 20.dp),
+            .padding(16.dp),
     ){
         PlayerHeader(
             onBack = onBack,
@@ -54,7 +54,7 @@ fun PlayerScreen(
                 viewModel.processIntent(MviIntent.OnClickClosePlayer(context))
             }
         )
-        Spacer(Modifier.size(20.dp))
+        Spacer(Modifier.size(10.dp))
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(state.playerSong?.img)

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,13 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.hungdm.R
 import com.example.hungdm.screen.mvi.MviIntent
 import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.screen.playlistdetail.component.PlaylistDetailHeader
 import com.example.hungdm.screen.playlistdetail.component.SongItemLinear
 
 @Composable
@@ -50,18 +48,13 @@ fun PlaylistDetailScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colorScheme.background)
-            .padding(start = 8.dp, end = 8.dp),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Text(
-            text = stringResource(R.string.playlist_detail),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.primary
-        )
+        PlaylistDetailHeader()
 
-        Spacer(Modifier.size(20.dp))
+        Spacer(Modifier.size(10.dp))
 
         LazyColumn(
             contentPadding = PaddingValues(16.dp),

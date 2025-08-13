@@ -117,7 +117,6 @@ object AppUtils {
 
     fun setAppLanguage(langCode: String, context: Context) {
         saveLangCode(context, langCode)
-//        (context as? Activity)?.recreate()
         val locale = Locale(langCode)
         Locale.setDefault(locale)
 
@@ -130,7 +129,6 @@ object AppUtils {
 
         if (context is Activity) {
             context.window.decorView.requestLayout()
-
         }
     }
 

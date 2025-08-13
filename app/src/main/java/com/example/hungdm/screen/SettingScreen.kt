@@ -53,7 +53,7 @@ fun SettingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(start = 8.dp, end = 8.dp)
     ) {
         SettingHeader(
             onBack = onBack,

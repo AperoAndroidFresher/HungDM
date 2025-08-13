@@ -79,7 +79,7 @@ fun ProfileScreen(
         modifier = modifier
             .background(colorScheme.background)
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(start = 8.dp, end = 8.dp)
             .pointerInput(Unit) {
                 detectTapGestures {
                     focusManager.clearFocus()

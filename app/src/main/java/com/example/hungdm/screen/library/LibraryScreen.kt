@@ -70,7 +70,7 @@ fun LibraryScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colorScheme.background)
-            .padding(16.dp)
+            .padding(start = 8.dp, end = 8.dp)
     ) {
         LibraryHeader(
             selectedLocal = selectedLocal,

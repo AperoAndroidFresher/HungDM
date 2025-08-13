@@ -1,5 +1,6 @@
 package com.example.hungdm.screen.playlistdetail.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,7 @@ import com.example.hungdm.screen.component.SongInfo
 @Composable
 fun SongItemLinear(
     modifier: Modifier = Modifier,
+    isPlay: Boolean = false,
     song: Song = Song(0, "Noi nay co anh", "MTP", duration = 100000L, null),
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
@@ -38,6 +41,7 @@ fun SongItemLinear(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .background(if(isPlay) colorScheme.surfaceContainerHigh else Color.Transparent)
             .clickable {
                 onCLickSongPlay()
             }

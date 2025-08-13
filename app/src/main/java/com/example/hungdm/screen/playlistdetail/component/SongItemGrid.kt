@@ -1,6 +1,7 @@
 package com.example.hungdm.screen.playlistdetail.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,17 +32,23 @@ import com.example.hungdm.domain.model.Song
 @Composable
 fun SongItemGrid(
     modifier: Modifier = Modifier,
+    isPlay: Boolean = false,
     song: Song = Song(100, "Noi nay co anh", "MTP", duration = 100000L, null),
     showOption: Boolean = false,
     onClickShowOption: () -> Unit = {},
     onClickOption1: () -> Unit = {},
     onClickOption2: () -> Unit = {},
+    onCLickSongPlay: () -> Unit = {},
     onDismissRequest: () -> Unit = {}
 ) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.wrapContentSize()
+            .background(if(isPlay) colorScheme.surfaceContainerHigh else Color.Transparent)
+            .clickable {
+                onCLickSongPlay()
+            }
     ) {
         Box {
             AsyncImage(
@@ -53,7 +60,7 @@ fun SongItemGrid(
                     .build(),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(135.dp)
+                    .size(140.dp)
                     .align(Alignment.Center)
             )
 
@@ -91,10 +98,12 @@ fun SongInfoGrid(
     modifier: Modifier = Modifier,
     song: Song
 ) {
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = song.title,
-            fontSize = 20.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
             overflow = TextOverflow.Ellipsis,

@@ -20,7 +20,8 @@ import com.example.hungdm.R
 @Composable
 fun PlaylistDetailHeader(
     modifier: Modifier = Modifier,
-    onClickNewPlaylist: ()->Unit = {},
+    isLinear: Boolean,
+    onClick: ()->Unit = {},
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
@@ -34,11 +35,11 @@ fun PlaylistDetailHeader(
         )
 
         IconButton(
-            onClick = onClickNewPlaylist,
+            onClick = onClick,
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
             Icon(
-                painter = painterResource(R.drawable.type),
+                painter = painterResource(if(isLinear) R.drawable.type else R.drawable.abou1),
                 contentDescription = null,
                 tint = colorScheme.primary,
                 modifier = Modifier.size(20.dp)

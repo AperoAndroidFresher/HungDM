@@ -39,7 +39,6 @@ fun PlaylistDetailScreen(
     onBack: () -> Unit = {}
 ) {
 
-    val context = LocalContext.current
     val state by viewModel.state.collectAsState()
     val playlist = state.playlists.find { it.id == playlistId }
     val songPlayIndex = if(playlist!!.id==state.playerPlaylist?.id) {

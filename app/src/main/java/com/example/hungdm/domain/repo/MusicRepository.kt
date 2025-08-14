@@ -10,12 +10,13 @@ interface MusicRepository {
     fun playSong(song: Song, listSong: List<Song>?, playlist: Playlist?, index: Int)
     fun pause()
     fun resume()
-    fun close()
+    fun close() // xoa playlist dang phat, huy service, logout
     fun next()
     fun previous()
     fun shuffle()
     fun repeat()
-    fun updatePlaylist(playlist: Playlist)
+    fun updatePlaylist(playlist: Playlist) // them bai hat vao playlist, xoa bai hat dang khong phat
+    fun handleCurrentSongDeleted() // xoa bai hat dang phat
 }
 
 class MusicRepositoryImpl(private val context: Context) : MusicRepository {
@@ -38,6 +39,7 @@ class MusicRepositoryImpl(private val context: Context) : MusicRepository {
     override fun previous() = sendAction(AppService.ACTION_PREVIOUS)
     override fun shuffle() = sendAction(AppService.ACTION_SHUFFLE)
     override fun repeat() = sendAction(AppService.ACTION_REPEAT)
+    override fun handleCurrentSongDeleted() = sendAction(AppService.ACTION_HANDLE_CURRENT_SONG_DELETE)
 
     override fun updatePlaylist(playlist: Playlist) {
         val intent = Intent(context, AppService::class.java).apply {
@@ -49,6 +51,6 @@ class MusicRepositoryImpl(private val context: Context) : MusicRepository {
 
     private fun sendAction(action: String) {
         val intent = Intent(context, AppService::class.java).apply { this.action = action }
-        context.startService(intent)
+        context.startForegroundService(intent)
     }
 }

@@ -356,7 +356,8 @@ class MviViewModel(
                     if(newPlaylist!!.listSong.isEmpty()){
                         musicRepository.close()
                     } else {
-                        musicRepository.next()
+                        musicRepository.updatePlaylist(newPlaylist)
+                        musicRepository.handleCurrentSongDeleted()
                     }
                 } else {
                     musicRepository.updatePlaylist(newPlaylist!!)

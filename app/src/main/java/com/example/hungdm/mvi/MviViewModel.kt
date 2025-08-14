@@ -215,6 +215,8 @@ class MviViewModel(
 
                 is MviIntent.OnClickPreviousSong -> musicRepository.previous()
 
+                is MviIntent.OnSeek -> musicRepository.seek(intent.position)
+
                 is MviIntent.OnClickShuffle -> musicRepository.shuffle()
 
                 is MviIntent.OnClickRepeat -> musicRepository.repeat()

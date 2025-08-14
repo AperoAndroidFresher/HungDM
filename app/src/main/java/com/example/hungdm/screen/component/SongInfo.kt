@@ -15,13 +15,13 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SongInfo(
     modifier: Modifier = Modifier,
-    title: String = "",
+    title: String = "chung ta roi se hanh phuc j97 jack 97",
     artist: String = ""
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(4.dp)
-            .width(210.dp)
+            .width(180.dp)
     ) {
         Text(
             text = title,

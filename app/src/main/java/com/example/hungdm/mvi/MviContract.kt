@@ -61,6 +61,7 @@ sealed interface MviIntent{
     data object OnClickPreviousSong: MviIntent
     data object OnClickShuffle: MviIntent
     data object OnClickRepeat: MviIntent
+    data class OnSeek(val position: Int): MviIntent
 
     data object ChangeTheme : MviIntent
 }

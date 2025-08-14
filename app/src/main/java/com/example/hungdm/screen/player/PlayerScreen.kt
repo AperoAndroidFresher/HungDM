@@ -37,7 +37,6 @@ fun PlayerScreen(
     onBack: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
 
     BackHandler { onBack() }
 
@@ -90,7 +89,10 @@ fun PlayerScreen(
         state.playerSong?.let {
             SongProgress(
                 playerTime = state.playerTime,
-                duration = it.duration
+                duration = it.duration,
+                onSeek = { position ->
+                    viewModel.processIntent(MviIntent.OnSeek(position))
+                }
             )
         }
         Spacer(Modifier.size(10.dp))

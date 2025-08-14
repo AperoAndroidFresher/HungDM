@@ -30,6 +30,7 @@ import com.example.hungdm.screen.component.PlaylistInfo
 fun PlaylistItem(
     modifier: Modifier = Modifier,
     playlist: Playlist = Playlist(),
+    isPlay: Boolean = false,
     showDropDown: Boolean = false,
     onClickShowDropDown: () -> Unit = {},
     onClickOption1: () -> Unit = {},
@@ -41,6 +42,7 @@ fun PlaylistItem(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .background(if(isPlay) colorScheme.surfaceContainerHigh else Color.Transparent)
             .clickable {
                 onCLickShowPlaylistDetail()
             }

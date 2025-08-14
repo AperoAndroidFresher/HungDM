@@ -15,6 +15,7 @@ interface MusicRepository {
     fun previous()
     fun shuffle()
     fun repeat()
+    fun seek(position: Int)
     fun updatePlaylist(playlist: Playlist) // them bai hat vao playlist, xoa bai hat dang khong phat
     fun handleCurrentSongDeleted() // xoa bai hat dang phat
 }
@@ -41,16 +42,24 @@ class MusicRepositoryImpl(private val context: Context) : MusicRepository {
     override fun repeat() = sendAction(AppService.ACTION_REPEAT)
     override fun handleCurrentSongDeleted() = sendAction(AppService.ACTION_HANDLE_CURRENT_SONG_DELETE)
 
+    override fun seek(position: Int) {
+        val intent = Intent(context, AppService::class.java).apply {
+            action = AppService.ACTION_SEEK
+            putExtra(AppService.EXTRA_SEEK, position)
+        }
+        context.startService(intent)
+    }
+
     override fun updatePlaylist(playlist: Playlist) {
         val intent = Intent(context, AppService::class.java).apply {
             action = AppService.ACTION_UPDATE
             putExtra(AppService.EXTRA_PLAYLIST, playlist)
         }
-        context.startForegroundService(intent)
+        context.startService(intent)
     }
 
     private fun sendAction(action: String) {
         val intent = Intent(context, AppService::class.java).apply { this.action = action }
-        context.startForegroundService(intent)
+        context.startService(intent)
     }
 }

@@ -29,12 +29,14 @@ class AppService : LifecycleService() {
         const val ACTION_PREVIOUS = "ACTION_PREVIOUS"
         const val ACTION_UPDATE = "ACTION_UPDATE"
         const val ACTION_SHUFFLE = "ACTION_SHUFFLE"
+        const val ACTION_SEEK = "ACTION_SEEK"
         const val ACTION_HANDLE_CURRENT_SONG_DELETE = "ACTION_HANDLE_CURRENT_SONG_DELETE"
         const val ACTION_REPEAT = "ACTION_REPEAT"
         const val EXTRA_PLAYLIST = "EXTRA_PLAYLIST"
         const val EXTRA_LIST_SONG = "EXTRA_LIST_SONG"
         const val EXTRA_INDEX = "EXTRA_INDEX"
         const val EXTRA_SONG = "EXTRA_SONG"
+        const val EXTRA_SEEK = "EXTRA_SEEK"
 
         val playerPlaylist: MutableStateFlow<Playlist?> = MutableStateFlow(null)
         val playerListSong: MutableStateFlow<List<Song>?> = MutableStateFlow(null)
@@ -68,17 +70,21 @@ class AppService : LifecycleService() {
                 isPlay.value = true
                 playSong()
             }
+
             ACTION_PAUSE -> {
                 isPlay.value = false
                 pauseSong()
             }
+
             ACTION_CLOSE -> {
                 close()
             }
+
             ACTION_RESUME -> {
                 isPlay.value = true
                 resumeSong()
             }
+
             ACTION_NEXT -> {
                 if(isShuffle.value){
                     shuffleSong()
@@ -87,6 +93,7 @@ class AppService : LifecycleService() {
                 } else nextSong()
 
             }
+
             ACTION_PREVIOUS -> {
                 if(isShuffle.value){
                     shuffleSong()
@@ -94,17 +101,26 @@ class AppService : LifecycleService() {
                     repeatSong()
                 } else previousSong()
             }
+
             ACTION_SHUFFLE -> {
                 isShuffle.value = !isShuffle.value
                 isRepeat.value = false
             }
+
             ACTION_REPEAT -> {
                 isRepeat.value = !isRepeat.value
                 isShuffle.value = false
             }
+
+            ACTION_SEEK -> {
+                val position = intent.getIntExtra(EXTRA_SEEK,0)
+                mediaPlayer?.seekTo(position)
+            }
+
             ACTION_UPDATE -> {
                 playerPlaylist.value = intent.getParcelableExtra<Playlist>(EXTRA_PLAYLIST)
             }
+
             ACTION_HANDLE_CURRENT_SONG_DELETE -> { // xoa dung bai hat dang phat
                 if(playerPlaylist.value!!.listSong.isNotEmpty()){
                     if (playerSongIndex.value!! > playerPlaylist.value!!.listSong.size - 1) {
@@ -131,9 +147,10 @@ class AppService : LifecycleService() {
             mediaPlayer?.release()
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(applicationContext, playerSong.value?.uri!!)
-                prepare()
-                start()
-                isLooping = false
+                setOnPreparedListener {
+                    it.start()
+                }
+                prepareAsync()
                 setOnCompletionListener {
                     if(isShuffle.value){
                         shuffleSong()
@@ -141,7 +158,6 @@ class AppService : LifecycleService() {
                         repeatSong()
                     } else nextSong()
                 }
-
             }
             isPlay.value = true
             startUpdatingTime()

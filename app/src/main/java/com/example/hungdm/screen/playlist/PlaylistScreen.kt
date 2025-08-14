@@ -19,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
@@ -37,13 +36,14 @@ fun PlaylistScreen(
     viewModel: MviViewModel,
     onBack: () -> Unit = {},
 ) {
-
-    val state = viewModel.state.collectAsState()
-    val playlists = state.value.playlists
-    val context = LocalContext.current
+    val state by viewModel.state.collectAsState()
+    val playlists = state.playlists
     var selectedPlaylist by remember { mutableStateOf<Playlist?>(null) }
     var showCreatePlaylistDialog by remember { mutableStateOf(false) }
     var showRenamePlaylistDialog by remember { mutableStateOf(false) }
+
+    val playlistIndex = playlists.map { it.id }.indexOf(state.playerPlaylist?.id)
+
 
     LaunchedEffect(Unit) {
         if(playlists.isEmpty()){ viewModel.processIntent(MviIntent.LoadPlaylistsOfUser) }
@@ -71,9 +71,11 @@ fun PlaylistScreen(
             ) {
                 items(playlists.size) {
                     var showOption by remember { mutableStateOf(false) }
+                    val isPlay = it==playlistIndex
                     PlaylistItem(
                         modifier = Modifier.fillMaxWidth(),
                         playlist = playlists[it],
+                        isPlay = isPlay,
                         showDropDown = showOption,
                         onClickShowDropDown = {
                             showOption = true

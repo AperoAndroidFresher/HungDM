@@ -1,5 +1,6 @@
 package com.example.hungdm.screen.player.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,6 +24,8 @@ fun PlayerHeader(
     onBack: () -> Unit = {},
     onClose: ()->Unit = {},
 ) {
+    BackHandler { onBack() }
+
     Box(
         modifier = modifier.fillMaxWidth(),
     ) {
@@ -38,7 +42,7 @@ fun PlayerHeader(
         }
 
         Text(
-            text = "Now playing",
+            text = stringResource(R.string.now_play),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = colorScheme.primary,

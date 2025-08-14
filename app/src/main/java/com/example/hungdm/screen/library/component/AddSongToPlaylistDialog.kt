@@ -2,9 +2,11 @@ package com.example.hungdm.screen.library.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,12 +24,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.hungdm.R
 import com.example.hungdm.domain.model.Playlist
+import com.example.hungdm.screen.component.PlaylistImage
+import com.example.hungdm.screen.component.PlaylistInfo
 
 @Composable
 fun AddSongToPlaylistDialog(
@@ -48,7 +53,7 @@ fun AddSongToPlaylistDialog(
                 .padding(20.dp)
         ) {
             Text(
-                text = "Choose playlist",
+                text = stringResource(R.string.choose_playlist),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -57,7 +62,7 @@ fun AddSongToPlaylistDialog(
             if (playlists.isEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "You don’t have any playlists.\n Click the '+' button to add",
+                    text = stringResource(R.string.empty_playlist),
                     color = Color.White
                 )
 
@@ -76,7 +81,7 @@ fun AddSongToPlaylistDialog(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(playlists.size) {
-                        PlaylistItem(
+                        PlaylistItemLibrary(
                             playlist = playlists[it],
                             onAddSongToPlaylist = {
                                 onAddSongToPlaylist(playlists[it])
@@ -86,5 +91,29 @@ fun AddSongToPlaylistDialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PlaylistItemLibrary(
+    modifier: Modifier = Modifier,
+    playlist: Playlist = Playlist(),
+    onAddSongToPlaylist: () -> Unit = {}
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable {
+                onAddSongToPlaylist()
+            }
+    ) {
+        PlaylistImage()
+        Spacer(Modifier.size(8.dp))
+
+        PlaylistInfo(
+            title = playlist.title,
+            songNumberStr = playlist.songNumber
+        )
     }
 }

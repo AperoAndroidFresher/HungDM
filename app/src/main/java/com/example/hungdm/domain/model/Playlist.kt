@@ -12,5 +12,4 @@ data class Playlist(
     val listSong: MutableList<Song> = mutableListOf(),
 ): Parcelable {
     val songNumber = listSong.size
-    val songNumberStr =  "${listSong.size} songs"
 }

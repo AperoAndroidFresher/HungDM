@@ -8,10 +8,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.example.hungdm.MainActivity
 import com.example.hungdm.R
 
 class NotificationHelper(private val context: Context) {
     private val channelId = "music_channel"
+    private val notificationId = 1
+
+    private val notificationManager: NotificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
 
     init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -27,6 +33,15 @@ class NotificationHelper(private val context: Context) {
 
 
     fun createNotification(songTitle: String, isPlaying: Boolean): Notification {
+        return buildNotification(songTitle,isPlaying)
+    }
+
+    fun updateNotification(songTitle: String, isPlaying: Boolean) {
+        val notification = buildNotification(songTitle, isPlaying)
+        notificationManager.notify(notificationId, notification)
+    }
+
+    private fun buildNotification(songTitle: String, isPlaying: Boolean): Notification {
         val prevIntent = Intent(context, AppService::class.java).apply {
             action = AppService.ACTION_PREVIOUS
         }
@@ -59,10 +74,19 @@ class NotificationHelper(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val openAppIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val openAppPendingIntent = PendingIntent.getActivity(
+            context, 100, openAppIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         return NotificationCompat.Builder(context, channelId)
             .setContentTitle(songTitle)
             .setSmallIcon(R.drawable.logoapp)
             .setOngoing(isPlaying)
+            .setContentIntent(openAppPendingIntent)
             .addAction(R.drawable.baseline_skip_previous_24, "", prevPending)
             .addAction(
                 if (isPlaying) R.drawable.baseline_pause_24 else R.drawable.baseline_play_arrow_24,

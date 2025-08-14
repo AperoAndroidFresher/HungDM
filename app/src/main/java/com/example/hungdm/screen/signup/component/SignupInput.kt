@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.R
 import com.example.hungdm.component.InputPassword
@@ -31,7 +32,7 @@ fun SignupInput(
         modifier = modifier.wrapContentSize()
     ) {
         InputText(
-            title = "Username",
+            title = stringResource(R.string.username),
             value = userInfo.username,
             isValid = userInfo.inputValid.userValid,
             onValueChange = onValueChangeUsername
@@ -39,7 +40,7 @@ fun SignupInput(
 
         Spacer(Modifier.size(10.dp))
         InputPassword(
-            title = "Password",
+            title = stringResource(R.string.password),
             value = userInfo.password,
             isValid = userInfo.inputValid.passValid,
             showPass = showPass,
@@ -49,7 +50,7 @@ fun SignupInput(
 
         Spacer(Modifier.size(10.dp))
         InputPassword(
-            title = "Confirm password",
+            title = stringResource(R.string.confirm_password),
             value = userInfo.pass2,
             isValid = userInfo.inputValid.pass2valid,
             showPass = showPass2,
@@ -59,7 +60,7 @@ fun SignupInput(
 
         Spacer(Modifier.size(10.dp))
         InputText(
-            title = "Email",
+            title = stringResource(R.string.email),
             value = userInfo.email,
             isValid = userInfo.inputValid.emailValid,
             leadingIcon = R.drawable.outline_mail_24,

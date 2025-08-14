@@ -1,6 +1,7 @@
-package com.example.hungdm.screen.profile.component
+package com.example.hungdm.screen.playlistdetail.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -18,39 +19,39 @@ import androidx.compose.ui.unit.sp
 import com.example.hungdm.R
 
 @Composable
-fun ProfileHeader(
+fun PlaylistDetailHeader(
     modifier: Modifier = Modifier,
-    isEdit: Boolean = false,
-    darkTheme: Boolean = true,
-    onChangeTheme: ()->Unit = {},
-    onEdit: () -> Unit = {},
+    isLinear: Boolean,
+    onClick: ()->Unit = {},
+    onSort: ()->Unit = {},
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
     ) {
-        IconButton(
-            onClick = onChangeTheme
-        ) {
-            Icon(
-                painter = painterResource(if(darkTheme) R.drawable.light else R.drawable.dark),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-            )
-        }
         Text(
-            text = stringResource(R.string.my_info),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Medium,
+            text = stringResource(R.string.playlist_detail),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
             color = colorScheme.primary,
             modifier = Modifier.align(Alignment.Center)
         )
-        if (!isEdit) {
+
+        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
             IconButton(
-                onClick = onEdit,
-                modifier = Modifier.align(Alignment.TopEnd)
+                onClick = onClick,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.outline_edit_24),
+                    painter = painterResource(if(isLinear) R.drawable.type else R.drawable.abou1),
+                    contentDescription = null,
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            IconButton(
+                onClick = onSort,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.sort),
                     contentDescription = null,
                     tint = colorScheme.primary,
                     modifier = Modifier.size(20.dp)

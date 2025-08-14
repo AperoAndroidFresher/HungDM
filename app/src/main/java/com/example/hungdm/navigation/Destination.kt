@@ -1,4 +1,4 @@
-package com.example.hungdm.screen.navigation
+package com.example.hungdm.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.example.hungdm.domain.model.UserInfo
@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 
 sealed interface Destination: NavKey {
-
+    data object Splash: Destination
     data object Login: Destination
     data object Signup : Destination
     data object Home: Destination

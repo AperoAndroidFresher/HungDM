@@ -1,4 +1,4 @@
-package com.example.hungdm.screen.navigation
+package com.example.hungdm.navigation
 
 import android.app.Activity
 import android.widget.Toast
@@ -27,17 +27,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.example.hungdm.R
+import com.example.hungdm.component.Splash
 import com.example.hungdm.screen.SettingScreen
 import com.example.hungdm.screen.component.PlayerBottomBar
-import com.example.hungdm.screen.mvi.MviEvent
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviEvent
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.home.HomeScreen
 import com.example.hungdm.screen.library.LibraryScreen
 import com.example.hungdm.screen.login.LoginScreen
-import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.screen.player.PlayerScreen
 import com.example.hungdm.screen.playlistdetail.PlaylistDetailScreen
 import com.example.hungdm.screen.playlist.PlaylistScreen
@@ -48,6 +52,7 @@ import com.example.hungdm.screen.TopArtistsScreen
 import com.example.hungdm.screen.TopTracksScreen
 import com.example.hungdm.ui.theme.AppTheme
 import com.example.hungdm.utils.AppUtils
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -55,24 +60,24 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
     val viewModel: MviViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
-    val backStack = remember { mutableStateListOf<Destination>(Destination.Login) }
+    val backStack = remember { mutableStateListOf<Destination>(Destination.Splash) }
     val context = LocalContext.current
     val activity = context as? Activity
 
-    val bottomItem = listOf(
-        BottomItem("Home", Icons.Default.Home, Destination.Home),
-        BottomItem("Library", Icons.Default.DateRange, Destination.Library),
-        BottomItem("Playlist", Icons.Default.PlayArrow, Destination.Playlist)
-    )
     var selectedBottomBar by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         val userId = AppUtils.getUser(context)
 
         if (userId != null) {
+            viewModel.processIntent(MviIntent.GetUser(userId))
+            delay(2000)
             backStack.clear()
             backStack.add(Destination.Home)
-            viewModel.processIntent(MviIntent.GetUser(userId))
+        } else{
+            delay(2000)
+            backStack.clear()
+            backStack.add(Destination.Login)
         }
     }
 
@@ -129,13 +134,17 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     ) {
         Scaffold(
             bottomBar = {
-                val showBottomNav = backStack.lastOrNull()?.let {
-                    it !is Destination.Login && it !is Destination.Signup && it !is Destination.Profile &&
-                            it !is Destination.Player && it !is Destination.TopTracks &&
-                            it !is Destination.TopAlbums && it !is Destination.TopArtists
+                val showBottomBar = backStack.lastOrNull()?.let {
+                    it is Destination.Home || it is Destination.Playlist ||
+                            it is Destination.Library || it is Destination.PlaylistDetail
                 } ?: false
 
-                if (showBottomNav) {
+                if (showBottomBar) {
+                    val bottomItem = listOf(
+                        BottomItem(stringResource(R.string.home), R.drawable.outline_home_24, Destination.Home),
+                        BottomItem(stringResource(R.string.library), R.drawable.outline_library_music_24, Destination.Library),
+                        BottomItem(stringResource(R.string.playlist), R.drawable.outline_playlist_play_24, Destination.Playlist)
+                    )
                     Column {
                         if(state.playerPlaylist!=null || state.playerListSong!=null){
                             PlayerBottomBar(
@@ -145,11 +154,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                 onClick = {
                                     backStack.add(Destination.Player)
                                 },
-                                onPauseClick = {
-                                    viewModel.processIntent(MviIntent.OnChangeSongPlayState(context))
+                                onCLickPause = {
+                                    viewModel.processIntent(MviIntent.OnChangeSongPlayState)
                                 },
-                                onCloseClick = {
-                                    viewModel.processIntent(MviIntent.OnClickClosePlayer(context))
+                                onClickClose = {
+                                    viewModel.processIntent(MviIntent.OnClickClosePlayer)
                                 }
                             )
                         }
@@ -165,7 +174,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                                         backStack.clear()
                                         backStack.add(item.destination)
                                     },
-                                    icon = { Icon(item.icon, null) },
+                                    icon = { Icon(painterResource(item.icon), null) },
                                     label = { Text(item.label, color = colorScheme.primary) }
                                 )
                             }
@@ -179,6 +188,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 backStack = backStack,
                 onBack = { backStack.removeLastOrNull() },
                 entryProvider = entryProvider {
+                    entry<Destination.Splash> {
+                        Splash()
+                    }
                     entry<Destination.Login> {
                         LoginScreen(
                             viewModel = viewModel
@@ -222,7 +234,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     entry<Destination.PlaylistDetail> { destination ->
                         PlaylistDetailScreen(
                             viewModel = viewModel,
-                            destination = destination,
+                            playlistId = destination.playlistID,
                             onBack = { backStack.removeLastOrNull() }
                         )
                     }
@@ -263,6 +275,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
 data class BottomItem(
     var label: String,
-    var icon: ImageVector,
+    var icon: Int,
     val destination: Destination
 )

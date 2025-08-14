@@ -1,4 +1,4 @@
-package com.example.hungdm.screen.mvi
+package com.example.hungdm.mvi
 
 import android.content.Context
 import com.example.hungdm.data.remote.musicApi.dto.TopAlbums
@@ -24,7 +24,9 @@ data class MviState(
     val playerSongIndex: Int? = null,
     val playerSong: Song? = null,
     val playerTime: Long = 0,
-    val isPlay: Boolean = false
+    val isPlay: Boolean = false,
+    val isShuffle: Boolean = false,
+    val isRepeat: Boolean = false
 )
 
 sealed interface MviIntent{
@@ -52,11 +54,14 @@ sealed interface MviIntent{
     data class RemoveSongInPlaylist(val song: Song, val playlist: Playlist): MviIntent
     data class OnClickPlaylistDetail(val playlistId: Long) : MviIntent
 
-    data class OnClickPlayer(val song: Song, val playerListSong: List<Song>?, val playerPlaylist: Playlist?, val context: Context) : MviIntent
-    data class OnClickClosePlayer(val context: Context): MviIntent
-    data class OnChangeSongPlayState(val context: Context): MviIntent
-    data class OnClickNextSong(val context: Context): MviIntent
-    data class OnClickPreviousSong(val context: Context): MviIntent
+    data class OnClickPlayer(val song: Song, val playerListSong: List<Song>?, val playerPlaylist: Playlist?) : MviIntent
+    data object OnClickClosePlayer: MviIntent
+    data object OnChangeSongPlayState: MviIntent
+    data object OnClickNextSong: MviIntent
+    data object OnClickPreviousSong: MviIntent
+    data object OnClickShuffle: MviIntent
+    data object OnClickRepeat: MviIntent
+    data class OnSeek(val position: Int): MviIntent
 
     data object ChangeTheme : MviIntent
 }

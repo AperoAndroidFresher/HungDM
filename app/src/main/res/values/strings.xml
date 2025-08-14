@@ -1,5 +1,73 @@
 <resources>
     <string name="app_name">HungDM</string>
-    <string name="title_activity_signup">SignupActivity</string>
-    <string name="title_activity_login">LoginActivity</string>
+
+    <string name="login_title">Login to your account</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login_btn">Login</string>
+    <string name="remember">Remember me</string>
+    <string name="login_footer">Don’t have an account? Sign Up</string>
+
+
+    <string name="signup">Sign up</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="email">Email</string>
+    <string name="invalid_format">Invalid format</string>
+
+    <string name="welcome_back">Welcome back!</string>
+    <string name="ranking">Rankings</string>
+    <string name="top_album">Top Albums</string>
+    <string name="top_track">Top Tracks</string>
+    <string name="top_artist">Top Artists</string>
+    <string name="see_all">See all</string>
+    <string name="home">Home</string>
+    <string name="no_internet">No internet connection, \nplease check your \nconnection again</string>
+    <string name="try_again">Try again</string>
+
+    <string name="language">Language</string>
+    <string name="english">English</string>
+    <string name="vietnamese">Vietnamese</string>
+    <string name="japanese">Japanese</string>
+
+    <string name="my_info">My Information</string>
+    <string name="name">Name</string>
+    <string name="enter_name">Enter your name…</string>
+    <string name="phone_number">Phone number</string>
+    <string name="enter_phone">Your phone number…</string>
+    <string name="university">University name</string>
+    <string name="enter_uni">Your unisersity name…</string>
+    <string name="desc">Describe yourself</string>
+    <string name="enter_desc">Enter a description about yourself…</string>
+    <string name="submit">Submit</string>
+    <string name="logout">Log out</string>
+
+    <string name="library">Library</string>
+    <string name="local">Local</string>
+    <string name="remote">Remote</string>
+    <string name="add_playlist">Add to playlist</string>
+    <string name="share">Share</string>
+    <string name="choose_playlist">Choose playlist</string>
+
+    <string name="playlist">Playlist</string>
+    <string name="empty_playlist">You don\'t have any\nplaylists. Click the\n “+” button to add</string>
+    <string name="new_playlist">New playlist</string>
+    <string name="enter_name_playlist">Give your playlist a title</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
+    <string name="remove_playlist">Remove playlist</string>
+    <string name="rename">Rename</string>
+
+    <string name="playlist_detail">Playlist detail</string>
+    <string name="remove_song">Remove from playlist</string>
+
+    <string name="now_play">Now playing</string>
+    <string name="song_number"> songs</string>
+    <string name="pop_up">Your information has\nbeen updated!</string>
+    <string name="setting">Settings</string>
+
+    <string name="login_failed">Login failed</string>
+
+    <string name="success">Success!</string>
+    <string name="sorting">Sorting</string>
+
 </resources>

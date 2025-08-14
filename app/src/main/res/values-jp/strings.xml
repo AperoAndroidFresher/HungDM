@@ -1,0 +1,70 @@
+<resources>
+    <string name="app_name">HungDM</string>
+
+    <string name="login_title">アカウントにログイン</string>
+    <string name="username">ユーザー名</string>
+    <string name="password">パスワード</string>
+    <string name="login_btn">ログイン</string>
+    <string name="remember">ログイン状態を保持</string>
+    <string name="login_footer">アカウントをお持ちでないですか？ 新規登録</string>
+
+    <string name="signup">新規登録</string>
+    <string name="confirm_password">パスワードを確認</string>
+    <string name="email">メールアドレス</string>
+    <string name="invalid_format">無効な形式です</string>
+
+    <string name="welcome_back">お帰りなさい！</string>
+    <string name="ranking">ランキング</string>
+    <string name="top_album">トップアルバム</string>
+    <string name="top_track">トップ曲</string>
+    <string name="top_artist">トップアーティスト</string>
+    <string name="see_all">すべて表示</string>
+    <string name="home">ホーム</string>
+    <string name="no_internet">インターネットに接続されていません。\n接続を確認してください。</string>
+    <string name="try_again">再試行</string>
+
+    <string name="language">言語</string>
+    <string name="english">英語</string>
+    <string name="vietnamese">ベトナム語</string>
+    <string name="japanese">日本語</string>
+
+    <string name="my_info">マイ情報</string>
+    <string name="name">氏名</string>
+    <string name="enter_name">氏名を入力…</string>
+    <string name="phone_number">電話番号</string>
+    <string name="enter_phone">電話番号を入力…</string>
+    <string name="university">大学名</string>
+    <string name="enter_uni">大学名を入力…</string>
+    <string name="desc">自己紹介</string>
+    <string name="enter_desc">自己紹介を入力…</string>
+    <string name="submit">送信</string>
+    <string name="logout">ログアウト</string>
+
+    <string name="library">ライブラリ</string>
+    <string name="local">ローカル</string>
+    <string name="remote">オンライン</string>
+    <string name="add_playlist">プレイリストに追加</string>
+    <string name="share">共有</string>
+    <string name="choose_playlist">プレイリストを選択</string>
+
+    <string name="playlist">プレイリスト</string>
+    <string name="empty_playlist">プレイリストがありません。\n「+」ボタンを押して追加</string>
+    <string name="new_playlist">新しいプレイリスト</string>
+    <string name="enter_name_playlist">プレイリストの名前を入力</string>
+    <string name="cancel">キャンセル</string>
+    <string name="create">作成</string>
+    <string name="remove_playlist">プレイリストを削除</string>
+    <string name="rename">名前を変更</string>
+
+    <string name="playlist_detail">プレイリスト詳細</string>
+    <string name="remove_song">プレイリストから削除</string>
+
+    <string name="now_play">再生中</string>
+    <string name="song_number"> 曲</string>
+    <string name="pop_up">あなたの情報が更新されました！</string>
+    <string name="setting">設定</string>
+
+    <string name="login_failed">ログインに失敗しました</string>
+    <string name="success">成功！</string>
+    <string name="sorting">ソート</string>
+</resources>

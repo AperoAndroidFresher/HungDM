@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +35,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.hungdm.R
 import com.example.hungdm.screen.component.NoInternet
-import com.example.hungdm.screen.mvi.MviIntent
+import com.example.hungdm.mvi.MviIntent
 import com.example.hungdm.screen.home.component.HomeHeader
 import com.example.hungdm.screen.home.component.TopAlbums
 import com.example.hungdm.screen.home.component.TopArtists
@@ -59,11 +59,10 @@ fun HomeScreen(
     LaunchedEffect(isLoading) {
         if (isLoading) {
             viewModel.processIntent(MviIntent.LoadMusicData(context))
-            delay(2000)
+            delay(3000)
             isLoading = false
         }
     }
-
     if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_AUDIO)
         != PackageManager.PERMISSION_GRANTED
     ) {
@@ -74,7 +73,6 @@ fun HomeScreen(
             100
         )
     }
-
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -88,8 +86,6 @@ fun HomeScreen(
             )
         }
     }
-
-
 
     BackHandler { onBack() }
 
@@ -111,7 +107,7 @@ fun HomeScreen(
                 viewModel.processIntent(MviIntent.OnClickSetting)
             }
         )
-        Spacer(modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.size(10.dp))
 
         if (topAlbums == null || topTracks == null || topArtists == null) {
             if (isLoading) {

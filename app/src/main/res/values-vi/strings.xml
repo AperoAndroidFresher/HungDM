@@ -1,0 +1,71 @@
+<resources>
+    <string name="app_name">HungDM</string>
+
+    <string name="login_title">Đăng nhập vào tài khoản của bạn</string>
+    <string name="username">Tên đăng nhập</string>
+    <string name="password">Mật khẩu</string>
+    <string name="login_btn">Đăng nhập</string>
+    <string name="remember">Ghi nhớ tôi</string>
+    <string name="login_footer">Chưa có tài khoản? Đăng ký</string>
+
+    <string name="signup">Đăng ký</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="email">Email</string>
+    <string name="invalid_format">Định dạng không hợp lệ</string>
+
+    <string name="welcome_back">Chào mừng bạn quay lại!</string>
+    <string name="ranking">Bảng xếp hạng</string>
+    <string name="top_album">Album hàng đầu</string>
+    <string name="top_track">Bài hát hàng đầu</string>
+    <string name="top_artist">Nghệ sĩ hàng đầu</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="home">Trang chủ</string>
+    <string name="no_internet">Không có kết nối internet,\n vui lòng kiểm tra kết nối\n của bạn</string>
+    <string name="try_again">Thử lại</string>
+
+    <string name="language">Ngôn ngữ</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="japanese">Tiếng Nhật</string>
+
+    <string name="my_info">Thông tin của tôi</string>
+    <string name="name">Họ và tên</string>
+    <string name="enter_name">Nhập họ và tên…</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="enter_phone">Nhập số điện thoại…</string>
+    <string name="university">Tên trường đại học</string>
+    <string name="enter_uni">Nhập tên trường đại học…</string>
+    <string name="desc">Mô tả bản thân</string>
+    <string name="enter_desc">Nhập mô tả về bản thân…</string>
+    <string name="submit">Lưu</string>
+    <string name="logout">Đăng xuất</string>
+
+    <string name="library">Thư viện</string>
+    <string name="local">Cục bộ</string>
+    <string name="remote">Trực tuyến</string>
+    <string name="add_playlist">Thêm vào playlist</string>
+    <string name="share">Chia sẻ</string>
+    <string name="choose_playlist">Chọn playlist</string>
+
+    <string name="playlist">Playlist</string>
+    <string name="empty_playlist">Bạn chưa có playlist nào.\nNhấn nút “+” để thêm</string>
+    <string name="new_playlist">Playlist mới</string>
+    <string name="enter_name_playlist">Đặt tên cho playlist</string>
+    <string name="cancel">Hủy</string>
+    <string name="create">Tạo</string>
+    <string name="remove_playlist">Xóa playlist</string>
+    <string name="rename">Đổi tên</string>
+
+    <string name="playlist_detail">Chi tiết playlist</string>
+    <string name="remove_song">Xóa khỏi playlist</string>
+
+    <string name="now_play">Đang phát</string>
+    <string name="song_number"> bài hát</string>
+    <string name="pop_up">Thông tin của bạn đã được\ncập nhật!</string>
+    <string name="setting">Cài đặt</string>
+
+    <string name="login_failed">Đăng nhập thất bại</string>
+    <string name="success">Thành công!</string>
+    <string name="sorting">Sắp xếp</string>
+
+</resources>

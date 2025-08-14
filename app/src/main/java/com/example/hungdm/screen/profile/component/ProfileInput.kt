@@ -20,11 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hungdm.R
 import com.example.hungdm.domain.model.UserInfo
 
 @Composable
@@ -45,8 +47,8 @@ fun ProfileInput(
         Row {
             ProfileInputItem(
                 modifier = Modifier.width(160.dp),
-                text = "Name".uppercase(),
-                hint = "Enter your name...",
+                text = stringResource(R.string.name),
+                hint = stringResource(R.string.enter_name),
                 value = userInfo.name,
                 isValid = userInfo.inputValid.nameValid,
                 isEdit = isEdit,
@@ -55,8 +57,8 @@ fun ProfileInput(
             Spacer(Modifier.weight(1f))
             ProfileInputItem(
                 modifier = Modifier.width(180.dp),
-                text = "Phone number".uppercase(),
-                hint = "Your phone number...",
+                text = stringResource(R.string.phone_number),
+                hint = stringResource(R.string.enter_phone),
                 value = userInfo.phone,
                 isValid = userInfo.inputValid.phoneValid,
                 isEdit = isEdit,
@@ -67,8 +69,8 @@ fun ProfileInput(
         Spacer(Modifier.size(10.dp))
         ProfileInputItem(
             modifier = Modifier.fillMaxWidth(),
-            text = "University name".uppercase(),
-            hint = "Your university name...",
+            text = stringResource(R.string.university),
+            hint = stringResource(R.string.enter_uni),
             value = userInfo.uni,
             isValid = userInfo.inputValid.uniValid,
             isEdit = isEdit,
@@ -78,9 +80,9 @@ fun ProfileInput(
         ProfileInputItem(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp),
-            text = "describe yourself".uppercase(),
-            hint = "Enter a description about yourself...",
+                .height(150.dp),
+            text = stringResource(R.string.desc),
+            hint = stringResource(R.string.enter_desc),
             value = userInfo.desc,
             isEdit = isEdit,
             onValueChange = onValueChangeDesc
@@ -95,18 +97,18 @@ fun ProfileInput(
                     .width(170.dp)
                     .height(60.dp),
             ) {
-                Text(text = "Submit", fontSize = 16.sp, color = Color.White)
+                Text(text = stringResource(R.string.submit), fontSize = 16.sp, color = Color.White)
             }
         } else {
             Button(
                 onClick = onLogout,
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(colorScheme.onSecondary),
+                colors = ButtonDefaults.buttonColors(colorScheme.surfaceTint),
                 modifier = Modifier
                     .width(170.dp)
                     .height(60.dp),
             ) {
-                Text(text = "Log out", fontSize = 16.sp, color = Color.Red)
+                Text(text = stringResource(R.string.logout), fontSize = 16.sp, color = Color.Red)
             }
         }
     }
@@ -131,7 +133,6 @@ fun ProfileInputItem(
             color = colorScheme.primary
         )
 
-
         OutlinedTextField(
             modifier = modifier.background(colorScheme.onSecondary),
             textStyle = TextStyle(
@@ -149,7 +150,7 @@ fun ProfileInputItem(
         Spacer(Modifier.size(4.dp))
         if (!isValid) {
             Text(
-                text = "Invalid format",
+                text = stringResource(R.string.invalid_format),
                 color = Color.Red
             )
         }

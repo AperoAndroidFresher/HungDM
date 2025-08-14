@@ -32,8 +32,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.example.hungdm.utils.AppUtils
 import com.example.hungdm.R
-import com.example.hungdm.screen.mvi.MviIntent
-import com.example.hungdm.screen.mvi.MviViewModel
+import com.example.hungdm.mvi.MviIntent
+import com.example.hungdm.mvi.MviViewModel
 import com.example.hungdm.screen.profile.component.Avatar
 import com.example.hungdm.screen.profile.component.PopUp
 import com.example.hungdm.screen.profile.component.ProfileHeader
@@ -48,10 +48,8 @@ fun ProfileScreen(
     onBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val state = viewModel.state.collectAsState()
-    var userInfo by remember { mutableStateOf(state.value.userInfo) }
-    var showPopup by remember { mutableStateOf(false) }
-    var isEdit by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsState()
+    var userInfo by remember { mutableStateOf(state.userInfo) }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri: Uri? ->
@@ -63,14 +61,16 @@ fun ProfileScreen(
                 val inputStream = context.contentResolver.openInputStream(it)
                 val byteArray = inputStream?.use { stream -> stream.readBytes() }
 
-                byteArray?.let {
-                    userInfo = userInfo.copy(img = it)
+                byteArray?.let { byteArr ->
+                    userInfo = userInfo.copy(img = byteArr)
                 }
             }
         }
     )
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
+    var showPopup by remember { mutableStateOf(false) }
+    var isEdit by remember { mutableStateOf(false) }
 
     BackHandler { onBack() }
 
@@ -79,7 +79,7 @@ fun ProfileScreen(
         modifier = modifier
             .background(colorScheme.background)
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp)
+            .padding(start = 8.dp, end = 8.dp)
             .pointerInput(Unit) {
                 detectTapGestures {
                     focusManager.clearFocus()
@@ -88,18 +88,14 @@ fun ProfileScreen(
     ) {
         ProfileHeader(
             isEdit = isEdit,
-            darkTheme = state.value.darkTheme,
-            onChangeTheme = {
-                viewModel.processIntent(MviIntent.ChangeTheme)
-            },
+            darkTheme = state.darkTheme,
+            onChangeTheme = { viewModel.processIntent(MviIntent.ChangeTheme) },
             onEdit = { isEdit = !isEdit }
         )
-        Spacer(Modifier.size(20.dp))
+        Spacer(Modifier.size(10.dp))
         Avatar(
             isEdit = isEdit,
-            onChangeAvatar = {
-                launcher.launch(arrayOf("image/*"))
-            },
+            onChangeAvatar = { launcher.launch(arrayOf("image/*")) },
             image = userInfo.img ?: R.drawable.img
         )
         Spacer(Modifier.size(20.dp))
@@ -146,12 +142,6 @@ fun ProfileScreen(
                 viewModel.processIntent(MviIntent.OnLogout(context))
             }
         )
-        PopUp(
-            modifier = Modifier
-                .background(Color(0xFFFEFEFE), RoundedCornerShape(20.dp))
-                .height(350.dp)
-                .width(330.dp),
-            visible = showPopup
-        )
+        PopUp(visible = showPopup)
     }
 }

@@ -1,12 +1,15 @@
 package com.example.hungdm.utils
 
+import android.app.Activity
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.edit
 import com.example.hungdm.domain.model.Song
+import java.util.Locale
 
 object AppUtils {
     private const val PREF_NAME = "user_prefs"
@@ -94,6 +97,45 @@ object AppUtils {
         }
 
         context.startActivity(Intent.createChooser(shareIntent, "Send"))
+    }
+
+    fun setLocale(context: Context, language: String): Context {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(locale)
+
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+        return context
+    }
+
+    fun getSavedLangCode(context: Context): String {
+        return context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            .getString("lang_code", "en") ?: "en"
+    }
+
+    fun setAppLanguage(langCode: String, context: Context) {
+        saveLangCode(context, langCode)
+        val locale = Locale(langCode)
+        Locale.setDefault(locale)
+
+        val config = context.resources.configuration
+        config.setLocale(locale)
+        config.setLayoutDirection(locale)
+
+        @Suppress("DEPRECATION")
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+
+        if (context is Activity) {
+            context.window.decorView.requestLayout()
+        }
+    }
+
+    private fun saveLangCode(context: Context, langCode: String) {
+        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).edit {
+            putString("lang_code", langCode)
+        }
     }
 
     private fun noSpace(input: String): Boolean {

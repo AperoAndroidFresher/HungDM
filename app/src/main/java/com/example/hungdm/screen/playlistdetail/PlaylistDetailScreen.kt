@@ -38,13 +38,13 @@ fun PlaylistDetailScreen(
     playlistId: Long,
     onBack: () -> Unit = {}
 ) {
-
     val state by viewModel.state.collectAsState()
     val playlist = state.playlists.find { it.id == playlistId }
     val songPlayIndex = if(playlist!!.id==state.playerPlaylist?.id) {
         state.playerSongIndex
     } else null
     var isLinear by remember { mutableStateOf(true) }
+    var isSort by remember { mutableStateOf(false) }
 
     BackHandler {
         onBack()
@@ -57,69 +57,83 @@ fun PlaylistDetailScreen(
             .padding(start = 8.dp, end = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        PlaylistDetailHeader(
-            isLinear = isLinear,
-            onClick = {
-                isLinear = !isLinear
-            }
-        )
+        if(!isSort){
+            PlaylistDetailHeader(
+                isLinear = isLinear,
+                onClick = {
+                    isLinear = !isLinear
+                },
+                onSort = {
+//                    isSort=true
+//                    isLinear=true
+                }
+            )
 
-        Spacer(Modifier.size(10.dp))
+            Spacer(Modifier.size(10.dp))
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(if(isLinear) 1 else 2),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(if(isLinear) 8.dp else 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(playlist.listSong.size){
-                val isPlay = it==songPlayIndex
-                if(isLinear){
-                    var showOption by remember { mutableStateOf(false) }
-                    SongItemLinear(
-                        isPlay = isPlay,
-                        song = playlist.listSong[it],
-                        showOption = showOption,
-                        onClickShowOption = { showOption = true },
-                        onClickOption1 = {
-                            viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
-                        },
-                        onClickOption2 = {},
-                        onDismissRequest = { showOption = false },
-                        onCLickSongPlay = {
-                            viewModel.processIntent(
-                                MviIntent.OnClickPlayer(
-                                    song = playlist.listSong[it],
-                                    playerListSong = null,
-                                    playerPlaylist = playlist
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(if(isLinear) 1 else 2),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(if(isLinear) 8.dp else 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(playlist.listSong.size){
+                    val isPlay = it==songPlayIndex
+                    if(isLinear){
+                        var showOption by remember { mutableStateOf(false) }
+                        SongItemLinear(
+                            isPlay = isPlay,
+                            song = playlist.listSong[it],
+                            showOption = showOption,
+                            onClickShowOption = { showOption = true },
+                            onClickOption1 = {
+                                viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
+                            },
+                            onClickOption2 = {},
+                            onDismissRequest = { showOption = false },
+                            onCLickSongPlay = {
+                                viewModel.processIntent(
+                                    MviIntent.OnClickPlayer(
+                                        song = playlist.listSong[it],
+                                        playerListSong = null,
+                                        playerPlaylist = playlist
+                                    )
                                 )
-                            )
-                        }
-                    )
-                } else {
-                    var showOption by remember { mutableStateOf(false) }
-                    SongItemGrid(
-                        isPlay = isPlay,
-                        song = playlist.listSong[it],
-                        showOption = showOption,
-                        onClickShowOption = { showOption = true },
-                        onClickOption1 = {
-                            viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
-                        },
-                        onClickOption2 = {},
-                        onDismissRequest = { showOption = false },
-                        onCLickSongPlay = {
-                            viewModel.processIntent(
-                                MviIntent.OnClickPlayer(
-                                    song = playlist.listSong[it],
-                                    playerListSong = null,
-                                    playerPlaylist = playlist
+                            }
+                        )
+                    } else {
+                        var showOption by remember { mutableStateOf(false) }
+                        SongItemGrid(
+                            isPlay = isPlay,
+                            song = playlist.listSong[it],
+                            showOption = showOption,
+                            onClickShowOption = { showOption = true },
+                            onClickOption1 = {
+                                viewModel.processIntent(MviIntent.RemoveSongInPlaylist(playlist.listSong[it], playlist))
+                            },
+                            onClickOption2 = {},
+                            onDismissRequest = { showOption = false },
+                            onCLickSongPlay = {
+                                viewModel.processIntent(
+                                    MviIntent.OnClickPlayer(
+                                        song = playlist.listSong[it],
+                                        playerListSong = null,
+                                        playerPlaylist = playlist
+                                    )
                                 )
-                            )
-                        }
-                    )
+                            }
+                        )
+                    }
                 }
             }
+        } else {
+//            SortHeader(
+//                onBack = {
+//                    isSort = false
+//                }
+//            )
+//            Spacer(Modifier.size(10.dp))
+//            SortContent(playlist = playlist)
         }
     }
 }

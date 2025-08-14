@@ -1,6 +1,7 @@
 package com.example.hungdm.screen.playlistdetail.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -22,6 +23,7 @@ fun PlaylistDetailHeader(
     modifier: Modifier = Modifier,
     isLinear: Boolean,
     onClick: ()->Unit = {},
+    onSort: ()->Unit = {},
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
@@ -34,16 +36,27 @@ fun PlaylistDetailHeader(
             modifier = Modifier.align(Alignment.Center)
         )
 
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier.align(Alignment.TopEnd)
-        ) {
-            Icon(
-                painter = painterResource(if(isLinear) R.drawable.type else R.drawable.abou1),
-                contentDescription = null,
-                tint = colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
+        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+            IconButton(
+                onClick = onClick,
+            ) {
+                Icon(
+                    painter = painterResource(if(isLinear) R.drawable.type else R.drawable.abou1),
+                    contentDescription = null,
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            IconButton(
+                onClick = onSort,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.sort),
+                    contentDescription = null,
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }

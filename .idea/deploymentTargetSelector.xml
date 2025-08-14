@@ -2,10 +2,13 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="MainActivity">
+      <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SortScreen">
+      <SelectionState runConfigName="DropAndDrag">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="VerticalReorderList">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

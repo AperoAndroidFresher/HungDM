@@ -66,5 +66,6 @@
 
     <string name="login_failed">Đăng nhập thất bại</string>
     <string name="success">Thành công!</string>
+    <string name="sorting">Sắp xếp</string>
 
 </resources>

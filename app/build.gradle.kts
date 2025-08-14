@@ -85,4 +85,9 @@ dependencies {
     implementation("androidx.media:media:1.7.0")
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
+    implementation("com.ernestoyaquello.dragdropswipelazycolumn:drag-drop-swipe-lazycolumn:0.10.1")
+
+    implementation("androidx.compose.foundation:foundation:1.8.3")
+    implementation("androidx.compose.runtime:runtime:1.8.3")
+
 }

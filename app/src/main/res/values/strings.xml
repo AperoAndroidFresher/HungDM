@@ -68,5 +68,6 @@
     <string name="login_failed">Login failed</string>
 
     <string name="success">Success!</string>
+    <string name="sorting">Sorting</string>
 
 </resources>
